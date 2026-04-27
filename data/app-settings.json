@@ -1,0 +1,32 @@
+{
+  "planner.warehouse_time_motion.loading_rate_cases_per_hour": {
+    "value": "1500",
+    "value_type": "number",
+    "description": "Warehouse Time Motion — Loading Rate (Cases/Hour)"
+  },
+  "planner.warehouse_time_motion.start_picking_time": {
+    "value": "13:00",
+    "value_type": "string",
+    "description": "Warehouse Time Motion — Start Picking Time (HH:mm)"
+  },
+  "planner.warehouse_time_motion.picking_mp": {
+    "value": "2",
+    "value_type": "number",
+    "description": "Warehouse Time Motion — Picking MP"
+  },
+  "planner.warehouse_time_motion.picking_rate_cases_per_hour": {
+    "value": "1000",
+    "value_type": "number",
+    "description": "Warehouse Time Motion — Picking Rate (Cases/Hour)"
+  },
+  "planner.warehouse_time_motion.loading_dock": {
+    "value": "3",
+    "value_type": "number",
+    "description": "Warehouse Time Motion — Loading Dock"
+  },
+  "planner.warehouse_time_motion.start_loading_time": {
+    "value": "19:00",
+    "value_type": "string",
+    "description": "Warehouse Time Motion — Start Loading Time (HH:mm)"
+  }
+}

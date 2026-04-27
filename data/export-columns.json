@@ -1,0 +1,19 @@
+[
+  { "column_key": "po_date", "label": "PO Date", "enabled": true, "display_order": 0 },
+  { "column_key": "po_number", "label": "PO NUMBER", "enabled": true, "display_order": 1 },
+  { "column_key": "delivery_location", "label": "DC Name", "enabled": true, "display_order": 2 },
+  { "column_key": "product_code", "label": "MT Channel SKU", "enabled": true, "display_order": 3 },
+  { "column_key": "item", "label": "ITEM", "enabled": true, "display_order": 4 },
+  { "column_key": "product_name", "label": "Nama Produk", "enabled": true, "display_order": 5 },
+  { "column_key": "quantity", "label": "Qty ", "enabled": true, "display_order": 6 },
+  { "column_key": "delivery_date", "label": "Delivery Date", "enabled": true, "display_order": 7 },
+  { "column_key": "retailer", "label": "Retailer", "enabled": false, "display_order": 8 },
+  { "column_key": "supplier_name", "label": "Nama Supplier", "enabled": false, "display_order": 9 },
+  { "column_key": "supplier_code", "label": "Kode Supplier", "enabled": false, "display_order": 10 },
+  { "column_key": "unit", "label": "Satuan", "enabled": false, "display_order": 11 },
+  { "column_key": "unit_price", "label": "Harga Satuan", "enabled": false, "display_order": 12 },
+  { "column_key": "total_price", "label": "Total Harga", "enabled": false, "display_order": 13 },
+  { "column_key": "discount", "label": "Diskon", "enabled": false, "display_order": 14 },
+  { "column_key": "tax", "label": "Pajak", "enabled": false, "display_order": 15 },
+  { "column_key": "notes", "label": "Catatan", "enabled": false, "display_order": 16 }
+]

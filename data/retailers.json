@@ -1,0 +1,11 @@
+[
+  { "name": "hari_hari", "display_name": "Hari-Hari", "channel_type": "modern_trade", "is_enabled": true },
+  { "name": "aeon", "display_name": "AEON", "channel_type": "modern_trade", "is_enabled": true },
+  { "name": "alfamart", "display_name": "Alfamart", "channel_type": "general_trade", "is_enabled": true },
+  { "name": "alfamidi", "display_name": "Alfamidi", "channel_type": "general_trade", "is_enabled": true },
+  { "name": "indomarco", "display_name": "Indomarco", "channel_type": "wholesale", "is_enabled": true },
+  { "name": "indogrosir", "display_name": "Indogrosir", "channel_type": "wholesale", "is_enabled": true },
+  { "name": "lotte_mart", "display_name": "Lotte Mart", "channel_type": "modern_trade", "is_enabled": true },
+  { "name": "lotte_grosir", "display_name": "Lotte Grosir", "channel_type": "wholesale", "is_enabled": true },
+  { "name": "foodhall", "display_name": "Foodhall", "channel_type": "modern_trade", "is_enabled": true }
+]
