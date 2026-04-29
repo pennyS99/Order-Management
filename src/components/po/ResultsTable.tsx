@@ -10,6 +10,10 @@ interface ResultsTableProps {
   data: POLineItem[];
   headers: HeaderConfig[];
   onDataChange?: (data: POLineItem[]) => void;
+  showToolbar?: boolean;
+  className?: string;
+  tableContainerClassName?: string;
+  fill?: boolean;
 }
 
 const MONTH_ABBR = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -29,6 +33,10 @@ function formatDateDdMmmYy(val: string | null): string {
 export function ResultsTable({
   data,
   headers,
+  showToolbar = true,
+  className,
+  tableContainerClassName,
+  fill = false,
 }: ResultsTableProps) {
   const [filter, setFilter] = useState("");
   const [sortKey, setSortKey] = useState<keyof POLineItem | null>(null);
@@ -88,8 +96,14 @@ export function ResultsTable({
   );
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-4">
+    <div
+      className={cn(
+        fill ? "flex min-h-0 flex-1 flex-col gap-4" : "space-y-4",
+        className,
+      )}
+    >
+      {showToolbar ? (
+        <div className="flex flex-wrap items-center gap-4">
         <div className="flex items-center gap-2 text-sm text-[#888888]">
           <span>{new Set(data.map((r) => r.po_number || "")).size || 0} POs</span>
           <span className="text-[#5c5c5c]">·</span>
@@ -123,9 +137,17 @@ export function ResultsTable({
           headers={headers}
           disabled={data.length === 0}
         />
-      </div>
+        </div>
+      ) : null}
 
-      <div className="max-h-[50vh] overflow-auto rounded-lg border border-[#2a2a2a]">
+      <div
+        className={cn(
+          fill
+            ? "min-h-0 flex-1 overflow-auto rounded-lg border border-[#2a2a2a]"
+            : "max-h-[50vh] overflow-auto rounded-lg border border-[#2a2a2a]",
+          tableContainerClassName,
+        )}
+      >
         <table className="w-full text-sm text-[#e0e0e0]">
           <caption className="sr-only">Extracted records results table</caption>
           <thead className="sticky top-0 z-10">

@@ -54,11 +54,3 @@ export async function preprocessForOcr(
     return imageBuffer;
   }
 }
-
-/**
- * @deprecated Use preprocessForOcr for full pipeline.
- * Light preprocessing only (backward compat).
- */
-export async function sharpenForOcr(imageBuffer: Buffer): Promise<Buffer> {
-  return preprocessForOcr(imageBuffer, {});
-}

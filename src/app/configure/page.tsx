@@ -455,7 +455,7 @@ export default function ConfigurePage() {
           void confirmAction.onConfirm();
         }}
       />
-      <header className="sticky top-0 z-20 border-b border-[#2a2a2a] bg-[#0d0d0d]">
+      <header className="z-20 border-b border-[#2a2a2a] bg-[#0d0d0d]">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between gap-4 mb-4">
             {view === "list" ? (

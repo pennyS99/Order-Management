@@ -2,13 +2,18 @@
 
 import React, { useState } from "react";
 import { Download } from "lucide-react";
-import { Button } from "@/components/po/ui/button";
+import { Button, type ButtonProps } from "@/components/po/ui/button";
 import type { POLineItem, HeaderConfig, ExportOptions } from "@/lib/po/types";
 
 interface ExportButtonProps {
   data: POLineItem[];
   headers: HeaderConfig[];
   disabled?: boolean;
+  label?: string;
+  variant?: ButtonProps["variant"];
+  size?: ButtonProps["size"];
+  className?: string;
+  showStatusText?: boolean;
 }
 
 const defaultOptions: ExportOptions = {
@@ -21,6 +26,11 @@ export function ExportButton({
   data,
   headers,
   disabled = false,
+  label = "Download .xlsx",
+  variant = "default",
+  size = "sm",
+  className,
+  showStatusText = true,
 }: ExportButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,25 +66,32 @@ export function ExportButton({
   };
 
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className={showStatusText ? "flex flex-col items-end gap-1" : "inline-flex"}>
       <Button
-        size="sm"
-        variant="default"
+        size={size}
+        variant={variant}
         onClick={handleExport}
         disabled={disabled || data.length === 0 || loading}
+        className={className}
       >
         {loading ? (
           "Generating..."
         ) : (
           <>
             <Download className="h-4 w-4 mr-2" />
-            Download .xlsx
+            {label}
           </>
         )}
       </Button>
-      <p aria-live="polite" role={error ? "alert" : "status"} className="text-xs text-rose-300 min-h-4">
-        {error ?? ""}
-      </p>
+      {showStatusText ? (
+        <p
+          aria-live="polite"
+          role={error ? "alert" : "status"}
+          className="min-h-4 text-xs text-rose-300"
+        >
+          {error ?? ""}
+        </p>
+      ) : null}
     </div>
   );
 }

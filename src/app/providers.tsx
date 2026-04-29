@@ -2,13 +2,13 @@
 
 import { PlannerProvider } from "@/context/PlannerContext";
 import { HeadersProvider } from "@/context/HeadersContext";
-import { PoAppShell } from "@/components/po/PoAppShell";
+import { EnterpriseAppShell } from "@/components/enterprise/EnterpriseAppShell";
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
     <PlannerProvider>
       <HeadersProvider>
-        <PoAppShell>{children}</PoAppShell>
+        <EnterpriseAppShell>{children}</EnterpriseAppShell>
       </HeadersProvider>
     </PlannerProvider>
   );

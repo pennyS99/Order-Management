@@ -1,7 +1,7 @@
 "use client";
 
 import { usePlannerContext } from "@/context/PlannerContext";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { Route } from "lucide-react";
 import { PlannerRouteProgress } from "@/components/planner/PlannerRouteProgress";
 
@@ -19,7 +19,6 @@ export function CsvUploadPanel() {
   } = usePlannerContext();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [isDragOver, setIsDragOver] = useState(false);
 
   const ordersState = upload.orders;
   const hasFile = Boolean(ordersState.fileName);
@@ -31,101 +30,26 @@ export function CsvUploadPanel() {
 
   return (
     <section className="space-y-3">
-      <div
-        className="overflow-hidden rounded-[10px]"
-        style={{ background: "#0e0e0e", border: "0.5px solid #2a2a2a" }}
-      >
-        <div
-          className="flex items-center justify-between gap-3"
-          style={{ padding: "12px 16px", borderBottom: "0.5px solid #1e1e1e" }}
-        >
+      <div className="rounded-[10px] border border-[var(--border)] bg-[var(--surface-elevated)] p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Route className="h-4 w-4 text-[#1D9E75]" aria-hidden />
-            <div className="text-[13px] font-medium text-white">Consolidation</div>
+            <Route className="h-4 w-4 text-[var(--primary)]" aria-hidden />
+            <div className="text-[13px] font-medium text-[var(--text)]">
+              Consolidation
+            </div>
           </div>
-          <span
-            className="inline-flex items-center"
+
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="rounded-[7px] px-[14px] py-[8px] text-[12px] font-medium transition-colors"
             style={{
-              background: "#0F2218",
-              color: "#1D9E75",
-              fontSize: 9,
-              padding: "2px 8px",
-              borderRadius: 99,
+              background: "var(--primary)",
+              color: "var(--primary-foreground)",
             }}
           >
-            ● Input
-          </span>
-        </div>
-
-        <div
-          className="m-[14px] flex flex-col items-center justify-center gap-2.5 rounded-[8px] border-[1.5px] border-dashed px-4 py-7 text-center transition-colors"
-          style={{
-            borderColor: isDragOver ? "#1D9E75" : "#2a2a2a",
-            background: isDragOver ? "rgba(29,158,117,0.04)" : "transparent",
-            cursor: "pointer",
-          }}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setIsDragOver(true);
-          }}
-          onDragLeave={() => setIsDragOver(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setIsDragOver(false);
-            const file = e.dataTransfer.files?.[0];
-            if (file) void uploadCsv("orders", file);
-          }}
-          onClick={() => inputRef.current?.click()}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") inputRef.current?.click();
-          }}
-          aria-label="Upload Orders CSV"
-        >
-          {!hasFile ? (
-            <>
-              <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden>
-                <path
-                  d="M14 18V8M9 13l5-5 5 5"
-                  stroke="#1D9E75"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M5 22h18"
-                  stroke="#1D9E75"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <p className="text-[12px] text-[#aaa]">
-                Drop Orders CSV or{" "}
-                <span className="text-[#1D9E75]" style={{ cursor: "pointer" }}>
-                  browse
-                </span>
-              </p>
-            </>
-          ) : (
-            <div className="flex w-full items-center justify-between gap-3 px-1">
-              <div className="flex min-w-0 items-center gap-2">
-                <span className="text-[#1D9E75]">✓</span>
-                <span className="min-w-0 truncate text-[12px] text-white">{ordersState.fileName}</span>
-              </div>
-              <button
-                type="button"
-                className="shrink-0 text-[#555]"
-                aria-label="Replace file"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  inputRef.current?.click();
-                }}
-              >
-                ✕
-              </button>
-            </div>
-          )}
+            {hasFile ? "Replace Orders file" : "Choose Orders file"}
+          </button>
 
           <input
             ref={inputRef}
@@ -139,6 +63,23 @@ export function CsvUploadPanel() {
             }}
           />
         </div>
+
+        {hasFile && (
+          <div className="mt-2 flex min-w-0 items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2 text-[12px] text-[var(--muted-foreground)]">
+              <span className="text-[var(--primary)]">✓</span>
+              <span className="min-w-0 truncate">{ordersState.fileName}</span>
+            </div>
+
+            <button
+              type="button"
+              className="shrink-0 text-[12px] font-medium text-[var(--primary)] hover:underline"
+              onClick={() => inputRef.current?.click()}
+            >
+              Replace
+            </button>
+          </div>
+        )}
 
       {consolidationPlanning && <PlannerRouteProgress />}
 
@@ -160,7 +101,7 @@ export function CsvUploadPanel() {
         </p>
       )}
 
-        <div className="flex justify-end px-[14px] pb-[14px] pt-[10px]">
+        <div className="flex justify-end pt-2">
           <button
             type="button"
             disabled={!allRequiredFilesReady || consolidationPlanning}

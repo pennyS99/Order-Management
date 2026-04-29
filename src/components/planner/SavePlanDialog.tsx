@@ -41,10 +41,7 @@ export function SavePlanDialog({
   confirmLabel?: string;
   loadingLabel?: string;
   onClose: () => void;
-  buildPayload:
-    | (() => SavePlanPayload)
-    | (() => { id: string; name: string })
-    | (() => null);
+  buildPayload: () => SavePlanPayload | { id: string; name: string } | null;
   mode: "create" | "rename";
   planIdForRename?: string;
   onSaved: (meta: { id: string; name: string }) => void;

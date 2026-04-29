@@ -80,15 +80,6 @@ export function routeLegDurationMin(
 }
 
 /** @deprecated Use {@link routeLegDurationMin} for time simulation (was incorrectly symmetric-min). */
-export function minDirectedMin(
-  from: string,
-  to: string,
-  matrix: Map<string, number>,
-): number | undefined {
-  return routeLegDurationMin(from, to, matrix);
-}
-
-/** Directed route leg duration (see {@link routeLegDurationMin}). */
 export const directedDurationMin = routeLegDurationMin;
 
 export type TimeStopSim = {
