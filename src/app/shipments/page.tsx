@@ -1,28 +1,28 @@
-import { SavedPlansGlobalSearchClient } from "@/components/planner/SavedPlansGlobalSearchClient";
+import Link from "next/link";
 
-function todayIso(): string {
-  const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-}
+import { ShipmentsSavedPlansTable } from "@/components/planner/ShipmentsSavedPlansTable";
+import { buildDcSummaryRows } from "@/lib/planner/dcSummaryRows";
+import { searchSavedPlansAcrossAll } from "@/lib/savedPlansStore";
 
-export default function ShipmentsPage() {
-  const defaultPldIso = todayIso();
+export default async function ShipmentsPage() {
+  const result = await searchSavedPlansAcrossAll({});
+  const rows = buildDcSummaryRows(result.shipments).map((r) => ({
+    ...r,
+    savedPlanName: result.savedPlanNameByShipmentId[r.shipmentId] ?? "",
+  }));
 
   return (
-    <main className="p-0">
-      <SavedPlansGlobalSearchClient
-        defaultPldIso={defaultPldIso}
-        autoSearchOnMount
-        layout="gmaps"
-        frame="none"
-        // Header height differs on mobile (2 rows) vs desktop (1 row)
-        mapHeightClassName="h-[calc(100vh-112px)] md:h-[calc(100vh-64px)]"
-        tableMaxHeightClassName="max-h-[38vh]"
-      />
+    <main className="mx-auto max-w-[min(100vw-2rem,1600px)] px-4 py-6 md:px-6 md:py-8">
+      <nav className="mb-4 text-xs text-[#888888]">
+        <Link href="/planner" className="hover:text-[#1D9E75]">
+          Planner
+        </Link>
+        <span className="mx-1.5 opacity-60" aria-hidden>
+          /
+        </span>
+        <span className="text-[#e0e0e0]">Shipments</span>
+      </nav>
+      <ShipmentsSavedPlansTable rows={rows} />
     </main>
   );
 }
-

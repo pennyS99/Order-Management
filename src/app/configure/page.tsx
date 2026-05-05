@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import Link from "next/link";
 import { ArrowLeft, ChevronRight, Columns, Plus, Package, Trash2, Pencil, Check, X, Boxes, Upload, Download, History } from "lucide-react";
 import { BrandMark } from "@/components/po/BrandMark";
@@ -18,6 +18,9 @@ import {
   replaceUomMasterAction,
 } from "@/app/actions/uom";
 import type { UomMasterRow } from "@/lib/po/uom";
+import { useTableFilterSort } from "@/hooks/use-table-filter-sort";
+import { TableColumnHeaderControlButtons } from "@/components/po/table-column-header-controls";
+import { TableFilterToolbar } from "@/components/po/table-filter-toolbar";
 
 type SettingsView = "list" | "poExtract" | "planner" | "headers" | "uom";
 type PlannerMasterCategory = "list" | "item" | "address" | "truck";
@@ -35,12 +38,6 @@ export default function ConfigurePage() {
   // UOM state
   const [uomItems, setUomItems] = useState<UomMasterRow[]>([]);
   const [uomLoading, setUomLoading] = useState(false);
-  const [uomFilters, setUomFilters] = useState({
-    sku: "",
-    item: "",
-    pcsPerCtn: "",
-    packPerCtn: "",
-  });
   const [editingSku, setEditingSku] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ sku: "", item: "", pcsPerCtn: 1, packPerCtn: 1 });
   const [addForm, setAddForm] = useState({ sku: "", item: "", pcsPerCtn: "24", packPerCtn: "24" });
@@ -66,10 +63,46 @@ export default function ConfigurePage() {
     setUomLoading(false);
   }, []);
 
+  const uomRowsWithIndex = useMemo(
+    () => uomItems.map((item, originalIndex) => ({ ...item, originalIndex })),
+    [uomItems],
+  );
+
+  type UomRowWithIndex = UomMasterRow & { originalIndex: number };
+
+  const getUomColumnText = useCallback((row: UomRowWithIndex, columnId: string) => {
+    switch (columnId) {
+      case "sku":
+        return row.sku ?? "";
+      case "item":
+        return row.item ?? "";
+      case "pcsPerCtn":
+        return String(row.pcsPerCtn);
+      case "packPerCtn":
+        return String(row.packPerCtn);
+      default:
+        return "";
+    }
+  }, []);
+
+  const {
+    filterText,
+    setFilterText,
+    activeFilterColumn,
+    sortColumn,
+    sortDir,
+    displayRows: filteredItems,
+    toggleSort,
+    toggleFilterColumn,
+  } = useTableFilterSort(uomRowsWithIndex, {
+    columnIds: ["sku", "item", "pcsPerCtn", "packPerCtn"],
+    getColumnText: getUomColumnText,
+  });
+
   useEffect(() => {
     setCurrentPage(1);
     setSelectedRows(new Set());
-  }, [uomFilters.sku, uomFilters.item, uomFilters.pcsPerCtn, uomFilters.packPerCtn, rowsPerPage]);
+  }, [filterText, activeFilterColumn, rowsPerPage]);
 
   useEffect(() => {
     if (view === "uom") {
@@ -82,22 +115,6 @@ export default function ConfigurePage() {
       setPlannerMasterCategory("list");
     }
   }, [view]);
-
-  const filteredItems = uomItems
-    .map((item, originalIndex) => ({ ...item, originalIndex }))
-    .filter((item) => {
-    const skuFilter = uomFilters.sku.trim().toLowerCase();
-    const itemFilter = uomFilters.item.trim().toLowerCase();
-    const pcsFilter = uomFilters.pcsPerCtn.trim();
-    const packFilter = uomFilters.packPerCtn.trim();
-
-    const skuMatch = !skuFilter || item.sku.toLowerCase().includes(skuFilter);
-    const itemMatch = !itemFilter || item.item.toLowerCase().includes(itemFilter);
-    const pcsMatch = !pcsFilter || String(item.pcsPerCtn).includes(pcsFilter);
-    const packMatch = !packFilter || String(item.packPerCtn).includes(packFilter);
-
-      return skuMatch && itemMatch && pcsMatch && packMatch;
-    });
 
   const totalPages = Math.max(1, Math.ceil(filteredItems.length / rowsPerPage));
   const safeCurrentPage = Math.min(currentPage, totalPages);
@@ -819,6 +836,18 @@ export default function ConfigurePage() {
                 <div className="p-8 text-center text-sm text-[#888888]">Loading UOM data...</div>
               ) : (
                 <div className="overflow-x-auto">
+                  <div className="border-b border-[#2a2a2a] bg-[#141414] px-3 py-2">
+                    <TableFilterToolbar
+                      id="configure-uom-filter"
+                      value={filterText}
+                      onChange={setFilterText}
+                      placeholder={
+                        activeFilterColumn
+                          ? `Filter ${activeFilterColumn === "pcsPerCtn" ? "PCS/CTN" : activeFilterColumn === "packPerCtn" ? "PACK/CTN" : activeFilterColumn}...`
+                          : "Filter..."
+                      }
+                    />
+                  </div>
                   <table className="w-full min-w-[620px] md:min-w-[720px] text-sm">
                     <thead>
                       <tr className="border-b border-[#2a2a2a] bg-[#1a1a1a]">
@@ -830,56 +859,76 @@ export default function ConfigurePage() {
                             className="h-4 w-4 rounded border-[#2a2a2a] bg-[#0d0d0d] accent-[#1D9E75]"
                           />
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#888888]">SKU</th>
-                        <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#888888]">Item</th>
-                        <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-[#888888]">PCS/CTN</th>
-                        <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-[#888888]">PACK/CTN</th>
-                        <th className="w-28 px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-[#888888]">Actions</th>
-                      </tr>
-                      <tr className="border-b border-[#2a2a2a] bg-[#141414]">
-                        <th className="px-3 py-2" />
-                        <th className="px-4 py-2">
-                          <Input
-                            value={uomFilters.sku}
-                            onChange={(e) => setUomFilters((p) => ({ ...p, sku: e.target.value }))}
-                            placeholder="Filter SKU"
-                            className="h-8 text-xs font-mono"
+                        <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#888888]">
+                          <TableColumnHeaderControlButtons
+                            label="SKU"
+                            columnId="sku"
+                            filterActive={activeFilterColumn === "sku"}
+                            sortActive={sortColumn === "sku"}
+                            sortDir={sortColumn === "sku" ? sortDir : null}
+                            onFilterClick={toggleFilterColumn}
+                            onSortClick={toggleSort}
+                            variant="po"
+                            labelClassName="text-inherit font-bold uppercase tracking-wider"
                           />
                         </th>
-                        <th className="px-4 py-2">
-                          <Input
-                            value={uomFilters.item}
-                            onChange={(e) => setUomFilters((p) => ({ ...p, item: e.target.value }))}
-                            placeholder="Filter item"
-                            className="h-8 text-xs font-mono"
+                        <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#888888]">
+                          <TableColumnHeaderControlButtons
+                            label="Item"
+                            columnId="item"
+                            filterActive={activeFilterColumn === "item"}
+                            sortActive={sortColumn === "item"}
+                            sortDir={sortColumn === "item" ? sortDir : null}
+                            onFilterClick={toggleFilterColumn}
+                            onSortClick={toggleSort}
+                            variant="po"
+                            labelClassName="text-inherit font-bold uppercase tracking-wider"
                           />
                         </th>
-                        <th className="px-4 py-2">
-                          <Input
-                            value={uomFilters.pcsPerCtn}
-                            onChange={(e) => setUomFilters((p) => ({ ...p, pcsPerCtn: e.target.value }))}
-                            placeholder="Filter"
-                            className="h-8 text-xs text-center"
-                          />
+                        <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-[#888888]">
+                          <div className="flex justify-center">
+                            <TableColumnHeaderControlButtons
+                              label="PCS/CTN"
+                              columnId="pcsPerCtn"
+                              filterActive={activeFilterColumn === "pcsPerCtn"}
+                              sortActive={sortColumn === "pcsPerCtn"}
+                              sortDir={sortColumn === "pcsPerCtn" ? sortDir : null}
+                              onFilterClick={toggleFilterColumn}
+                              onSortClick={toggleSort}
+                              variant="po"
+                              labelClassName="text-inherit font-bold uppercase tracking-wider"
+                            />
+                          </div>
                         </th>
-                        <th className="px-4 py-2">
-                          <Input
-                            value={uomFilters.packPerCtn}
-                            onChange={(e) => setUomFilters((p) => ({ ...p, packPerCtn: e.target.value }))}
-                            placeholder="Filter"
-                            className="h-8 text-xs text-center"
-                          />
+                        <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-[#888888]">
+                          <div className="flex justify-center">
+                            <TableColumnHeaderControlButtons
+                              label="PACK/CTN"
+                              columnId="packPerCtn"
+                              filterActive={activeFilterColumn === "packPerCtn"}
+                              sortActive={sortColumn === "packPerCtn"}
+                              sortDir={sortColumn === "packPerCtn" ? sortDir : null}
+                              onFilterClick={toggleFilterColumn}
+                              onSortClick={toggleSort}
+                              variant="po"
+                              labelClassName="text-inherit font-bold uppercase tracking-wider"
+                            />
+                          </div>
                         </th>
-                        <th className="px-4 py-2" />
+                        <th className="w-28 px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-[#888888]">
+                          Actions
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredItems.length === 0 ? (
                         <tr>
                           <td colSpan={6} className="px-4 py-8 text-center text-[#888888]">
-                            {uomFilters.sku || uomFilters.item || uomFilters.pcsPerCtn || uomFilters.packPerCtn
-                              ? "No items match the applied filters."
-                              : "No items in UOM master."}
+                            {uomItems.length === 0
+                              ? "No items in UOM master."
+                              : filterText.trim() || activeFilterColumn
+                                ? "No items match the applied filters."
+                                : "No items in UOM master."}
                           </td>
                         </tr>
                       ) : (

@@ -1,18 +1,16 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Bell, ChevronRight, Search } from "lucide-react";
+import { ChevronRight, Search } from "lucide-react";
 import { cn } from "@/lib/po/utils";
 import { EnterpriseSidebar } from "./EnterpriseSidebar";
-import { enterpriseNav } from "./nav";
+import { matchEnterpriseNavItem } from "./nav";
 
 function getBreadcrumb(pathname: string): { section: string; page: string } {
   if (pathname === "/" || pathname === "") {
     return { section: "Operations", page: "Overview" };
   }
-  const match = enterpriseNav.find(
-    (n) => pathname === n.href || pathname.startsWith(`${n.href}/`),
-  );
+  const match = matchEnterpriseNavItem(pathname);
   if (match) return { section: match.section, page: match.label };
   return { section: "Operations", page: "Overview" };
 }
@@ -80,14 +78,6 @@ export function EnterpriseAppShell({
                   ⌘K
                 </kbd>
               </label>
-              <button
-                type="button"
-                aria-label="Notifications"
-                className="relative grid h-8 w-8 place-items-center rounded-md border border-[var(--border)] bg-[var(--surface)] text-[var(--muted-foreground)] transition-colors hover:bg-[var(--surface-elevated)] hover:text-[var(--text)]"
-              >
-                <Bell className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
-                <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--warning)]" aria-hidden />
-              </button>
               <span className="inline-flex items-center gap-1.5 rounded-md border border-[var(--border)] bg-[var(--surface)] px-2 py-1.5 text-[11px] font-medium text-[var(--muted-foreground)]">
                 <span
                   aria-hidden

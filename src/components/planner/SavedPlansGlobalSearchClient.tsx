@@ -7,28 +7,10 @@ import type { Shipment } from "@/types/planner";
 import { PldCalendarPicker } from "@/components/planner/PldCalendarPicker";
 import { SavedPlansQuickMenu } from "@/components/planner/SavedPlansQuickMenu";
 import type { SavedPlansFacets } from "@/lib/savedPlansStore";
-
-type SearchRow = {
-  savedPlanName: string;
-  shipmentId: string;
-  truckType: string;
-  serviceType: string;
-  dcName: string;
-  poNumber: string;
-  pld: string;
-  rad: string;
-  legFromPreviousKm: number | null;
-  legFromPreviousMin: number | null;
-  arriveClock: string;
-  unloadStartClock: string;
-  departClock: string;
-  tripDurationMin: number | null;
-  totalQty: number;
-  totalKg: number;
-  totalCbm: number;
-  dropSequence: number;
-  origin: string;
-};
+import {
+  SavedPlansSearchDcTable,
+  type SavedPlansSearchRow as SearchRow,
+} from "@/components/planner/saved-plans-search-dc-table";
 
 type ByDcListItem = {
   key: string;
@@ -305,82 +287,7 @@ export function SavedPlansGlobalSearchClient({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-zinc-800 bg-[#0d0d0d]">
-        <div className="border-b border-zinc-800 bg-[#151515] px-4 py-2.5">
-          <h3 className="text-sm font-semibold text-slate-100">By DC</h3>
-        </div>
-        <div className={`overflow-auto ${tableMaxHeightClassName ?? "max-h-[28rem]"}`}>
-          <table className="min-w-full whitespace-nowrap text-sm text-slate-200">
-                <thead className="sticky top-0 z-10 border-b border-zinc-800 bg-[#151515] shadow-sm shadow-black/40">
-                  <tr>
-                    <th className="px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide">No.</th>
-                    <th className="px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide">Saved Plan</th>
-                    <th className="px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide">Origin</th>
-                    <th className="px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide">Shipment ID</th>
-                    <th className="px-2 py-2.5 text-right text-xs font-semibold uppercase tracking-wide">Drop #</th>
-                    <th className="px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide">DC Name</th>
-                    <th className="px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide">PO Number</th>
-                    <th className="px-2 py-2.5 text-center text-xs font-semibold uppercase tracking-wide">PLD</th>
-                    <th className="px-2 py-2.5 text-center text-xs font-semibold uppercase tracking-wide">RAD</th>
-                    <th className="px-2 py-2.5 text-right text-xs font-semibold uppercase tracking-wide">Drive km</th>
-                    <th className="px-2 py-2.5 text-right text-xs font-semibold uppercase tracking-wide">Drive min</th>
-                    <th className="px-2 py-2.5 text-right text-xs font-semibold uppercase tracking-wide">Arrive</th>
-                    <th className="px-2 py-2.5 text-right text-xs font-semibold uppercase tracking-wide">Unload start</th>
-                    <th className="px-2 py-2.5 text-right text-xs font-semibold uppercase tracking-wide">Depart</th>
-                    <th className="px-2 py-2.5 text-right text-xs font-semibold uppercase tracking-wide">Trip duration</th>
-                    <th className="px-2 py-2.5 text-right text-xs font-semibold uppercase tracking-wide">Qty</th>
-                    <th className="px-2 py-2.5 text-right text-xs font-semibold uppercase tracking-wide">KG</th>
-                    <th className="px-2 py-2.5 text-right text-xs font-semibold uppercase tracking-wide">CBM</th>
-                    <th className="px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide">Truck Type</th>
-                    <th className="px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide">Service</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((row, index) => (
-                    <tr key={`${row.shipmentId}-${row.dcName}-${index}`}>
-                      <td className="border-t border-zinc-800/90 px-2 py-2">{index + 1}</td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2">{row.savedPlanName || "—"}</td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2">{row.origin || "—"}</td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2">{row.shipmentId}</td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">
-                        {row.dropSequence > 0 ? row.dropSequence : "—"}
-                      </td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2">{row.dcName}</td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2">{row.poNumber}</td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2 text-center">{row.pld}</td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2 text-center">{row.rad}</td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">
-                        {row.legFromPreviousKm != null ? row.legFromPreviousKm.toFixed(1) : "—"}
-                      </td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">
-                        {row.legFromPreviousMin != null ? Math.round(row.legFromPreviousMin) : "—"}
-                      </td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">{row.arriveClock}</td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">
-                        {row.unloadStartClock}
-                      </td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">{row.departClock}</td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">
-                        {row.tripDurationMin != null ? `${Math.round(row.tripDurationMin)} min` : "—"}
-                      </td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">{row.totalQty}</td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">{row.totalKg.toFixed(2)}</td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">{row.totalCbm.toFixed(2)}</td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2">{row.truckType}</td>
-                      <td className="border-t border-zinc-800/90 px-2 py-2">{row.serviceType}</td>
-                    </tr>
-                  ))}
-                  {rows.length === 0 && (
-                    <tr>
-                      <td className="border-t border-zinc-800/90 px-2 py-6 text-center text-xs text-[#888888]" colSpan={20}>
-                        No matches for the current filters.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-          </table>
-        </div>
-      </div>
+      <SavedPlansSearchDcTable rows={rows} tableMaxHeightClassName={tableMaxHeightClassName} />
     </div>
   );
 

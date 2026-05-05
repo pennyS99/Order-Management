@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useTransition, useRef } from "react";
-import { ArrowUpDown, Columns2, Filter, Inbox, Plus, RefreshCw, Upload } from "lucide-react";
+import { Filter, Inbox, Plus, RefreshCw, Upload } from "lucide-react";
 import { ResultsTable } from "@/components/po/ResultsTable";
 import { ProgressTracker } from "@/components/po/ProgressTracker";
 import { LoadingBar } from "@/components/po/LoadingBar";
@@ -263,14 +263,6 @@ export default function ExtractPage() {
                   className="h-9 rounded-md pl-9 text-[12px] placeholder:text-[var(--muted-foreground)]"
                 />
               </div>
-              <Button variant="outline" className="h-9 rounded-md px-3 text-[11px] font-semibold">
-                <ArrowUpDown className="mr-2 h-4 w-4" strokeWidth={1.75} aria-hidden />
-                Sort
-              </Button>
-              <Button variant="outline" className="h-9 rounded-md px-3 text-[11px] font-semibold">
-                <Columns2 className="mr-2 h-4 w-4" strokeWidth={1.75} aria-hidden />
-                Columns
-              </Button>
             </div>
             <div className="flex items-center gap-2 text-[11px] text-[#9ca3af]">
               <span className="inline-flex items-center gap-2">

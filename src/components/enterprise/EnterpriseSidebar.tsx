@@ -5,13 +5,14 @@ import { usePathname } from "next/navigation";
 import {
   CalendarDays,
   FileText,
+  Map,
   MapPin,
   Truck,
   Settings as SettingsIcon,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/po/utils";
-import { enterpriseNav } from "./nav";
+import { enterpriseNav, matchEnterpriseNavItem } from "./nav";
 
 function isActivePath(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -21,6 +22,7 @@ const ICONS: Record<string, LucideIcon> = {
   "/extract": FileText,
   "/planner": CalendarDays,
   "/shipments": Truck,
+  "/shipments/map": Map,
   "/configure": SettingsIcon,
 };
 
@@ -32,6 +34,7 @@ export function EnterpriseSidebar({
   className?: string;
 }) {
   const pathname = usePathname();
+  const activeNav = matchEnterpriseNavItem(pathname);
   const settingsItem = enterpriseNav.find((i) => i.href === "/configure");
   const settingsActive = settingsItem ? isActivePath(pathname, settingsItem.href) : false;
 
@@ -75,7 +78,7 @@ export function EnterpriseSidebar({
                 <div className="space-y-1">
                   {items.map((item) => {
                     const Icon = ICONS[item.href] ?? FileText;
-                    const active = isActivePath(pathname, item.href);
+                    const active = activeNav?.href === item.href;
                     return (
                       <Link
                         key={item.href}

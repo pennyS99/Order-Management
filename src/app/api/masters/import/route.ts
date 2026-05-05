@@ -102,23 +102,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (dataset === "address") {
-      const nextAddresses: Array<{
-        id: number;
-        dcName: string;
-        latitude: number;
-        longitude: number;
-        province: string;
-        city: string;
-        origin: string;
-        channelType: string;
-        transportMode: string;
-        maxKgLtlLcl: number | null;
-        leadTimeFtlFcl: number | null;
-        leadTimeLtlLcl: number | null;
-        registerOpen: string;
-        registerClosed: string;
-        unloadDurationMin: number | null;
-      }> = [];
       const seenDc = new Set<string>();
       for (const row of rows) {
         const dcName = toText(readCell(row, ["DC", "dcName"]));
@@ -179,8 +162,7 @@ export async function POST(request: NextRequest) {
             "unloaddurationmin",
           ]),
         );
-        nextAddresses.push({
-          id: nextAddressId({ ...data, addresses: nextAddresses }),
+        const payload = {
           dcName,
           latitude: latitude ?? 0,
           longitude: longitude ?? 0,
@@ -195,11 +177,16 @@ export async function POST(request: NextRequest) {
           registerOpen,
           registerClosed,
           unloadDurationMin,
-        });
+        };
+        const idx = data.addresses.findIndex((a) => a.dcName === dcName);
+        if (idx >= 0) {
+          data.addresses[idx] = { ...data.addresses[idx], ...payload };
+          updated += 1;
+        } else {
+          data.addresses.push({ id: nextAddressId(data), ...payload });
+          created += 1;
+        }
       }
-      data.addresses = nextAddresses;
-      created = nextAddresses.length;
-      updated = 0;
     }
 
     if (dataset === "truck") {
