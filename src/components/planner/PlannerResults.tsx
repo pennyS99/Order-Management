@@ -15,7 +15,7 @@ import {
   type PlannerColumnConfig,
   type PlannerResultsTab,
 } from "@/lib/planner/results-columns";
-import type { SavedPlanOverlapRef, Shipment } from "@/types/planner";
+import type { ConsolidationResult, SavedPlanOverlapRef, Shipment } from "@/types/planner";
 import { SavePlanDialog } from "@/components/planner/SavePlanDialog";
 
 type WarehouseTimeMotionSettingsClient = {
@@ -1262,7 +1262,7 @@ type RenderCol<Row> = {
 
 type DcSummaryRow = ReturnType<typeof buildDcSummaryRows>[number];
 type PoSummaryRow = ReturnType<typeof buildPoSummaryRows>[number];
-type UnassignedRow = Shipment["orders"][number] & {
+type UnassignedRow = ConsolidationResult["unassignedOrders"][number]["order"] & {
   _reason?: string;
   _overlaps?: SavedPlanOverlapRef[];
 };
@@ -2109,7 +2109,7 @@ export function PlannerResults() {
                     className="w-8 px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]"
                     aria-hidden
                   />
-                  {visibleColumns.map((col) => (
+                  {visibleUnassignedColumns.map((col) => (
                     <th key={col.id} className={col.thClassName}>
                       {col.headerLabel}
                     </th>
