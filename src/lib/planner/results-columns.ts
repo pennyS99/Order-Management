@@ -59,7 +59,7 @@ export function defaultColumnsByTab(): PlannerResultsColumnsStateV1["columnsByTa
     ],
     unassigned: [
       { id: "no", label: "No.", enabled: true, order: 0 },
-      { id: "shipment", label: "Shipment", enabled: true, order: 1 },
+      { id: "shipmentId", label: "Shipment", enabled: true, order: 1 },
       { id: "dcName", label: "DC Name", enabled: true, order: 2 },
       { id: "dropSequence", label: "Drop #", enabled: true, order: 3 },
       { id: "startPicking", label: "Pick time", enabled: true, order: 4 },
