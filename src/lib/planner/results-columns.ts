@@ -99,8 +99,11 @@ export function mergeStoredWithDefaults(args: {
   }
 
   const mergedIds = new Set(merged.map((c) => c.id));
+  let maxOrder = merged.reduce((acc, c) => (c.order > acc ? c.order : acc), -1);
   for (const d of defaults) {
-    if (!mergedIds.has(d.id)) merged.push(d);
+    if (mergedIds.has(d.id)) continue;
+    maxOrder += 1;
+    merged.push({ ...d, order: maxOrder });
   }
 
   return normalizeOrder(merged);

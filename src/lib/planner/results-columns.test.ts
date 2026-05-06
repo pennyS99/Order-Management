@@ -43,5 +43,37 @@ describe("planner results columns", () => {
     expect(state.columnsByTab.po.some((c) => c.enabled)).toBe(true);
     expect(state.columnsByTab.po.map((c) => c.id)).toEqual(defaults.map((c) => c.id));
   });
+
+  it("appends missing default columns at the end (after stored ordering)", () => {
+    const defaults = normalizeOrder(defaultColumnsByTab().po);
+    const stored = [
+      { id: "no", order: 0, enabled: true, label: "No." },
+      { id: "shipmentId", order: 1000, enabled: true, label: "Shipment" },
+    ];
+    const state = buildStateFromStorage({ version: 1, columnsByTab: { dc: [], po: stored, unassigned: [] } });
+
+    const ids = state.columnsByTab.po.map((c) => c.id);
+    const shipmentIdx = ids.indexOf("shipmentId");
+    const dcNameIdx = ids.indexOf("dcName");
+    expect(shipmentIdx).toBeGreaterThanOrEqual(0);
+    expect(dcNameIdx).toBeGreaterThanOrEqual(0);
+    expect(dcNameIdx).toBeGreaterThan(shipmentIdx);
+    expect(ids[ids.length - 1]).toBe(defaults[defaults.length - 1]!.id);
+  });
+
+  it("preserves stored label/enabled overrides for matching ids", () => {
+    const state = buildStateFromStorage({
+      version: 1,
+      columnsByTab: {
+        dc: [{ id: "dcName", label: "Warehouse", enabled: false, order: 1 }],
+        po: [],
+        unassigned: [],
+      },
+    });
+    const dcName = state.columnsByTab.dc.find((c) => c.id === "dcName");
+    expect(dcName).toBeTruthy();
+    expect(dcName?.label).toBe("Warehouse");
+    expect(dcName?.enabled).toBe(false);
+  });
 });
 
