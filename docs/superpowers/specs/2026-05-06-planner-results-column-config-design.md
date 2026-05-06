@@ -18,10 +18,13 @@ Configuration is saved locally (browser `localStorage`) and affects the on-scree
 - Changing planner consolidation logic or the underlying row data shapes
 
 ## UX design
-- Add a **Columns** control in the Planner results area, adjacent to the results tabs:
-  - Tabs: `DC stops`, `PO lines`, `Unassigned`
-  - Columns button applies to the *currently selected tab*
-- Clicking **Columns** opens a panel (dialog/drawer) showing the column list for the current tab:
+- Add a **Results columns** configuration section under **Configure → Planner data** (`/configure`, Planner view).
+  - The UI edits the column config for each Planner results tab:
+    - `DC stops` (`dc`)
+    - `PO lines` (`po`)
+    - `Unassigned` (`unassigned`)
+- In the Planner results page (`/planner`), the tables read this stored configuration and render accordingly, but do **not** provide inline column editing controls.
+- In Configure, editing **Results columns** opens a panel (dialog/drawer) showing the column list for the selected tab:
   - Reorder via drag-and-drop and/or up/down buttons
   - Toggle visibility (enabled/disabled)
   - Editable label input (disabled when column is disabled)
