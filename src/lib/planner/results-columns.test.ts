@@ -35,5 +35,13 @@ describe("planner results columns", () => {
     expect(state.columnsByTab.dc.some((c) => c.id === "unknown")).toBe(false);
     expect(state.columnsByTab.dc[0]?.id).toBe("no");
   });
+
+  it("falls back to defaults when a tab ends up with all columns disabled", () => {
+    const defaults = normalizeOrder(defaultColumnsByTab().po);
+    const allDisabled = defaults.map((c) => ({ ...c, enabled: false }));
+    const state = buildStateFromStorage({ version: 1, columnsByTab: { dc: [], po: allDisabled, unassigned: [] } });
+    expect(state.columnsByTab.po.some((c) => c.enabled)).toBe(true);
+    expect(state.columnsByTab.po.map((c) => c.id)).toEqual(defaults.map((c) => c.id));
+  });
 });
 

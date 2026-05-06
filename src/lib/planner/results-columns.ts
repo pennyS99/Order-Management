@@ -121,15 +121,29 @@ export function buildStateFromStorage(raw: unknown): PlannerResultsColumnsStateV
   const parsed = raw as Partial<PlannerResultsColumnsStateV1>;
   if (parsed.version !== 1 || !parsed.columnsByTab) return base;
 
+  const ensureNonEmpty = (tab: PlannerResultsTab, columns: PlannerColumnConfig[]): PlannerColumnConfig[] => {
+    const hasEnabled = columns.some((c) => c.enabled);
+    return hasEnabled ? columns : normalizedDefaults[tab];
+  };
+
   return {
     version: 1,
     columnsByTab: {
-      dc: mergeStoredWithDefaults({ defaults: normalizedDefaults.dc, stored: parsed.columnsByTab.dc }),
-      po: mergeStoredWithDefaults({ defaults: normalizedDefaults.po, stored: parsed.columnsByTab.po }),
-      unassigned: mergeStoredWithDefaults({
-        defaults: normalizedDefaults.unassigned,
-        stored: parsed.columnsByTab.unassigned,
-      }),
+      dc: ensureNonEmpty(
+        "dc",
+        mergeStoredWithDefaults({ defaults: normalizedDefaults.dc, stored: parsed.columnsByTab.dc }),
+      ),
+      po: ensureNonEmpty(
+        "po",
+        mergeStoredWithDefaults({ defaults: normalizedDefaults.po, stored: parsed.columnsByTab.po }),
+      ),
+      unassigned: ensureNonEmpty(
+        "unassigned",
+        mergeStoredWithDefaults({
+          defaults: normalizedDefaults.unassigned,
+          stored: parsed.columnsByTab.unassigned,
+        }),
+      ),
     },
   };
 }
