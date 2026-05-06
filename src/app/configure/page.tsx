@@ -577,7 +577,7 @@ export default function ConfigurePage() {
                     <Boxes className="h-5 w-5 text-[#1D9E75]" />
                   </div>
                   <div>
-                    <span className="font-semibold text-[#e0e0e0]">Settings for Planner</span>
+                    <span className="font-semibold text-[#e0e0e0]">Planner data</span>
                     <p className="text-sm text-[#888888]">Manage OM Masters (item, address, and truck data)</p>
                   </div>
                 </div>
