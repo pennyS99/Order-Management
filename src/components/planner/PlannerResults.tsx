@@ -1260,6 +1260,342 @@ type RenderCol<Row> = {
   getValue: (row: Row, index: number) => React.ReactNode;
 };
 
+type DcSummaryRow = ReturnType<typeof buildDcSummaryRows>[number];
+type PoSummaryRow = ReturnType<typeof buildPoSummaryRows>[number];
+type UnassignedRow = Shipment["orders"][number] & {
+  _reason?: string;
+  _overlaps?: SavedPlanOverlapRef[];
+};
+
+const RESULTS_TH_BASE =
+  "px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]";
+const RESULTS_TD_BASE = "px-3 py-2 align-top";
+
+const DC_COLS: RenderCol<DcSummaryRow>[] = [
+  {
+    id: "no",
+    thClassName: cn("w-9", RESULTS_TH_BASE),
+    tdClassName: cn("w-9 text-[#666]", RESULTS_TD_BASE),
+    getValue: (_row, index) => index + 1,
+  },
+  {
+    id: "shipmentId",
+    thClassName: RESULTS_TH_BASE,
+    tdClassName: cn("min-w-0", RESULTS_TD_BASE),
+    getValue: (row) => (
+      <div className="flex min-w-0 flex-col gap-1">
+        <div className="truncate" title={`${row.shipmentId} · ${row.origin?.trim() || "—"}`}>
+          <span className="font-medium text-white">{row.shipmentId}</span>
+          <span className="text-[11px] text-[#888]"> · {row.origin?.trim() || "—"}</span>
+        </div>
+        {row.overlapsSavedPlans && row.overlapsSavedPlans.length > 0 && (
+          <OverlapWithSavedPlanChip overlaps={row.overlapsSavedPlans} />
+        )}
+      </div>
+    ),
+  },
+  {
+    id: "dcName",
+    thClassName: RESULTS_TH_BASE,
+    tdClassName: cn("min-w-0 text-[#ccc]", RESULTS_TD_BASE),
+    getValue: (row) => <div>{row.dcName}</div>,
+  },
+  {
+    id: "dropSequence",
+    thClassName: cn("w-20", RESULTS_TH_BASE),
+    tdClassName: cn("w-20", RESULTS_TD_BASE),
+    getValue: (row) => <DropSequenceBadge dropSequence={row.dropSequence} />,
+  },
+  {
+    id: "startPicking",
+    thClassName: cn("w-20", RESULTS_TH_BASE),
+    tdClassName: cn("w-20 text-[#aaa]", RESULTS_TD_BASE),
+    getValue: (row) => row.startPickingClock,
+  },
+  {
+    id: "plt",
+    thClassName: cn("w-20", RESULTS_TH_BASE),
+    tdClassName: cn("w-20 text-[#aaa]", RESULTS_TD_BASE),
+    getValue: (row) => row.pltClock,
+  },
+  {
+    id: "legKm",
+    thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    getValue: (row) => (row.legFromPreviousKm != null ? row.legFromPreviousKm.toFixed(1) : "—"),
+  },
+  {
+    id: "legMin",
+    thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    getValue: (row) => (row.legFromPreviousMin != null ? Math.round(row.legFromPreviousMin) : "—"),
+  },
+  {
+    id: "arrive",
+    thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE, "text-right"),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    getValue: (row) => row.arriveClock,
+  },
+  {
+    id: "unloadStart",
+    thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE, "text-right"),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    getValue: (row) => row.unloadStartClock,
+  },
+  {
+    id: "depart",
+    thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE, "text-right"),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    getValue: (row) => row.departClock,
+  },
+  {
+    id: "tripDur",
+    thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-right"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    getValue: (row) => formatTripDurationMin(row.tripDurationMin),
+  },
+  {
+    id: "totalQty",
+    thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    getValue: (row) => row.totalQty,
+  },
+  {
+    id: "totalKg",
+    thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    getValue: (row) => row.totalKg.toFixed(2),
+  },
+  {
+    id: "totalCbm",
+    thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    getValue: (row) => row.totalCbm.toFixed(2),
+  },
+  {
+    id: "utilizationPct",
+    thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-right"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    getValue: (row) => formatUtilization(row.serviceType, row.utilizationPct),
+  },
+  {
+    id: "truckType",
+    thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-[#ccc]"),
+    getValue: (row) => row.truckType,
+  },
+  {
+    id: "serviceType",
+    thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-[#ccc]"),
+    getValue: (row) => row.serviceType,
+  },
+  {
+    id: "pld",
+    thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-center"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[#aaa]"),
+    getValue: (row) => row.pld,
+  },
+  {
+    id: "rad",
+    thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-center"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[#aaa]"),
+    getValue: (row) => row.rad,
+  },
+];
+
+const PO_COLS: RenderCol<PoSummaryRow>[] = [
+  {
+    id: "no",
+    thClassName: cn("w-9", RESULTS_TH_BASE),
+    tdClassName: cn("w-9 text-[#666]", RESULTS_TD_BASE),
+    getValue: (_row, index) => index + 1,
+  },
+  {
+    id: "shipmentId",
+    thClassName: RESULTS_TH_BASE,
+    tdClassName: cn("min-w-0", RESULTS_TD_BASE),
+    getValue: (row) => (
+      <div className="flex min-w-0 flex-col gap-1">
+        <div className="truncate" title={`${row.shipmentId} · ${row.origin?.trim() || "—"}`}>
+          <span className="font-medium text-white">{row.shipmentId}</span>
+          <span className="text-[11px] text-[#888]"> · {row.origin?.trim() || "—"}</span>
+        </div>
+        {row.overlapsSavedPlans && row.overlapsSavedPlans.length > 0 && (
+          <OverlapWithSavedPlanChip overlaps={row.overlapsSavedPlans} />
+        )}
+      </div>
+    ),
+  },
+  {
+    id: "dcName",
+    thClassName: RESULTS_TH_BASE,
+    tdClassName: cn("min-w-0 text-[#ccc]", RESULTS_TD_BASE),
+    getValue: (row) => <div>{row.dcName}</div>,
+  },
+  {
+    id: "poNumber",
+    thClassName: RESULTS_TH_BASE,
+    tdClassName: cn("min-w-0 text-[#ccc]", RESULTS_TD_BASE),
+    getValue: (row) => row.purchaseOrder,
+  },
+  {
+    id: "dropSequence",
+    thClassName: cn("w-20", RESULTS_TH_BASE),
+    tdClassName: cn("w-20", RESULTS_TD_BASE),
+    getValue: (row) => <DropSequenceBadge dropSequence={row.dropSequence} />,
+  },
+  {
+    id: "startPicking",
+    thClassName: cn("w-20", RESULTS_TH_BASE),
+    tdClassName: cn("w-20 text-[#aaa]", RESULTS_TD_BASE),
+    getValue: (row) => row.startPickingClock,
+  },
+  {
+    id: "plt",
+    thClassName: cn("w-20", RESULTS_TH_BASE),
+    tdClassName: cn("w-20 text-[#aaa]", RESULTS_TD_BASE),
+    getValue: (row) => row.pltClock,
+  },
+  {
+    id: "totalQty",
+    thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    getValue: (row) => row.totalQty,
+  },
+  {
+    id: "totalKg",
+    thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    getValue: (row) => row.totalKg.toFixed(2),
+  },
+  {
+    id: "totalCbm",
+    thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    getValue: (row) => row.totalCbm.toFixed(2),
+  },
+  {
+    id: "utilizationPct",
+    thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE, "text-right"),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    getValue: (row) => formatUtilization(row.serviceType, row.utilizationPct),
+  },
+  {
+    id: "truckType",
+    thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-[#ccc]"),
+    getValue: (row) => row.truckType,
+  },
+  {
+    id: "serviceType",
+    thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-[#ccc]"),
+    getValue: (row) => row.serviceType,
+  },
+  {
+    id: "tripDur",
+    thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-right"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    getValue: (row) => formatTripDurationMin(row.tripDurationMin),
+  },
+  {
+    id: "pld",
+    thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-center"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[#aaa]"),
+    getValue: (row) => row.pld,
+  },
+  {
+    id: "rad",
+    thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-center"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[#aaa]"),
+    getValue: (row) => row.rad,
+  },
+  {
+    id: "poExpiredDate",
+    thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-center"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[#aaa]"),
+    getValue: (row) => row.poExpiredDate,
+  },
+];
+
+const UNASSIGNED_COLS: RenderCol<UnassignedRow>[] = [
+  {
+    id: "no",
+    thClassName: cn("w-9", RESULTS_TH_BASE),
+    tdClassName: cn("w-9 text-[#666]", RESULTS_TD_BASE),
+    getValue: (_row, index) => index + 1,
+  },
+  {
+    id: "shipmentId",
+    thClassName: RESULTS_TH_BASE,
+    tdClassName: cn("min-w-0", RESULTS_TD_BASE),
+    getValue: (o) => {
+      const po = o.purchaseOrder?.trim() || "—";
+      const origin = o.origin?.trim() || "—";
+      return (
+        <div className="flex min-w-0 flex-col gap-1">
+          <div className="truncate" title={`${po} · ${origin}${o._reason ? ` · ${o._reason}` : ""}`}>
+            <span className="font-medium text-white">{po}</span>
+            <span className="text-[11px] text-[#888]"> · {origin}</span>
+            {o._reason && <span className="text-[11px] text-[#ff9a7a]"> · {o._reason}</span>}
+          </div>
+          {o._overlaps && o._overlaps.length > 0 && <OverlapWithSavedPlanChip overlaps={o._overlaps} />}
+        </div>
+      );
+    },
+  },
+  {
+    id: "dcName",
+    thClassName: RESULTS_TH_BASE,
+    tdClassName: cn("min-w-0 text-[#ccc]", RESULTS_TD_BASE),
+    getValue: (o) => o.dcName?.trim() || "—",
+  },
+  {
+    id: "dropSequence",
+    thClassName: cn("w-20", RESULTS_TH_BASE),
+    tdClassName: cn("w-20", RESULTS_TD_BASE),
+    getValue: () => <DropSequenceBadge dropSequence={0} />,
+  },
+  {
+    id: "startPicking",
+    thClassName: cn("w-20", RESULTS_TH_BASE),
+    tdClassName: cn("w-20 text-[#aaa]", RESULTS_TD_BASE),
+    getValue: () => "—",
+  },
+  {
+    id: "plt",
+    thClassName: cn("w-20", RESULTS_TH_BASE),
+    tdClassName: cn("w-20 text-[#aaa]", RESULTS_TD_BASE),
+    getValue: () => "—",
+  },
+];
+
+function buildVisibleColumns<Row>(
+  defs: readonly RenderCol<Row>[],
+  config: PlannerColumnConfig[],
+  fallback: PlannerColumnConfig[],
+): Array<RenderCol<Row> & { headerLabel: string }> {
+  const defById = new Map(defs.map((c) => [c.id, c] as const));
+  const fromConfig = config
+    .filter((c) => c.enabled)
+    .map((c) => {
+      const def = defById.get(c.id);
+      return def ? { ...def, headerLabel: c.label } : null;
+    })
+    .filter(Boolean) as Array<RenderCol<Row> & { headerLabel: string }>;
+
+  if (fromConfig.length > 0) return fromConfig;
+
+  return fallback
+    .filter((c) => c.enabled)
+    .map((c) => {
+      const def = defById.get(c.id);
+      return def ? { ...def, headerLabel: c.label } : null;
+    })
+    .filter(Boolean) as Array<RenderCol<Row> & { headerLabel: string }>;
+}
+
 export function PlannerResults() {
   const { consolidationResult, data, moveDcToShipment, consolidationPlanning, loadedFromSavedPlan, clearPlannerState } =
     usePlannerContext();
@@ -1425,347 +1761,23 @@ export function PlannerResults() {
     [consolidationResult, pickLoadSchedule.scheduleByShipmentId],
   );
 
-  const DC_COLS = useMemo<RenderCol<(typeof dcSummaryRows)[number]>[]>(() => {
-    const thBase = "px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]";
-    const tdBase = "px-3 py-2 align-top";
-    return [
-      {
-        id: "no",
-        thClassName: cn("w-9", thBase),
-        tdClassName: cn("w-9 text-[#666]", tdBase),
-        getValue: (_row, index) => index + 1,
-      },
-      {
-        id: "shipmentId",
-        thClassName: thBase,
-        tdClassName: cn("min-w-0", tdBase),
-        getValue: (row) => (
-          <div className="flex min-w-0 flex-col gap-1">
-            <div className="truncate" title={`${row.shipmentId} · ${row.origin?.trim() || "—"}`}>
-              <span className="font-medium text-white">{row.shipmentId}</span>
-              <span className="text-[11px] text-[#888]"> · {row.origin?.trim() || "—"}</span>
-            </div>
-            {row.overlapsSavedPlans && row.overlapsSavedPlans.length > 0 && (
-              <OverlapWithSavedPlanChip overlaps={row.overlapsSavedPlans} />
-            )}
-          </div>
-        ),
-      },
-      {
-        id: "dcName",
-        thClassName: thBase,
-        tdClassName: cn("min-w-0 text-[#ccc]", tdBase),
-        getValue: (row) => <div>{row.dcName}</div>,
-      },
-      {
-        id: "dropSequence",
-        thClassName: cn("w-20", thBase),
-        tdClassName: cn("w-20", tdBase),
-        getValue: (row) => <DropSequenceBadge dropSequence={row.dropSequence} />,
-      },
-      {
-        id: "startPicking",
-        thClassName: cn("w-20", thBase),
-        tdClassName: cn("w-20 text-[#aaa]", tdBase),
-        getValue: (row) => row.startPickingClock,
-      },
-      {
-        id: "plt",
-        thClassName: cn("w-20", thBase),
-        tdClassName: cn("w-20 text-[#aaa]", tdBase),
-        getValue: (row) => row.pltClock,
-      },
-      {
-        id: "legKm",
-        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
-        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
-        getValue: (row) => (row.legFromPreviousKm != null ? row.legFromPreviousKm.toFixed(1) : "—"),
-      },
-      {
-        id: "legMin",
-        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
-        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
-        getValue: (row) => (row.legFromPreviousMin != null ? Math.round(row.legFromPreviousMin) : "—"),
-      },
-      {
-        id: "arrive",
-        thClassName: cn("hidden lg:table-cell", thBase, "text-right"),
-        tdClassName: cn("hidden lg:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
-        getValue: (row) => row.arriveClock,
-      },
-      {
-        id: "unloadStart",
-        thClassName: cn("hidden lg:table-cell", thBase, "text-right"),
-        tdClassName: cn("hidden lg:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
-        getValue: (row) => row.unloadStartClock,
-      },
-      {
-        id: "depart",
-        thClassName: cn("hidden lg:table-cell", thBase, "text-right"),
-        tdClassName: cn("hidden lg:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
-        getValue: (row) => row.departClock,
-      },
-      {
-        id: "tripDur",
-        thClassName: cn("hidden xl:table-cell", thBase, "text-right"),
-        tdClassName: cn("hidden xl:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
-        getValue: (row) => formatTripDurationMin(row.tripDurationMin),
-      },
-      {
-        id: "totalQty",
-        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
-        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
-        getValue: (row) => row.totalQty,
-      },
-      {
-        id: "totalKg",
-        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
-        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
-        getValue: (row) => row.totalKg.toFixed(2),
-      },
-      {
-        id: "totalCbm",
-        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
-        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
-        getValue: (row) => row.totalCbm.toFixed(2),
-      },
-      {
-        id: "utilizationPct",
-        thClassName: cn("hidden xl:table-cell", thBase, "text-right"),
-        tdClassName: cn("hidden xl:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
-        getValue: (row) => formatUtilization(row.serviceType, row.utilizationPct),
-      },
-      {
-        id: "truckType",
-        thClassName: cn("hidden lg:table-cell", thBase),
-        tdClassName: cn("hidden lg:table-cell", tdBase, "text-[#ccc]"),
-        getValue: (row) => row.truckType,
-      },
-      {
-        id: "serviceType",
-        thClassName: cn("hidden lg:table-cell", thBase),
-        tdClassName: cn("hidden lg:table-cell", tdBase, "text-[#ccc]"),
-        getValue: (row) => row.serviceType,
-      },
-      {
-        id: "pld",
-        thClassName: cn("hidden xl:table-cell", thBase, "text-center"),
-        tdClassName: cn("hidden xl:table-cell", tdBase, "text-center text-[#aaa]"),
-        getValue: (row) => row.pld,
-      },
-      {
-        id: "rad",
-        thClassName: cn("hidden xl:table-cell", thBase, "text-center"),
-        tdClassName: cn("hidden xl:table-cell", tdBase, "text-center text-[#aaa]"),
-        getValue: (row) => row.rad,
-      },
-    ];
-  }, [dcSummaryRows]);
+  const fallbackColumnsByTab = useMemo(() => defaultColumnsByTab(), []);
+  const dcColumnConfig = getTabColumns("dc");
+  const poColumnConfig = getTabColumns("po");
+  const unassignedColumnConfig = getTabColumns("unassigned");
 
-  const PO_COLS = useMemo<RenderCol<(typeof poSummaryRows)[number]>[]>(() => {
-    const thBase = "px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]";
-    const tdBase = "px-3 py-2 align-top";
-    return [
-      {
-        id: "no",
-        thClassName: cn("w-9", thBase),
-        tdClassName: cn("w-9 text-[#666]", tdBase),
-        getValue: (_row, index) => index + 1,
-      },
-      {
-        id: "shipmentId",
-        thClassName: thBase,
-        tdClassName: cn("min-w-0", tdBase),
-        getValue: (row) => (
-          <div className="flex min-w-0 flex-col gap-1">
-            <div className="truncate" title={`${row.shipmentId} · ${row.origin?.trim() || "—"}`}>
-              <span className="font-medium text-white">{row.shipmentId}</span>
-              <span className="text-[11px] text-[#888]"> · {row.origin?.trim() || "—"}</span>
-            </div>
-            {row.overlapsSavedPlans && row.overlapsSavedPlans.length > 0 && (
-              <OverlapWithSavedPlanChip overlaps={row.overlapsSavedPlans} />
-            )}
-          </div>
-        ),
-      },
-      {
-        id: "dcName",
-        thClassName: thBase,
-        tdClassName: cn("min-w-0 text-[#ccc]", tdBase),
-        getValue: (row) => <div>{row.dcName}</div>,
-      },
-      {
-        id: "poNumber",
-        thClassName: thBase,
-        tdClassName: cn("min-w-0 text-[#ccc]", tdBase),
-        getValue: (row) => row.purchaseOrder,
-      },
-      {
-        id: "dropSequence",
-        thClassName: cn("w-20", thBase),
-        tdClassName: cn("w-20", tdBase),
-        getValue: (row) => <DropSequenceBadge dropSequence={row.dropSequence} />,
-      },
-      {
-        id: "startPicking",
-        thClassName: cn("w-20", thBase),
-        tdClassName: cn("w-20 text-[#aaa]", tdBase),
-        getValue: (row) => row.startPickingClock,
-      },
-      {
-        id: "plt",
-        thClassName: cn("w-20", thBase),
-        tdClassName: cn("w-20 text-[#aaa]", tdBase),
-        getValue: (row) => row.pltClock,
-      },
-      {
-        id: "totalQty",
-        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
-        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
-        getValue: (row) => row.totalQty,
-      },
-      {
-        id: "totalKg",
-        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
-        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
-        getValue: (row) => row.totalKg.toFixed(2),
-      },
-      {
-        id: "totalCbm",
-        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
-        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
-        getValue: (row) => row.totalCbm.toFixed(2),
-      },
-      {
-        id: "utilizationPct",
-        thClassName: cn("hidden lg:table-cell", thBase, "text-right"),
-        tdClassName: cn("hidden lg:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
-        getValue: (row) => formatUtilization(row.serviceType, row.utilizationPct),
-      },
-      {
-        id: "truckType",
-        thClassName: cn("hidden lg:table-cell", thBase),
-        tdClassName: cn("hidden lg:table-cell", tdBase, "text-[#ccc]"),
-        getValue: (row) => row.truckType,
-      },
-      {
-        id: "serviceType",
-        thClassName: cn("hidden lg:table-cell", thBase),
-        tdClassName: cn("hidden lg:table-cell", tdBase, "text-[#ccc]"),
-        getValue: (row) => row.serviceType,
-      },
-      {
-        id: "tripDur",
-        thClassName: cn("hidden xl:table-cell", thBase, "text-right"),
-        tdClassName: cn("hidden xl:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
-        getValue: (row) => formatTripDurationMin(row.tripDurationMin),
-      },
-      {
-        id: "pld",
-        thClassName: cn("hidden xl:table-cell", thBase, "text-center"),
-        tdClassName: cn("hidden xl:table-cell", tdBase, "text-center text-[#aaa]"),
-        getValue: (row) => row.pld,
-      },
-      {
-        id: "rad",
-        thClassName: cn("hidden xl:table-cell", thBase, "text-center"),
-        tdClassName: cn("hidden xl:table-cell", tdBase, "text-center text-[#aaa]"),
-        getValue: (row) => row.rad,
-      },
-      {
-        id: "poExpiredDate",
-        thClassName: cn("hidden xl:table-cell", thBase, "text-center"),
-        tdClassName: cn("hidden xl:table-cell", tdBase, "text-center text-[#aaa]"),
-        getValue: (row) => row.poExpiredDate,
-      },
-    ];
-  }, [poSummaryRows]);
-
-  const UNASSIGNED_COLS = useMemo<RenderCol<Shipment["orders"][number] & { _reason?: string; _overlaps?: SavedPlanOverlapRef[] }>[]>(() => {
-    const thBase = "px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]";
-    const tdBase = "px-3 py-2 align-top";
-    return [
-      {
-        id: "no",
-        thClassName: cn("w-9", thBase),
-        tdClassName: cn("w-9 text-[#666]", tdBase),
-        getValue: (_row, index) => index + 1,
-      },
-      {
-        id: "shipmentId",
-        thClassName: thBase,
-        tdClassName: cn("min-w-0", tdBase),
-        getValue: (o) => {
-          const po = o.purchaseOrder?.trim() || "—";
-          const origin = o.origin?.trim() || "—";
-          return (
-            <div className="flex min-w-0 flex-col gap-1">
-              <div className="truncate" title={`${po} · ${origin}${o._reason ? ` · ${o._reason}` : ""}`}>
-                <span className="font-medium text-white">{po}</span>
-                <span className="text-[11px] text-[#888]"> · {origin}</span>
-                {o._reason && <span className="text-[11px] text-[#ff9a7a]"> · {o._reason}</span>}
-              </div>
-              {o._overlaps && o._overlaps.length > 0 && <OverlapWithSavedPlanChip overlaps={o._overlaps} />}
-            </div>
-          );
-        },
-      },
-      {
-        id: "dcName",
-        thClassName: thBase,
-        tdClassName: cn("min-w-0 text-[#ccc]", tdBase),
-        getValue: (o) => o.dcName?.trim() || "—",
-      },
-      {
-        id: "dropSequence",
-        thClassName: cn("w-20", thBase),
-        tdClassName: cn("w-20", tdBase),
-        getValue: () => <DropSequenceBadge dropSequence={0} />,
-      },
-      {
-        id: "startPicking",
-        thClassName: cn("w-20", thBase),
-        tdClassName: cn("w-20 text-[#aaa]", tdBase),
-        getValue: () => "—",
-      },
-      {
-        id: "plt",
-        thClassName: cn("w-20", thBase),
-        tdClassName: cn("w-20 text-[#aaa]", tdBase),
-        getValue: () => "—",
-      },
-    ];
-  }, []);
-
-  const visibleColumns = useMemo(() => {
-    const definitionsByTab: Record<PlannerResultsTab, RenderCol<any>[]> = {
-      dc: DC_COLS,
-      po: PO_COLS,
-      unassigned: UNASSIGNED_COLS,
-    };
-    const defs = definitionsByTab[resultsTab];
-    const defById = new Map(defs.map((c) => [c.id, c] as const));
-
-    const config = getTabColumns(resultsTab);
-    const fromConfig = config
-      .filter((c) => c.enabled)
-      .map((c) => {
-        const def = defById.get(c.id);
-        return def ? { ...def, headerLabel: c.label } : null;
-      })
-      .filter(Boolean) as Array<RenderCol<any> & { headerLabel: string }>;
-
-    if (fromConfig.length > 0) return fromConfig;
-
-    const fallbackDefaults = defaultColumnsByTab()[resultsTab];
-    return fallbackDefaults
-      .filter((c) => c.enabled)
-      .map((c) => {
-        const def = defById.get(c.id);
-        return def ? { ...def, headerLabel: c.label } : null;
-      })
-      .filter(Boolean) as Array<RenderCol<any> & { headerLabel: string }>;
-  }, [DC_COLS, PO_COLS, UNASSIGNED_COLS, getTabColumns, resultsTab]);
+  const visibleDcColumns = useMemo(
+    () => buildVisibleColumns(DC_COLS, dcColumnConfig, fallbackColumnsByTab.dc),
+    [dcColumnConfig, fallbackColumnsByTab.dc],
+  );
+  const visiblePoColumns = useMemo(
+    () => buildVisibleColumns(PO_COLS, poColumnConfig, fallbackColumnsByTab.po),
+    [fallbackColumnsByTab.po, poColumnConfig],
+  );
+  const visibleUnassignedColumns = useMemo(
+    () => buildVisibleColumns(UNASSIGNED_COLS, unassignedColumnConfig, fallbackColumnsByTab.unassigned),
+    [fallbackColumnsByTab.unassigned, unassignedColumnConfig],
+  );
 
   const exportResultsToXlsx = async () => {
     if (!consolidationResult) return;
@@ -2117,14 +2129,18 @@ export function PlannerResults() {
                           <DragHandleDotsSvg />
                         </span>
                       </td>
-                      {visibleColumns.map((col) => (
+                      {(() => {
+                        const augmented: UnassignedRow = {
+                          ...o,
+                          _reason: entry.reason,
+                          _overlaps: entry.overlapsSavedPlans,
+                        };
+                        return visibleUnassignedColumns.map((col) => (
                         <td key={col.id} className={col.tdClassName}>
-                          {col.getValue(
-                            { ...o, _reason: entry.reason, _overlaps: entry.overlapsSavedPlans },
-                            index,
-                          )}
+                          {col.getValue(augmented, index)}
                         </td>
-                      ))}
+                        ));
+                      })()}
                     </tr>
                   );
                 })}
@@ -2141,7 +2157,7 @@ export function PlannerResults() {
                       className="w-8 px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]"
                       aria-hidden
                     />
-                    {visibleColumns.map((col) => (
+                    {visibleDcColumns.map((col) => (
                       <th key={col.id} className={col.thClassName}>
                         {col.headerLabel}
                       </th>
@@ -2218,7 +2234,7 @@ export function PlannerResults() {
                             <DragHandleDotsSvg />
                           </span>
                         </td>
-                        {visibleColumns.map((col) => (
+                        {visibleDcColumns.map((col) => (
                           <td key={col.id} className={col.tdClassName}>
                             {col.getValue(row, index)}
                           </td>
@@ -2239,7 +2255,7 @@ export function PlannerResults() {
                     className="w-8 px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]"
                     aria-hidden
                   />
-                  {visibleColumns.map((col) => (
+                  {visiblePoColumns.map((col) => (
                     <th key={col.id} className={col.thClassName}>
                       {col.headerLabel}
                     </th>
@@ -2316,7 +2332,7 @@ export function PlannerResults() {
                           <DragHandleDotsSvg />
                         </span>
                       </td>
-                      {visibleColumns.map((col) => (
+                      {visiblePoColumns.map((col) => (
                         <td key={col.id} className={col.tdClassName}>
                           {col.getValue(row, index)}
                         </td>
