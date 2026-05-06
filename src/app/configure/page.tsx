@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, ChevronRight, Columns, Plus, Package, Trash2, Pencil, Check, X, Boxes, Upload, Download, History } from "lucide-react";
 import { BrandMark } from "@/components/po/BrandMark";
 import { HeaderConfig } from "@/components/po/HeaderConfig";
+import { PlannerResultsColumnsConfig } from "@/components/planner/PlannerResultsColumnsConfig";
 import { MasterSettingsClient } from "@/components/settings/MasterSettingsClient";
 import { Button } from "@/components/po/ui/button";
 import { ConfirmDialog } from "@/components/po/ui/confirm-dialog";
@@ -576,7 +577,7 @@ export default function ConfigurePage() {
                     <Boxes className="h-5 w-5 text-[#1D9E75]" />
                   </div>
                   <div>
-                    <span className="font-semibold text-[#e0e0e0]">Settings for Planner</span>
+                    <span className="font-semibold text-[#e0e0e0]">Planner data</span>
                     <p className="text-sm text-[#888888]">Manage OM Masters (item, address, and truck data)</p>
                   </div>
                 </div>
@@ -645,14 +646,21 @@ export default function ConfigurePage() {
         )}
 
         {view === "planner" && (
-          <MasterSettingsClient
-            initialItems={[]}
-            initialAddresses={[]}
-            initialTrucks={[]}
-            embedded
-            plannerCategory={plannerMasterCategory}
-            onPlannerCategoryChange={setPlannerMasterCategory}
-          />
+          <>
+            {plannerMasterCategory === "list" && (
+              <div className="mb-4 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] p-6">
+                <PlannerResultsColumnsConfig />
+              </div>
+            )}
+            <MasterSettingsClient
+              initialItems={[]}
+              initialAddresses={[]}
+              initialTrucks={[]}
+              embedded
+              plannerCategory={plannerMasterCategory}
+              onPlannerCategoryChange={setPlannerMasterCategory}
+            />
+          </>
         )}
 
         {view === "headers" && (
