@@ -9,6 +9,12 @@ import Link from "next/link";
 import { Button } from "@/components/po/ui/button";
 import { cn } from "@/lib/po/utils";
 import { usePlannerContext } from "@/context/PlannerContext";
+import { usePlannerResultsColumns } from "@/context/PlannerResultsColumnsContext";
+import {
+  defaultColumnsByTab,
+  type PlannerColumnConfig,
+  type PlannerResultsTab,
+} from "@/lib/planner/results-columns";
 import type { SavedPlanOverlapRef, Shipment } from "@/types/planner";
 import { SavePlanDialog } from "@/components/planner/SavePlanDialog";
 
@@ -1247,11 +1253,17 @@ function OverlapWithSavedPlanChip({ overlaps }: { overlaps?: SavedPlanOverlapRef
   );
 }
 
-type PlannerResultsTab = "dc" | "po" | "unassigned";
+type RenderCol<Row> = {
+  id: PlannerColumnConfig["id"];
+  thClassName: string;
+  tdClassName: string;
+  getValue: (row: Row, index: number) => React.ReactNode;
+};
 
 export function PlannerResults() {
   const { consolidationResult, data, moveDcToShipment, consolidationPlanning, loadedFromSavedPlan, clearPlannerState } =
     usePlannerContext();
+  const { getTabColumns } = usePlannerResultsColumns();
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
   const [isClientMounted, setIsClientMounted] = useState(false);
   const [draggingRowKey, setDraggingRowKey] = useState<string | null>(null);
@@ -1412,6 +1424,348 @@ export function PlannerResults() {
         : [],
     [consolidationResult, pickLoadSchedule.scheduleByShipmentId],
   );
+
+  const DC_COLS = useMemo<RenderCol<(typeof dcSummaryRows)[number]>[]>(() => {
+    const thBase = "px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]";
+    const tdBase = "px-3 py-2 align-top";
+    return [
+      {
+        id: "no",
+        thClassName: cn("w-9", thBase),
+        tdClassName: cn("w-9 text-[#666]", tdBase),
+        getValue: (_row, index) => index + 1,
+      },
+      {
+        id: "shipmentId",
+        thClassName: thBase,
+        tdClassName: cn("min-w-0", tdBase),
+        getValue: (row) => (
+          <div className="flex min-w-0 flex-col gap-1">
+            <div className="truncate" title={`${row.shipmentId} · ${row.origin?.trim() || "—"}`}>
+              <span className="font-medium text-white">{row.shipmentId}</span>
+              <span className="text-[11px] text-[#888]"> · {row.origin?.trim() || "—"}</span>
+            </div>
+            {row.overlapsSavedPlans && row.overlapsSavedPlans.length > 0 && (
+              <OverlapWithSavedPlanChip overlaps={row.overlapsSavedPlans} />
+            )}
+          </div>
+        ),
+      },
+      {
+        id: "dcName",
+        thClassName: thBase,
+        tdClassName: cn("min-w-0 text-[#ccc]", tdBase),
+        getValue: (row) => <div>{row.dcName}</div>,
+      },
+      {
+        id: "dropSequence",
+        thClassName: cn("w-20", thBase),
+        tdClassName: cn("w-20", tdBase),
+        getValue: (row) => <DropSequenceBadge dropSequence={row.dropSequence} />,
+      },
+      {
+        id: "startPicking",
+        thClassName: cn("w-20", thBase),
+        tdClassName: cn("w-20 text-[#aaa]", tdBase),
+        getValue: (row) => row.startPickingClock,
+      },
+      {
+        id: "plt",
+        thClassName: cn("w-20", thBase),
+        tdClassName: cn("w-20 text-[#aaa]", tdBase),
+        getValue: (row) => row.pltClock,
+      },
+      {
+        id: "legKm",
+        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
+        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
+        getValue: (row) => (row.legFromPreviousKm != null ? row.legFromPreviousKm.toFixed(1) : "—"),
+      },
+      {
+        id: "legMin",
+        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
+        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
+        getValue: (row) => (row.legFromPreviousMin != null ? Math.round(row.legFromPreviousMin) : "—"),
+      },
+      {
+        id: "arrive",
+        thClassName: cn("hidden lg:table-cell", thBase, "text-right"),
+        tdClassName: cn("hidden lg:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
+        getValue: (row) => row.arriveClock,
+      },
+      {
+        id: "unloadStart",
+        thClassName: cn("hidden lg:table-cell", thBase, "text-right"),
+        tdClassName: cn("hidden lg:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
+        getValue: (row) => row.unloadStartClock,
+      },
+      {
+        id: "depart",
+        thClassName: cn("hidden lg:table-cell", thBase, "text-right"),
+        tdClassName: cn("hidden lg:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
+        getValue: (row) => row.departClock,
+      },
+      {
+        id: "tripDur",
+        thClassName: cn("hidden xl:table-cell", thBase, "text-right"),
+        tdClassName: cn("hidden xl:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
+        getValue: (row) => formatTripDurationMin(row.tripDurationMin),
+      },
+      {
+        id: "totalQty",
+        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
+        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
+        getValue: (row) => row.totalQty,
+      },
+      {
+        id: "totalKg",
+        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
+        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
+        getValue: (row) => row.totalKg.toFixed(2),
+      },
+      {
+        id: "totalCbm",
+        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
+        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
+        getValue: (row) => row.totalCbm.toFixed(2),
+      },
+      {
+        id: "utilizationPct",
+        thClassName: cn("hidden xl:table-cell", thBase, "text-right"),
+        tdClassName: cn("hidden xl:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
+        getValue: (row) => formatUtilization(row.serviceType, row.utilizationPct),
+      },
+      {
+        id: "truckType",
+        thClassName: cn("hidden lg:table-cell", thBase),
+        tdClassName: cn("hidden lg:table-cell", tdBase, "text-[#ccc]"),
+        getValue: (row) => row.truckType,
+      },
+      {
+        id: "serviceType",
+        thClassName: cn("hidden lg:table-cell", thBase),
+        tdClassName: cn("hidden lg:table-cell", tdBase, "text-[#ccc]"),
+        getValue: (row) => row.serviceType,
+      },
+      {
+        id: "pld",
+        thClassName: cn("hidden xl:table-cell", thBase, "text-center"),
+        tdClassName: cn("hidden xl:table-cell", tdBase, "text-center text-[#aaa]"),
+        getValue: (row) => row.pld,
+      },
+      {
+        id: "rad",
+        thClassName: cn("hidden xl:table-cell", thBase, "text-center"),
+        tdClassName: cn("hidden xl:table-cell", tdBase, "text-center text-[#aaa]"),
+        getValue: (row) => row.rad,
+      },
+    ];
+  }, [dcSummaryRows]);
+
+  const PO_COLS = useMemo<RenderCol<(typeof poSummaryRows)[number]>[]>(() => {
+    const thBase = "px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]";
+    const tdBase = "px-3 py-2 align-top";
+    return [
+      {
+        id: "no",
+        thClassName: cn("w-9", thBase),
+        tdClassName: cn("w-9 text-[#666]", tdBase),
+        getValue: (_row, index) => index + 1,
+      },
+      {
+        id: "shipmentId",
+        thClassName: thBase,
+        tdClassName: cn("min-w-0", tdBase),
+        getValue: (row) => (
+          <div className="flex min-w-0 flex-col gap-1">
+            <div className="truncate" title={`${row.shipmentId} · ${row.origin?.trim() || "—"}`}>
+              <span className="font-medium text-white">{row.shipmentId}</span>
+              <span className="text-[11px] text-[#888]"> · {row.origin?.trim() || "—"}</span>
+            </div>
+            {row.overlapsSavedPlans && row.overlapsSavedPlans.length > 0 && (
+              <OverlapWithSavedPlanChip overlaps={row.overlapsSavedPlans} />
+            )}
+          </div>
+        ),
+      },
+      {
+        id: "dcName",
+        thClassName: thBase,
+        tdClassName: cn("min-w-0 text-[#ccc]", tdBase),
+        getValue: (row) => <div>{row.dcName}</div>,
+      },
+      {
+        id: "poNumber",
+        thClassName: thBase,
+        tdClassName: cn("min-w-0 text-[#ccc]", tdBase),
+        getValue: (row) => row.purchaseOrder,
+      },
+      {
+        id: "dropSequence",
+        thClassName: cn("w-20", thBase),
+        tdClassName: cn("w-20", tdBase),
+        getValue: (row) => <DropSequenceBadge dropSequence={row.dropSequence} />,
+      },
+      {
+        id: "startPicking",
+        thClassName: cn("w-20", thBase),
+        tdClassName: cn("w-20 text-[#aaa]", tdBase),
+        getValue: (row) => row.startPickingClock,
+      },
+      {
+        id: "plt",
+        thClassName: cn("w-20", thBase),
+        tdClassName: cn("w-20 text-[#aaa]", tdBase),
+        getValue: (row) => row.pltClock,
+      },
+      {
+        id: "totalQty",
+        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
+        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
+        getValue: (row) => row.totalQty,
+      },
+      {
+        id: "totalKg",
+        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
+        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
+        getValue: (row) => row.totalKg.toFixed(2),
+      },
+      {
+        id: "totalCbm",
+        thClassName: cn("hidden md:table-cell", thBase, "text-right"),
+        tdClassName: cn("hidden md:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
+        getValue: (row) => row.totalCbm.toFixed(2),
+      },
+      {
+        id: "utilizationPct",
+        thClassName: cn("hidden lg:table-cell", thBase, "text-right"),
+        tdClassName: cn("hidden lg:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
+        getValue: (row) => formatUtilization(row.serviceType, row.utilizationPct),
+      },
+      {
+        id: "truckType",
+        thClassName: cn("hidden lg:table-cell", thBase),
+        tdClassName: cn("hidden lg:table-cell", tdBase, "text-[#ccc]"),
+        getValue: (row) => row.truckType,
+      },
+      {
+        id: "serviceType",
+        thClassName: cn("hidden lg:table-cell", thBase),
+        tdClassName: cn("hidden lg:table-cell", tdBase, "text-[#ccc]"),
+        getValue: (row) => row.serviceType,
+      },
+      {
+        id: "tripDur",
+        thClassName: cn("hidden xl:table-cell", thBase, "text-right"),
+        tdClassName: cn("hidden xl:table-cell", tdBase, "text-right tabular-nums text-[#aaa]"),
+        getValue: (row) => formatTripDurationMin(row.tripDurationMin),
+      },
+      {
+        id: "pld",
+        thClassName: cn("hidden xl:table-cell", thBase, "text-center"),
+        tdClassName: cn("hidden xl:table-cell", tdBase, "text-center text-[#aaa]"),
+        getValue: (row) => row.pld,
+      },
+      {
+        id: "rad",
+        thClassName: cn("hidden xl:table-cell", thBase, "text-center"),
+        tdClassName: cn("hidden xl:table-cell", tdBase, "text-center text-[#aaa]"),
+        getValue: (row) => row.rad,
+      },
+      {
+        id: "poExpiredDate",
+        thClassName: cn("hidden xl:table-cell", thBase, "text-center"),
+        tdClassName: cn("hidden xl:table-cell", tdBase, "text-center text-[#aaa]"),
+        getValue: (row) => row.poExpiredDate,
+      },
+    ];
+  }, [poSummaryRows]);
+
+  const UNASSIGNED_COLS = useMemo<RenderCol<Shipment["orders"][number] & { _reason?: string; _overlaps?: SavedPlanOverlapRef[] }>[]>(() => {
+    const thBase = "px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]";
+    const tdBase = "px-3 py-2 align-top";
+    return [
+      {
+        id: "no",
+        thClassName: cn("w-9", thBase),
+        tdClassName: cn("w-9 text-[#666]", tdBase),
+        getValue: (_row, index) => index + 1,
+      },
+      {
+        id: "shipmentId",
+        thClassName: thBase,
+        tdClassName: cn("min-w-0", tdBase),
+        getValue: (o) => {
+          const po = o.purchaseOrder?.trim() || "—";
+          const origin = o.origin?.trim() || "—";
+          return (
+            <div className="flex min-w-0 flex-col gap-1">
+              <div className="truncate" title={`${po} · ${origin}${o._reason ? ` · ${o._reason}` : ""}`}>
+                <span className="font-medium text-white">{po}</span>
+                <span className="text-[11px] text-[#888]"> · {origin}</span>
+                {o._reason && <span className="text-[11px] text-[#ff9a7a]"> · {o._reason}</span>}
+              </div>
+              {o._overlaps && o._overlaps.length > 0 && <OverlapWithSavedPlanChip overlaps={o._overlaps} />}
+            </div>
+          );
+        },
+      },
+      {
+        id: "dcName",
+        thClassName: thBase,
+        tdClassName: cn("min-w-0 text-[#ccc]", tdBase),
+        getValue: (o) => o.dcName?.trim() || "—",
+      },
+      {
+        id: "dropSequence",
+        thClassName: cn("w-20", thBase),
+        tdClassName: cn("w-20", tdBase),
+        getValue: () => <DropSequenceBadge dropSequence={0} />,
+      },
+      {
+        id: "startPicking",
+        thClassName: cn("w-20", thBase),
+        tdClassName: cn("w-20 text-[#aaa]", tdBase),
+        getValue: () => "—",
+      },
+      {
+        id: "plt",
+        thClassName: cn("w-20", thBase),
+        tdClassName: cn("w-20 text-[#aaa]", tdBase),
+        getValue: () => "—",
+      },
+    ];
+  }, []);
+
+  const visibleColumns = useMemo(() => {
+    const definitionsByTab: Record<PlannerResultsTab, RenderCol<any>[]> = {
+      dc: DC_COLS,
+      po: PO_COLS,
+      unassigned: UNASSIGNED_COLS,
+    };
+    const defs = definitionsByTab[resultsTab];
+    const defById = new Map(defs.map((c) => [c.id, c] as const));
+
+    const config = getTabColumns(resultsTab);
+    const fromConfig = config
+      .filter((c) => c.enabled)
+      .map((c) => {
+        const def = defById.get(c.id);
+        return def ? { ...def, headerLabel: c.label } : null;
+      })
+      .filter(Boolean) as Array<RenderCol<any> & { headerLabel: string }>;
+
+    if (fromConfig.length > 0) return fromConfig;
+
+    const fallbackDefaults = defaultColumnsByTab()[resultsTab];
+    return fallbackDefaults
+      .filter((c) => c.enabled)
+      .map((c) => {
+        const def = defById.get(c.id);
+        return def ? { ...def, headerLabel: c.label } : null;
+      })
+      .filter(Boolean) as Array<RenderCol<any> & { headerLabel: string }>;
+  }, [DC_COLS, PO_COLS, UNASSIGNED_COLS, getTabColumns, resultsTab]);
 
   const exportResultsToXlsx = async () => {
     if (!consolidationResult) return;
@@ -1743,31 +2097,16 @@ export function PlannerResults() {
                     className="w-8 px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]"
                     aria-hidden
                   />
-                  <th className="w-9 px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                    #
-                  </th>
-                  <th className="px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                    Shipment
-                  </th>
-                  <th className="px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                    DC Name
-                  </th>
-                  <th className="w-20 px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                    Drop #
-                  </th>
-                  <th className="w-20 px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                    Pick time
-                  </th>
-                  <th className="w-20 px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                    Ready time
-                  </th>
+                  {visibleColumns.map((col) => (
+                    <th key={col.id} className={col.thClassName}>
+                      {col.headerLabel}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {consolidationResult.unassignedOrders.map((entry, index) => {
                   const o = entry.order;
-                  const po = o.purchaseOrder?.trim() || "—";
-                  const origin = o.origin?.trim() || "—";
                   return (
                     <tr
                       key={`unassigned-${index}`}
@@ -1778,30 +2117,14 @@ export function PlannerResults() {
                           <DragHandleDotsSvg />
                         </span>
                       </td>
-                      <td className="w-9 px-3 py-2 align-top text-[#666]">{index + 1}</td>
-                      <td className="min-w-0 px-3 py-2 align-top">
-                        <div className="flex min-w-0 flex-col gap-1">
-                          <div
-                            className="truncate"
-                            title={`${po} · ${origin}${entry.reason ? ` · ${entry.reason}` : ""}`}
-                          >
-                            <span className="font-medium text-white">{po}</span>
-                            <span className="text-[11px] text-[#888]"> · {origin}</span>
-                            {entry.reason && (
-                              <span className="text-[11px] text-[#ff9a7a]"> · {entry.reason}</span>
-                            )}
-                          </div>
-                          {entry.overlapsSavedPlans && entry.overlapsSavedPlans.length > 0 && (
-                            <OverlapWithSavedPlanChip overlaps={entry.overlapsSavedPlans} />
+                      {visibleColumns.map((col) => (
+                        <td key={col.id} className={col.tdClassName}>
+                          {col.getValue(
+                            { ...o, _reason: entry.reason, _overlaps: entry.overlapsSavedPlans },
+                            index,
                           )}
-                        </div>
-                      </td>
-                      <td className="min-w-0 px-3 py-2 align-top text-[#ccc]">{o.dcName?.trim() || "—"}</td>
-                      <td className="w-20 px-3 py-2 align-top">
-                        <DropSequenceBadge dropSequence={0} />
-                      </td>
-                      <td className="w-20 px-3 py-2 align-top text-[#aaa]">—</td>
-                      <td className="w-20 px-3 py-2 align-top text-[#aaa]">—</td>
+                        </td>
+                      ))}
                     </tr>
                   );
                 })}
@@ -1812,94 +2135,17 @@ export function PlannerResults() {
               <p className="px-4 py-8 text-center text-[13px] text-[#555]">No rows.</p>
             ) : (
               <table className="w-full border-separate border-spacing-0 text-[12px] whitespace-nowrap">
-                <colgroup>
-                  <col className="w-8" />
-                  <col className="w-9" />
-                  <col />
-                  <col />
-                  <col className="w-20" />
-                  <col className="w-20" />
-                  <col className="w-20" />
-                  <col className="w-24" />
-                  <col className="w-24" />
-                  <col className="w-24" />
-                  <col className="w-28" />
-                  <col className="w-24" />
-                  <col className="w-24" />
-                  <col className="w-24" />
-                  <col className="w-20" />
-                  <col className="w-20" />
-                  <col className="w-24" />
-                  <col className="w-28" />
-                  <col className="w-20" />
-                  <col className="w-20" />
-                </colgroup>
                 <thead className="sticky top-0 z-[1] border-b-[0.5px] border-[#2a2a2a] bg-[#161616] [&_th]:bg-[#161616]">
                   <tr>
                     <th
                       className="w-8 px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]"
                       aria-hidden
                     />
-                    <th className="w-9 px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                      #
-                    </th>
-                    <th className="px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                      Shipment
-                    </th>
-                    <th className="px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                      DC Name
-                    </th>
-                    <th className="w-20 px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                      Drop #
-                    </th>
-                    <th className="w-20 px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                      Pick time
-                    </th>
-                    <th className="w-20 px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                      Ready time
-                    </th>
-                    <th className="hidden px-3 py-2 text-right text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] md:table-cell">
-                      Drive km
-                    </th>
-                    <th className="hidden px-3 py-2 text-right text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] md:table-cell">
-                      Drive min
-                    </th>
-                    <th className="hidden px-3 py-2 text-right text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] lg:table-cell">
-                      Arrive
-                    </th>
-                    <th className="hidden px-3 py-2 text-right text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] lg:table-cell">
-                      Unload start
-                    </th>
-                    <th className="hidden px-3 py-2 text-right text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] lg:table-cell">
-                      Depart
-                    </th>
-                    <th className="hidden px-3 py-2 text-right text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] xl:table-cell">
-                      Trip dur
-                    </th>
-                    <th className="hidden px-3 py-2 text-right text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] md:table-cell">
-                      Qty
-                    </th>
-                    <th className="hidden px-3 py-2 text-right text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] md:table-cell">
-                      KG
-                    </th>
-                    <th className="hidden px-3 py-2 text-right text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] md:table-cell">
-                      Volume
-                    </th>
-                    <th className="hidden px-3 py-2 text-right text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] xl:table-cell">
-                      Util %
-                    </th>
-                    <th className="hidden px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] lg:table-cell">
-                      Truck type
-                    </th>
-                    <th className="hidden px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] lg:table-cell">
-                      Service
-                    </th>
-                    <th className="hidden px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] xl:table-cell">
-                      PLD
-                    </th>
-                    <th className="hidden px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] xl:table-cell">
-                      RAD
-                    </th>
+                    {visibleColumns.map((col) => (
+                      <th key={col.id} className={col.thClassName}>
+                        {col.headerLabel}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
@@ -1972,63 +2218,11 @@ export function PlannerResults() {
                             <DragHandleDotsSvg />
                           </span>
                         </td>
-                        <td className="w-9 px-3 py-2 align-top text-[#666]">{index + 1}</td>
-                        <td className="min-w-0 px-3 py-2 align-top">
-                          <div className="flex min-w-0 flex-col gap-1">
-                            <div
-                              className="truncate"
-                              title={`${row.shipmentId} · ${row.origin?.trim() || "—"}`}
-                            >
-                              <span className="font-medium text-white">{row.shipmentId}</span>
-                              <span className="text-[11px] text-[#888]"> · {row.origin?.trim() || "—"}</span>
-                            </div>
-                            {row.overlapsSavedPlans && row.overlapsSavedPlans.length > 0 && (
-                              <OverlapWithSavedPlanChip overlaps={row.overlapsSavedPlans} />
-                            )}
-                          </div>
-                        </td>
-                        <td className="min-w-0 px-3 py-2 align-top text-[#ccc]">
-                          <div>{row.dcName}</div>
-                        </td>
-                        <td className="w-20 px-3 py-2 align-top">
-                          <DropSequenceBadge dropSequence={row.dropSequence} />
-                        </td>
-                        <td className="w-20 px-3 py-2 align-top text-[#aaa]">{row.startPickingClock}</td>
-                        <td className="w-20 px-3 py-2 align-top text-[#aaa]">{row.pltClock}</td>
-                        <td className="hidden px-3 py-2 align-top text-right tabular-nums text-[#aaa] md:table-cell">
-                          {row.legFromPreviousKm != null ? row.legFromPreviousKm.toFixed(1) : "—"}
-                        </td>
-                        <td className="hidden px-3 py-2 align-top text-right tabular-nums text-[#aaa] md:table-cell">
-                          {row.legFromPreviousMin != null ? Math.round(row.legFromPreviousMin) : "—"}
-                        </td>
-                        <td className="hidden px-3 py-2 align-top text-right tabular-nums text-[#aaa] lg:table-cell">
-                          {row.arriveClock}
-                        </td>
-                        <td className="hidden px-3 py-2 align-top text-right tabular-nums text-[#aaa] lg:table-cell">
-                          {row.unloadStartClock}
-                        </td>
-                        <td className="hidden px-3 py-2 align-top text-right tabular-nums text-[#aaa] lg:table-cell">
-                          {row.departClock}
-                        </td>
-                        <td className="hidden px-3 py-2 align-top text-right tabular-nums text-[#aaa] xl:table-cell">
-                          {formatTripDurationMin(row.tripDurationMin)}
-                        </td>
-                        <td className="hidden px-3 py-2 align-top text-right tabular-nums text-[#aaa] md:table-cell">
-                          {row.totalQty}
-                        </td>
-                        <td className="hidden px-3 py-2 align-top text-right tabular-nums text-[#aaa] md:table-cell">
-                          {row.totalKg.toFixed(2)}
-                        </td>
-                        <td className="hidden px-3 py-2 align-top text-right tabular-nums text-[#aaa] md:table-cell">
-                          {row.totalCbm.toFixed(2)}
-                        </td>
-                        <td className="hidden px-3 py-2 align-top text-right tabular-nums text-[#aaa] xl:table-cell">
-                          {formatUtilization(row.serviceType, row.utilizationPct)}
-                        </td>
-                        <td className="hidden px-3 py-2 align-top text-[#ccc] lg:table-cell">{row.truckType}</td>
-                        <td className="hidden px-3 py-2 align-top text-[#ccc] lg:table-cell">{row.serviceType}</td>
-                        <td className="hidden px-3 py-2 align-top text-center text-[#aaa] xl:table-cell">{row.pld}</td>
-                        <td className="hidden px-3 py-2 align-top text-center text-[#aaa] xl:table-cell">{row.rad}</td>
+                        {visibleColumns.map((col) => (
+                          <td key={col.id} className={col.tdClassName}>
+                            {col.getValue(row, index)}
+                          </td>
+                        ))}
                       </tr>
                     );
                   })}
@@ -2039,84 +2233,17 @@ export function PlannerResults() {
             <p className="px-4 py-8 text-center text-[13px] text-[#555]">No rows.</p>
           ) : (
             <table className="w-full border-separate border-spacing-0 text-[12px] whitespace-nowrap">
-              <colgroup>
-                <col className="w-8" />
-                <col className="w-9" />
-                <col />
-                <col />
-                <col />
-                <col className="w-20" />
-                <col className="w-20" />
-                <col className="w-20" />
-                <col className="w-24" />
-                <col className="w-24" />
-                <col className="w-24" />
-                <col className="w-28" />
-                <col className="w-24" />
-                <col className="w-28" />
-                <col className="w-20" />
-                <col className="w-20" />
-                <col className="w-20" />
-                <col className="w-24" />
-                <col className="w-24" />
-              </colgroup>
               <thead className="sticky top-0 z-[1] border-b-[0.5px] border-[#2a2a2a] bg-[#161616] [&_th]:bg-[#161616]">
                 <tr>
                   <th
                     className="w-8 px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]"
                     aria-hidden
                   />
-                  <th className="w-9 px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                    #
-                  </th>
-                  <th className="px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                    Shipment
-                  </th>
-                  <th className="px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                    DC Name
-                  </th>
-                  <th className="px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                    PO Number
-                  </th>
-                  <th className="w-20 px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                    Drop #
-                  </th>
-                  <th className="w-20 px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                    Pick time
-                  </th>
-                  <th className="w-20 px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]">
-                    Ready time
-                  </th>
-                  <th className="hidden px-3 py-2 text-right text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] md:table-cell">
-                    Qty
-                  </th>
-                  <th className="hidden px-3 py-2 text-right text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] md:table-cell">
-                    KG
-                  </th>
-                  <th className="hidden px-3 py-2 text-right text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] md:table-cell">
-                    Volume
-                  </th>
-                  <th className="hidden px-3 py-2 text-right text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] lg:table-cell">
-                    Util %
-                  </th>
-                  <th className="hidden px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] lg:table-cell">
-                    Truck type
-                  </th>
-                  <th className="hidden px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] lg:table-cell">
-                    Service
-                  </th>
-                  <th className="hidden px-3 py-2 text-right text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] xl:table-cell">
-                    Trip dur
-                  </th>
-                  <th className="hidden px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] xl:table-cell">
-                    PLD
-                  </th>
-                  <th className="hidden px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] xl:table-cell">
-                    RAD
-                  </th>
-                  <th className="hidden px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[#555] xl:table-cell">
-                    PO Exp
-                  </th>
+                  {visibleColumns.map((col) => (
+                    <th key={col.id} className={col.thClassName}>
+                      {col.headerLabel}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -2189,52 +2316,11 @@ export function PlannerResults() {
                           <DragHandleDotsSvg />
                         </span>
                       </td>
-                      <td className="w-9 px-3 py-2 align-top text-[#666]">{index + 1}</td>
-                      <td className="min-w-0 px-3 py-2 align-top">
-                        <div className="flex min-w-0 flex-col gap-1">
-                          <div
-                            className="truncate"
-                            title={`${row.shipmentId} · ${row.origin?.trim() || "—"}`}
-                          >
-                            <span className="font-medium text-white">{row.shipmentId}</span>
-                            <span className="text-[11px] text-[#888]"> · {row.origin?.trim() || "—"}</span>
-                          </div>
-                          {row.overlapsSavedPlans && row.overlapsSavedPlans.length > 0 && (
-                            <OverlapWithSavedPlanChip overlaps={row.overlapsSavedPlans} />
-                          )}
-                        </div>
-                      </td>
-                      <td className="min-w-0 px-3 py-2 align-top text-[#ccc]">
-                        <div>{row.dcName}</div>
-                      </td>
-                      <td className="min-w-0 px-3 py-2 align-top text-[#ccc]">{row.purchaseOrder}</td>
-                      <td className="w-20 px-3 py-2 align-top">
-                        <DropSequenceBadge dropSequence={row.dropSequence} />
-                      </td>
-                      <td className="w-20 px-3 py-2 align-top text-[#aaa]">{row.startPickingClock}</td>
-                      <td className="w-20 px-3 py-2 align-top text-[#aaa]">{row.pltClock}</td>
-                      <td className="hidden px-3 py-2 align-top text-right tabular-nums text-[#aaa] md:table-cell">
-                        {row.totalQty}
-                      </td>
-                      <td className="hidden px-3 py-2 align-top text-right tabular-nums text-[#aaa] md:table-cell">
-                        {row.totalKg.toFixed(2)}
-                      </td>
-                      <td className="hidden px-3 py-2 align-top text-right tabular-nums text-[#aaa] md:table-cell">
-                        {row.totalCbm.toFixed(2)}
-                      </td>
-                      <td className="hidden px-3 py-2 align-top text-right tabular-nums text-[#aaa] lg:table-cell">
-                        {formatUtilization(row.serviceType, row.utilizationPct)}
-                      </td>
-                      <td className="hidden px-3 py-2 align-top text-[#ccc] lg:table-cell">{row.truckType}</td>
-                      <td className="hidden px-3 py-2 align-top text-[#ccc] lg:table-cell">{row.serviceType}</td>
-                      <td className="hidden px-3 py-2 align-top text-right tabular-nums text-[#aaa] xl:table-cell">
-                        {formatTripDurationMin(row.tripDurationMin)}
-                      </td>
-                      <td className="hidden px-3 py-2 align-top text-center text-[#aaa] xl:table-cell">{row.pld}</td>
-                      <td className="hidden px-3 py-2 align-top text-center text-[#aaa] xl:table-cell">{row.rad}</td>
-                      <td className="hidden px-3 py-2 align-top text-center text-[#aaa] xl:table-cell">
-                        {row.poExpiredDate}
-                      </td>
+                      {visibleColumns.map((col) => (
+                        <td key={col.id} className={col.tdClassName}>
+                          {col.getValue(row, index)}
+                        </td>
+                      ))}
                     </tr>
                   );
                 })}
