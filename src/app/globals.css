@@ -71,6 +71,13 @@
   --om-input-h: 32px;
 }
 
+/* Native <select> option popup readability (Windows/Chrome). */
+[data-theme="dark-ops"] select,
+[data-theme="dark-ops"] option {
+  background-color: var(--surface-elevated);
+  color: var(--text);
+}
+
 [data-theme="white"] {
   color-scheme: light;
   --primary: #171717;
@@ -652,6 +659,36 @@ pre {
   border: none !important;
 }
 
+/* Leaflet base-map “always dark” (free tiles) */
+.om-leaflet-always-dark .leaflet-container {
+  background: #0b1220;
+}
+
+.om-leaflet-always-dark .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) saturate(0.85) contrast(1.08) brightness(0.92);
+}
+
+/* Leaflet “leg distance” labels: high contrast over dark map */
+.leaflet-div-icon.om-leaflet-leg-km-label {
+  background: transparent !important;
+  border: none !important;
+}
+
+.om-leaflet-leg-km-pill {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(10, 15, 20, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font: 700 11px/1 var(--font-sans, system-ui, sans-serif);
+  color: rgba(255, 255, 255, 0.92);
+  white-space: nowrap;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.65);
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
 @theme inline {
   --font-sans: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
@@ -693,7 +730,7 @@ pre {
    Enterprise / TMS utility primitives
    ─────────────────────────────────────────────────────────── */
 
-/* KPI strip — dark cards with green accent left border */
+/* KPI strip — dark cards (no side accent stripe) */
 .om-kpi-strip {
   display: grid;
   gap: 16px;
@@ -708,17 +745,16 @@ pre {
   min-height: 56px;
   padding: 16px;
   border: 0.5px solid var(--om-border);
-  border-left: 2px solid var(--om-accent);
   border-radius: var(--om-panel-radius);
-  background: var(--om-surface);
+  background: color-mix(in oklch, var(--om-surface) 86%, var(--om-accent-soft));
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  transition: border-color 160ms ease, background 160ms ease;
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
 }
 
 .om-kpi-card:hover {
   border-color: var(--om-border-strong);
-  border-left-color: var(--om-accent);
   background: var(--om-surface-raised);
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--om-accent) 18%, transparent);
 }
 
 .om-kpi-label {
@@ -868,8 +904,7 @@ pre {
 .om-subnav__item[data-active="true"] {
   background: var(--om-accent-soft);
   color: var(--om-text);
-  border-left: 2px solid var(--om-accent);
-  padding-left: 8px;
+  box-shadow: inset 0 0 0 1px var(--om-accent-border);
 }
 
 /* Feature card */

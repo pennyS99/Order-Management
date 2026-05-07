@@ -49,14 +49,12 @@ function safeWriteStorage(state: PlannerResultsColumnsStateV1) {
 
 export function PlannerResultsColumnsProvider({ children }: { children: ReactNode }) {
   const [isMounted, setIsMounted] = useState(false);
-  const [state, setState] = useState<PlannerResultsColumnsStateV1>(() => buildStateFromStorage(null));
+  const [state, setState] = useState<PlannerResultsColumnsStateV1>(() => buildStateFromStorage(safeReadStorage()));
 
   useEffect(() => {
-    const stored = safeReadStorage();
-    const merged = buildStateFromStorage(stored);
-    setState(merged);
     setIsMounted(true);
-    safeWriteStorage(merged);
+    safeWriteStorage(state);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

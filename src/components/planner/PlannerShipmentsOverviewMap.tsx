@@ -9,28 +9,51 @@ import "leaflet/dist/leaflet.css";
 
 const OSRM_BASE = "https://router.project-osrm.org/route/v1/driving";
 
+const MAX_CONCURRENT_OSRM_REQUESTS = 4;
+let activeOsrmRequests = 0;
+const osrmWaitQueue: Array<() => void> = [];
+
+async function acquireOsrmSlot(): Promise<void> {
+  if (activeOsrmRequests < MAX_CONCURRENT_OSRM_REQUESTS) {
+    activeOsrmRequests += 1;
+    return;
+  }
+  await new Promise<void>((resolve) => {
+    osrmWaitQueue.push(() => {
+      activeOsrmRequests += 1;
+      resolve();
+    });
+  });
+}
+
+function releaseOsrmSlot() {
+  activeOsrmRequests = Math.max(0, activeOsrmRequests - 1);
+  const next = osrmWaitQueue.shift();
+  if (next) next();
+}
+
 /** Distinct colors per shipment (line + numbered pin). Cycles if there are more shipments than entries. */
 const ROUTE_PALETTE = [
-  "#2563eb",
-  "#059669",
-  "#d97706",
-  "#7c3aed",
-  "#db2777",
-  "#0891b2",
-  "#4f46e5",
-  "#ea580c",
-  "#0f766e",
-  "#b45309",
-  "#a21caf",
-  "#be123c",
-  "#0369a1",
-  "#65a30d",
-  "#c2410c",
-  "#6d28d9",
-  "#b91c1c",
-  "#0e7490",
-  "#15803d",
-  "#a16207",
+  "oklch(0.67 0.15 260)",
+  "oklch(0.69 0.14 160)",
+  "oklch(0.72 0.14 75)",
+  "oklch(0.66 0.16 300)",
+  "oklch(0.69 0.16 10)",
+  "oklch(0.70 0.12 220)",
+  "oklch(0.66 0.16 250)",
+  "oklch(0.72 0.16 45)",
+  "oklch(0.66 0.13 190)",
+  "oklch(0.70 0.14 85)",
+  "oklch(0.66 0.18 320)",
+  "oklch(0.66 0.17 20)",
+  "oklch(0.67 0.12 235)",
+  "oklch(0.73 0.14 135)",
+  "oklch(0.70 0.16 55)",
+  "oklch(0.66 0.17 285)",
+  "oklch(0.63 0.18 25)",
+  "oklch(0.67 0.12 210)",
+  "oklch(0.68 0.14 155)",
+  "oklch(0.71 0.14 92)",
 ];
 
 function routeColor(shipmentIndex: number): string {
@@ -41,7 +64,7 @@ function createDropSequenceIcon(sequence: number, color: string): L.DivIcon {
   const label = String(sequence);
   const size = label.length > 1 ? 30 : 26;
   const fontSize = label.length > 2 ? 10 : 12;
-  const inner = `<div style="display:flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:50%;background:${color};color:#fff;font-weight:700;font-size:${fontSize}px;font-family:system-ui,sans-serif;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.35);line-height:1;">${label}</div>`;
+  const inner = `<div style="display:flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:999px;background:${color};color:var(--primary-foreground);font-weight:700;font-size:${fontSize}px;font-family:var(--font-sans,system-ui,sans-serif);border:2px solid color-mix(in_oklch,var(--surface)_70%,transparent);box-shadow:0 1px 4px color-mix(in_oklch,var(--background)_55%,transparent);line-height:1;">${label}</div>`;
   return L.divIcon({
     className: "om-leaflet-drop-seq",
     html: inner,
@@ -87,6 +110,7 @@ async function fetchOsrmRoute(coordPath: string): Promise<LoadedRouteState> {
   const fetchPromise = (async () => {
     const url = `${OSRM_BASE}/${coordPath}?overview=full&geometries=geojson`;
     try {
+      await acquireOsrmSlot();
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = (await res.json()) as OsrmRouteResponse;
@@ -101,6 +125,7 @@ async function fetchOsrmRoute(coordPath: string): Promise<LoadedRouteState> {
         message: "Road route could not be loaded from OSRM.",
       };
     } finally {
+      releaseOsrmSlot();
       inFlightRouteFetchByCoordPath.delete(coordPath);
     }
   })();
@@ -308,6 +333,7 @@ export function PlannerShipmentsOverviewMap({
 
     if (toFetch.length > 0) {
       void (async () => {
+        const coordPathById = new Map(toFetch.map((t) => [t.id, t.coordPath] as const));
         const results = await Promise.all(
           toFetch.map(async ({ id, coordPath }) => {
               const state = await fetchOsrmRoute(coordPath);
@@ -318,7 +344,7 @@ export function PlannerShipmentsOverviewMap({
         setFetchedRoutesById((prev) => {
           const merged = { ...prev };
           for (const [id, state] of results) {
-            const coordPath = toFetch.find((item) => item.id === id)?.coordPath;
+            const coordPath = coordPathById.get(id);
             if (coordPath) merged[id] = { coordPath, state };
           }
           return merged;
@@ -392,7 +418,7 @@ export function PlannerShipmentsOverviewMap({
         <MapContainer
           center={center}
           zoom={6}
-          className="size-full"
+          className="om-leaflet-always-dark size-full"
           scrollWheelZoom
         >
           <TileLayer
@@ -419,7 +445,7 @@ export function PlannerShipmentsOverviewMap({
               interactive={false}
               icon={L.divIcon({
                 className: "om-leaflet-leg-km-label",
-                html: `<span style="display:inline-block;padding:2px 6px;border-radius:999px;background:rgba(255,255,255,0.95);border:1px solid rgba(148,163,184,0.8);font:600 11px/1 system-ui,sans-serif;color:#334155;white-space:nowrap;">${leg.km.toFixed(1)} km</span>`,
+                html: `<span class="om-leaflet-leg-km-pill">${leg.km.toFixed(1)} km</span>`,
               })}
             >
               <Tooltip direction="top" offset={[0, -8]} opacity={0.95}>
@@ -459,8 +485,8 @@ export function PlannerShipmentsOverviewMap({
                   center={[m.lat, m.lng]}
                   radius={active ? 10 : 6}
                   pathOptions={{
-                    color: active ? "#1D9E75" : "rgba(120,120,120,0.85)",
-                    fillColor: active ? "#1D9E75" : "rgba(40,40,40,0.65)",
+                    color: active ? "var(--primary)" : "color-mix(in_oklch,var(--text)_35%,transparent)",
+                    fillColor: active ? "var(--primary)" : "color-mix(in_oklch,var(--surface)_70%,transparent)",
                     fillOpacity: active ? 0.85 : 0.5,
                     weight: active ? 2 : 1,
                   }}
