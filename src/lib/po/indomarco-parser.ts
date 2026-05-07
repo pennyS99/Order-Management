@@ -118,7 +118,7 @@ export function parseIndomarcoPo(text: string): POLineItem[] {
   let inlineMatch;
   while ((inlineMatch = inlinePattern.exec(text)) !== null) {
     const productCode = inlineMatch[1];
-    let productName = inlineMatch[2].replace(/\s+(?:[A-Z]{2}\s+)?CTN\/\d+\s*$/, "").trim();
+    const productName = inlineMatch[2].replace(/\s+(?:[A-Z]{2}\s+)?CTN\/\d+\s*$/, "").trim();
     const quantity = parseInt(inlineMatch[4], 10);
     const unitPrice = parseFloat(inlineMatch[5].replace(/,/g, "")) || null;
     const totalPrice = parseFloat(inlineMatch[6].replace(/,/g, "")) || null;
@@ -158,7 +158,7 @@ export function parseIndomarcoPo(text: string): POLineItem[] {
     if (!pluNameMatch) continue;
 
     const productCode = pluNameMatch[1];
-    let productName = pluNameMatch[2].replace(/\s+(?:[A-Z]{2}\s+)?CTN\/\d+\s*$/, "").trim();
+    const productName = pluNameMatch[2].replace(/\s+(?:[A-Z]{2}\s+)?CTN\/\d+\s*$/, "").trim();
     if (!productName || /^DISC:|TOTAL|PLU\s*\||Merk\s+&/i.test(productName)) continue;
 
     let quantity: number | null = null;

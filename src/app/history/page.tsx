@@ -200,7 +200,7 @@ export default function HistoryPage() {
               className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to Extract
+              Back to extraction
             </Link>
             {history.length > 0 && (
               <Button
@@ -217,11 +217,11 @@ export default function HistoryPage() {
           <div className="flex items-center gap-3 mb-2">
             <BrandMark size="sm" />
             <h1 className="font-display text-xl font-black tracking-tight text-[#e0e0e0]">
-              Batch History
+              Extraction history
             </h1>
           </div>
           <p className="mt-1 text-sm text-[#888888]">
-            Previously processed batches. Re-export to Excel.
+            Review previous extraction batches and export them again when needed.
           </p>
         </div>
       </header>
@@ -241,7 +241,7 @@ export default function HistoryPage() {
             </p>
             <Link href="/extract">
               <Button variant="outline" className="mt-4">
-                Go to Extract
+                Go to extraction
               </Button>
             </Link>
           </div>
@@ -291,7 +291,7 @@ export default function HistoryPage() {
                       "Exporting..."
                     ) : (
                       <>
-                        <Download className="h-4 w-4 mr-1" />
+                        <Download className="mr-1 h-4 w-4" />
                         Export
                       </>
                     )}

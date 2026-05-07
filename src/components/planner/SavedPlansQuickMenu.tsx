@@ -132,7 +132,7 @@ export function SavedPlansQuickMenu() {
                 className="inline-flex min-h-9 min-w-9 items-center justify-center rounded-lg border border-[#2a2a2a] bg-[#141414] text-xs font-semibold text-[#e0e0e0]"
                 aria-label="Close"
               >
-                ✕
+                X
               </button>
             </div>
           </div>
@@ -147,7 +147,7 @@ export function SavedPlansQuickMenu() {
 
           <div className="max-h-[60vh] overflow-auto px-2 py-2">
             {loading ? (
-              <p className="px-2 py-3 text-sm text-[#888888]">Loading…</p>
+              <p className="px-2 py-3 text-sm text-[#888888]">Loading...</p>
             ) : plans.length === 0 ? (
               <p className="px-2 py-3 text-sm text-[#888888]">No saved plans yet.</p>
             ) : (
@@ -192,7 +192,7 @@ export function SavedPlansQuickMenu() {
                           onClick={() => void editInPlanner(p.id)}
                           disabled={editingId === p.id}
                         >
-                          {editingId === p.id ? "Loading…" : "Edit"}
+                          {editingId === p.id ? "Loading..." : "Edit"}
                         </button>
                       </div>
                     </div>
@@ -210,7 +210,7 @@ export function SavedPlansQuickMenu() {
         initialName={renaming?.name}
         summaryText={renaming ? `${renaming.shipmentCount} shipments · ${renaming.totalOrders} orders` : undefined}
         confirmLabel="Rename"
-        loadingLabel="Renaming…"
+        loadingLabel="Renaming..."
         mode="rename"
         planIdForRename={renaming?.id}
         buildPayload={() => (renaming ? { id: renaming.id, name: renaming.name } : null)}

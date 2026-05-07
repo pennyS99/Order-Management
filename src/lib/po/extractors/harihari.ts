@@ -336,7 +336,7 @@ async function extractItemsFromOcrText(ocrText: string, warnings: string[]): Pro
     const qtyMatches = Array.from(qtyContext.matchAll(/(\d+)\s*K[TI]?N/gi), (m) => Number(m[1]));
     const qty = qtyMatches.length > 0 ? qtyMatches[qtyMatches.length - 1] : NaN;
 
-    for (let barcode of barcodes) {
+    for (const barcode of barcodes) {
       if (!Number.isFinite(qty)) {
         warnings.push(`Missing quantity for barcode ${barcode} near line: "${line.trim()}"`);
         continue;

@@ -86,7 +86,7 @@ export function parseFoodhallPo(text: string): POLineItem[] {
   let m;
   while ((m = rowPattern.exec(text)) !== null) {
     const productCode = m[3];
-    let productName = m[4]
+    const productName = m[4]
       .replace(/\s+/g, " ")
       .replace(/\s*\n\s*/g, " ")
       .trim();
@@ -126,7 +126,7 @@ export function parseFoodhallPo(text: string): POLineItem[] {
   let fm;
   while ((fm = fallbackPattern.exec(text)) !== null) {
     const productCode = fm[1];
-    let productName = fm[2].replace(/\s+/g, " ").trim();
+    const productName = fm[2].replace(/\s+/g, " ").trim();
     const quantity = parseInt(fm[3], 10);
     const rawUom = fm[4];
     const unitPrice = parseFloat(fm[5].replace(/,/g, "")) || null;

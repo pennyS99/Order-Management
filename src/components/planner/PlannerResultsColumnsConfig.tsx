@@ -31,10 +31,20 @@ export function PlannerResultsColumnsConfig() {
   };
 
   const toggle = (id: string, enabled: boolean) => {
-    setTabColumns(
-      tab,
-      columns.map((c) => (c.id === id ? { ...c, enabled } : c)),
-    );
+    const idx = columns.findIndex((c) => c.id === id);
+    if (idx === -1) return;
+
+    const updated = { ...columns[idx], enabled };
+    const next = columns.slice();
+    next[idx] = updated;
+
+    // When disabling a column, move it to the very bottom automatically.
+    if (!enabled) {
+      next.splice(idx, 1);
+      next.push(updated);
+    }
+
+    setTabColumns(tab, normalizeOrder(next));
   };
 
   const updateLabel = (id: string, label: string) => {

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { ArrowLeft, ChevronRight, Columns, Plus, Package, Trash2, Pencil, Check, X, Boxes, Upload, Download, History } from "lucide-react";
 import { BrandMark } from "@/components/po/BrandMark";
 import { HeaderConfig } from "@/components/po/HeaderConfig";
-import { PlannerResultsColumnsConfig } from "@/components/planner/PlannerResultsColumnsConfig";
 import { MasterSettingsClient } from "@/components/settings/MasterSettingsClient";
 import { Button } from "@/components/po/ui/button";
 import { ConfirmDialog } from "@/components/po/ui/confirm-dialog";
@@ -24,7 +23,7 @@ import { TableColumnHeaderControlButtons } from "@/components/po/table-column-he
 import { TableFilterToolbar } from "@/components/po/table-filter-toolbar";
 
 type SettingsView = "list" | "poExtract" | "planner" | "headers" | "uom";
-type PlannerMasterCategory = "list" | "item" | "address" | "truck";
+type PlannerMasterCategory = "list" | "columns" | "item" | "address" | "truck";
 type ConfirmActionState = {
   title: string;
   description: string;
@@ -482,7 +481,7 @@ export default function ConfigurePage() {
                 className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Back to Extract
+                Back to extraction
               </Link>
             ) : (
               <button
@@ -501,7 +500,7 @@ export default function ConfigurePage() {
                 className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Back to Settings
+                Back to configure
               </button>
             )}
           </div>
@@ -509,38 +508,42 @@ export default function ConfigurePage() {
             <BrandMark size="sm" />
             <h1 className="font-display text-xl font-black tracking-tight text-[#e0e0e0]">
               {view === "list"
-                ? "Settings"
+                ? "Configure"
                 : view === "poExtract"
-                  ? "Settings for PO Extract"
+                  ? "PO extraction"
                   : view === "planner"
-                    ? plannerMasterCategory === "item"
-                      ? "Item Master"
-                      : plannerMasterCategory === "address"
-                        ? "Address Master"
-                        : plannerMasterCategory === "truck"
-                          ? "Truck Master"
-                          : "Settings for Planner"
+                    ? plannerMasterCategory === "columns"
+                      ? "Planner results columns"
+                      : plannerMasterCategory === "item"
+                        ? "Item master"
+                        : plannerMasterCategory === "address"
+                          ? "Address master"
+                          : plannerMasterCategory === "truck"
+                            ? "Truck master"
+                            : "Planner data"
                     : view === "headers"
-                      ? "Header configuration"
-                      : "UOM Master"}
+                      ? "Excel export columns"
+                      : "UOM master"}
             </h1>
           </div>
           <p className="mt-1 text-sm text-[#888888]">
             {view === "list"
-              ? "Choose a settings category."
+              ? "Manage the data and export settings used across the workspace."
               : view === "poExtract"
-                ? "Configure extraction headers and UOM conversion behavior."
+                ? "Configure export columns, UOM conversion, and extraction history."
                 : view === "planner"
-                  ? plannerMasterCategory === "item"
-                    ? "Manage item codes with CBM and weight used by shipment planning."
-                    : plannerMasterCategory === "address"
-                      ? "Manage DC mapping, coordinates, channels, transport modes, and time windows."
-                      : plannerMasterCategory === "truck"
-                        ? "Manage truck types and capacity limits (kg and CBM)."
-                        : "Configure master data used by shipment planning."
+                  ? plannerMasterCategory === "columns"
+                    ? "Choose which columns appear in planner results tables and control their order."
+                    : plannerMasterCategory === "item"
+                      ? "Manage item codes with CBM and weight used by shipment planning."
+                      : plannerMasterCategory === "address"
+                        ? "Manage DC mapping, coordinates, channels, transport modes, and time windows."
+                        : plannerMasterCategory === "truck"
+                          ? "Manage truck types and capacity limits (kg and CBM)."
+                          : "Manage master data used for route planning."
                   : view === "headers"
-                    ? "Toggle, rename, and reorder columns for your Excel export."
-                    : `Manage ${uomItems.length} SKUs for barcode verification and quantity conversion.`}
+                    ? "Choose which columns appear in exported workbooks and control their order."
+                    : `Manage ${uomItems.length} SKUs for barcode checks and quantity conversion.`}
           </p>
         </div>
       </header>
@@ -559,8 +562,8 @@ export default function ConfigurePage() {
                     <Columns className="h-5 w-5 text-[#1D9E75]" />
                   </div>
                   <div>
-                    <span className="font-semibold text-[#e0e0e0]">Settings for PO Extract</span>
-                    <p className="text-sm text-[#888888]">Header configuration and UOM Master</p>
+                    <span className="font-semibold text-[#e0e0e0]">PO extraction</span>
+                    <p className="text-sm text-[#888888]">Export columns, UOM conversion, and history</p>
                   </div>
                 </div>
                 <ChevronRight className="h-5 w-5 text-[#888888]" />
@@ -578,7 +581,7 @@ export default function ConfigurePage() {
                   </div>
                   <div>
                     <span className="font-semibold text-[#e0e0e0]">Planner data</span>
-                    <p className="text-sm text-[#888888]">Manage OM Masters (item, address, and truck data)</p>
+                    <p className="text-sm text-[#888888]">Item, address, and truck masters for routing</p>
                   </div>
                 </div>
                 <ChevronRight className="h-5 w-5 text-[#888888]" />
@@ -600,8 +603,8 @@ export default function ConfigurePage() {
                     <Columns className="h-5 w-5 text-[#1D9E75]" />
                   </div>
                   <div>
-                    <span className="font-semibold text-[#e0e0e0]">Header configuration</span>
-                    <p className="text-sm text-[#888888]">Toggle, rename, and reorder Excel columns</p>
+                    <span className="font-semibold text-[#e0e0e0]">Excel export columns</span>
+                    <p className="text-sm text-[#888888]">Show, rename, and reorder exported columns</p>
                   </div>
                 </div>
                 <ChevronRight className="h-5 w-5 text-[#888888]" />
@@ -618,8 +621,8 @@ export default function ConfigurePage() {
                     <Package className="h-5 w-5 text-[#1D9E75]" />
                   </div>
                   <div>
-                    <span className="font-semibold text-[#e0e0e0]">UOM Master</span>
-                    <p className="text-sm text-[#888888]">Manage SKUs for barcode verification & quantity conversion</p>
+                    <span className="font-semibold text-[#e0e0e0]">UOM master</span>
+                    <p className="text-sm text-[#888888]">Manage SKU barcodes and quantity conversion</p>
                   </div>
                 </div>
                 <ChevronRight className="h-5 w-5 text-[#888888]" />
@@ -636,7 +639,7 @@ export default function ConfigurePage() {
                   </div>
                   <div>
                     <span className="font-semibold text-[#e0e0e0]">History</span>
-                    <p className="text-sm text-[#888888]">View extraction history and previous batches</p>
+                    <p className="text-sm text-[#888888]">Review previous extraction batches</p>
                   </div>
                 </div>
                 <ChevronRight className="h-5 w-5 text-[#888888]" />
@@ -646,21 +649,14 @@ export default function ConfigurePage() {
         )}
 
         {view === "planner" && (
-          <>
-            {plannerMasterCategory === "list" && (
-              <div className="mb-4 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] p-6">
-                <PlannerResultsColumnsConfig />
-              </div>
-            )}
-            <MasterSettingsClient
-              initialItems={[]}
-              initialAddresses={[]}
-              initialTrucks={[]}
-              embedded
-              plannerCategory={plannerMasterCategory}
-              onPlannerCategoryChange={setPlannerMasterCategory}
-            />
-          </>
+          <MasterSettingsClient
+            initialItems={[]}
+            initialAddresses={[]}
+            initialTrucks={[]}
+            embedded
+            plannerCategory={plannerMasterCategory}
+            onPlannerCategoryChange={setPlannerMasterCategory}
+          />
         )}
 
         {view === "headers" && (
@@ -703,7 +699,7 @@ export default function ConfigurePage() {
                 disabled={uomPending || selectedRows.size === 0}
                 onClick={handleBulkDelete}
               >
-                Delete Selected ({selectedRows.size})
+                Delete selected ({selectedRows.size})
               </Button>
               <input
                 ref={uploadCsvRef}
@@ -721,7 +717,7 @@ export default function ConfigurePage() {
                 disabled={uomPending || uomLoading || uomItems.length === 0}
               >
                 <Download className="h-4 w-4" />
-                Download CSV
+                Export CSV
               </Button>
               <Button
                 type="button"
@@ -732,7 +728,7 @@ export default function ConfigurePage() {
                 disabled={uomPending || uomLoading}
               >
                 <Upload className="h-4 w-4" />
-                Upload CSV
+                Import CSV
               </Button>
               <Button
                 size="sm"
@@ -740,7 +736,7 @@ export default function ConfigurePage() {
                 onClick={() => { setShowAddForm(!showAddForm); setUomMessage(null); }}
               >
                 <Plus className="h-4 w-4" />
-                Add Item
+                Add item
               </Button>
             </div>
 
@@ -852,7 +848,7 @@ export default function ConfigurePage() {
                       placeholder={
                         activeFilterColumn
                           ? `Filter ${activeFilterColumn === "pcsPerCtn" ? "PCS/CTN" : activeFilterColumn === "packPerCtn" ? "PACK/CTN" : activeFilterColumn}...`
-                          : "Filter..."
+                          : "Search rows..."
                       }
                     />
                   </div>

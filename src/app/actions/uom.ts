@@ -8,6 +8,10 @@ function uomMasterFilePath(): string {
   return path.join(process.cwd(), "data", "uom-master.json");
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return value !== null && typeof value === "object" ? (value as Record<string, unknown>) : {};
+}
+
 function readUomMasterSync(): UomMasterRow[] {
   const filePath = uomMasterFilePath();
   try {
@@ -18,11 +22,12 @@ function readUomMasterSync(): UomMasterRow[] {
     if (!Array.isArray(parsed)) return [];
     return parsed
       .map((r) => {
-        const sku = String((r as any)?.sku ?? "").trim().replace(/\s/g, "");
-        const item = String((r as any)?.item ?? "").trim();
-        const pcsPerCtn = Number((r as any)?.pcsPerCtn ?? 1);
-        const packPerCtn = Number((r as any)?.packPerCtn ?? 1);
-        const ctn = Number((r as any)?.ctn ?? 1);
+        const row = asRecord(r);
+        const sku = String(row.sku ?? "").trim().replace(/\s/g, "");
+        const item = String(row.item ?? "").trim();
+        const pcsPerCtn = Number(row.pcsPerCtn ?? 1);
+        const packPerCtn = Number(row.packPerCtn ?? 1);
+        const ctn = Number(row.ctn ?? 1);
         if (!sku || !item) return null;
         return {
           sku,

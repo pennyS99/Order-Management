@@ -68,13 +68,16 @@ type RouteState =
   | { kind: "error"; message: string }
   | { kind: "skipped" };
 
-const routeCacheByCoordPath = new Map<string, Exclude<RouteState, "loading" | { kind: "skipped" }>>();
+type LoadedRouteState = { kind: "ok"; latLngs: [number, number][] } | { kind: "error"; message: string };
+type FetchedRouteState = { coordPath: string; state: LoadedRouteState };
+
+const routeCacheByCoordPath = new Map<string, LoadedRouteState>();
 const inFlightRouteFetchByCoordPath = new Map<
   string,
-  Promise<Exclude<RouteState, "loading" | { kind: "skipped" }>>
+  Promise<LoadedRouteState>
 >();
 
-async function fetchOsrmRoute(coordPath: string): Promise<Exclude<RouteState, "loading" | { kind: "skipped" }>> {
+async function fetchOsrmRoute(coordPath: string): Promise<LoadedRouteState> {
   const cached = routeCacheByCoordPath.get(coordPath);
   if (cached) return cached;
 
@@ -184,7 +187,7 @@ export function PlannerShipmentsOverviewMap({
   selectedDcName,
   onDcMarkerClick,
 }: PlannerShipmentsOverviewMapProps) {
-  const [routesById, setRoutesById] = useState<Record<string, RouteState>>({});
+  const [fetchedRoutesById, setFetchedRoutesById] = useState<Record<string, FetchedRouteState>>({});
 
   const markers = useMemo(() => {
     const out: Array<{
@@ -265,23 +268,7 @@ export function PlannerShipmentsOverviewMap({
     return labels;
   }, [shipments, dcCoordMap]);
 
-  const fetchKey = useMemo(
-    () =>
-      shipments
-        .map((s) => {
-          const parts = s.drops.map((dc) => {
-            const c = dcCoordMap.get(dc);
-            return c ? `${c.lng},${c.lat}` : "x";
-          });
-          return `${s.id}:${parts.join(";")}`;
-        })
-        .join("||"),
-    [shipments, dcCoordMap],
-  );
-
-  useEffect(() => {
-    let cancelled = false;
-
+  const routePlan = useMemo(() => {
     const nextRoutes: Record<string, RouteState> = {};
     const toFetch: { id: string; coordPath: string }[] = [];
 
@@ -303,13 +290,21 @@ export function PlannerShipmentsOverviewMap({
       const cached = routeCacheByCoordPath.get(coordPath);
       if (cached) {
         nextRoutes[shipment.id] = cached;
+      } else if (fetchedRoutesById[shipment.id]?.coordPath === coordPath) {
+        nextRoutes[shipment.id] = fetchedRoutesById[shipment.id].state;
       } else {
         nextRoutes[shipment.id] = "loading";
         toFetch.push({ id: shipment.id, coordPath });
       }
     }
 
-    setRoutesById(nextRoutes);
+    return { routesById: nextRoutes, toFetch };
+  }, [shipments, dcCoordMap, fetchedRoutesById]);
+
+  const { routesById, toFetch } = routePlan;
+
+  useEffect(() => {
+    let cancelled = false;
 
     if (toFetch.length > 0) {
       void (async () => {
@@ -320,10 +315,11 @@ export function PlannerShipmentsOverviewMap({
           }),
         );
         if (cancelled) return;
-        setRoutesById((prev) => {
+        setFetchedRoutesById((prev) => {
           const merged = { ...prev };
           for (const [id, state] of results) {
-            merged[id] = state;
+            const coordPath = toFetch.find((item) => item.id === id)?.coordPath;
+            if (coordPath) merged[id] = { coordPath, state };
           }
           return merged;
         });
@@ -333,7 +329,7 @@ export function PlannerShipmentsOverviewMap({
     return () => {
       cancelled = true;
     };
-  }, [fetchKey, shipments, dcCoordMap]);
+  }, [toFetch]);
 
   const fitPoints = useMemo(() => {
     const pts: [number, number][] = markers.map((m) => [m.lat, m.lng]);

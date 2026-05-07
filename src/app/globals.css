@@ -4,6 +4,8 @@
 
 :root,
 [data-theme="dark-ops"] {
+  /* Ensure native form controls (select popup) use dark palette on Windows/Chrome */
+  color-scheme: dark;
   --background: oklch(0.18 0.015 240);
   --surface: oklch(0.21 0.018 240);
   --surface-elevated: oklch(0.235 0.02 240);
@@ -56,20 +58,21 @@
   --om-status-red: var(--destructive);
   --om-status-red-bg: color-mix(in oklch, var(--destructive) 15%, transparent);
   --om-status-red-border: color-mix(in oklch, var(--destructive) 30%, transparent);
-  --om-font-xs: 11px;
-  --om-font-sm: 12px;
+  --om-font-xs: 12px;
+  --om-font-sm: 14px;
   --om-line-tight: 1.35;
-  --om-row-h: 30px;
-  --om-cell-px: 8px;
-  --om-cell-py: 6px;
-  --om-panel-radius: 8px;
-  --om-sidebar-w: 212px;
+  --om-row-h: 40px;
+  --om-cell-px: 12px;
+  --om-cell-py: 8px;
+  --om-panel-radius: 0.75rem;
+  --om-sidebar-w: 220px;
   --om-sidebar-w-collapsed: 56px;
   --om-toolbar-h: 56px;
   --om-input-h: 32px;
 }
 
 [data-theme="white"] {
+  color-scheme: light;
   --primary: #171717;
   --primary-dark: #171717;
   --secondary: #404040;
@@ -137,6 +140,7 @@
   border: 0.5px solid var(--om-border);
   background: var(--om-surface);
   border-radius: var(--om-panel-radius);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
 .om-enterprise-shell {
@@ -147,6 +151,7 @@
   border: 0.5px solid var(--om-border);
   background: var(--om-surface);
   border-radius: var(--om-panel-radius);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
 .om-enterprise-sidebar {
@@ -163,9 +168,9 @@
 
 .om-enterprise-grid {
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--om-panel-radius);
   background: var(--card);
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   overflow: hidden;
 }
 
@@ -182,9 +187,9 @@
 .om-enterprise-grid thead th {
   height: var(--om-row-h);
   padding: var(--om-cell-py) var(--om-cell-px);
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
+  font-size: var(--om-font-xs);
+  font-weight: 500;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted-foreground);
   background: var(--surface-elevated);
@@ -194,7 +199,7 @@
 .om-enterprise-grid tbody td {
   height: var(--om-row-h);
   padding: var(--om-cell-py) var(--om-cell-px);
-  font-size: 12.5px;
+  font-size: var(--om-font-sm);
   border-top: 1px solid var(--border);
 }
 
@@ -205,6 +210,8 @@
 .om-card {
   border: 1px solid var(--om-border);
   background-color: var(--om-surface);
+  border-radius: var(--om-panel-radius);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
 .om-subtle {
@@ -316,20 +323,22 @@ body {
 }
 
 [data-theme="dark-ops"] body {
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: 14px;
+  line-height: 1.5;
   color: var(--text);
   background: var(--background);
 }
 
 [data-theme="dark-ops"] table th {
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--muted-foreground);
 }
 
 [data-theme="dark-ops"] table td {
+  font-size: 14px;
   line-height: 1.45;
 }
 
@@ -687,7 +696,7 @@ pre {
 /* KPI strip — dark cards with green accent left border */
 .om-kpi-strip {
   display: grid;
-  gap: 8px;
+  gap: 16px;
 }
 
 .om-kpi-card {
@@ -696,12 +705,13 @@ pre {
   flex-direction: column;
   justify-content: center;
   gap: 2px;
-  min-height: 60px;
-  padding: 10px 12px 10px 14px;
+  min-height: 56px;
+  padding: 16px;
   border: 0.5px solid var(--om-border);
   border-left: 2px solid var(--om-accent);
-  border-radius: 6px;
+  border-radius: var(--om-panel-radius);
   background: var(--om-surface);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   transition: border-color 160ms ease, background 160ms ease;
 }
 
@@ -712,18 +722,18 @@ pre {
 }
 
 .om-kpi-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--om-text-faint);
 }
 
 .om-kpi-value {
   font-family: "Chivo", "IBM Plex Sans", system-ui, sans-serif;
-  font-size: 20px;
+  font-size: 14px;
   font-weight: 600;
-  line-height: 1.1;
+  line-height: 1.2;
   color: var(--om-text);
   letter-spacing: -0.02em;
 }
@@ -732,8 +742,8 @@ pre {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--om-text-secondary);
 }
 
@@ -745,13 +755,19 @@ pre {
   color: #fca5a5;
 }
 
-/* Section labels — micro caps */
+/* Section titles (sidebar groups, etc.) */
 .om-section-label {
-  font-size: 9px;
+  font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  text-transform: none;
   color: var(--om-text-faint);
+}
+
+/* Sidebar nested nav (e.g. Map under Shipments) */
+.om-sidebar-subitem {
+  padding-left: 1.5rem;
+  font-size: 13px;
 }
 
 /* Badges (status pills) */
@@ -862,10 +878,11 @@ pre {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 14px;
+  padding: 16px;
   border: 1px solid color-mix(in srgb, var(--om-accent) 18%, transparent);
-  border-radius: 8px;
+  border-radius: var(--om-panel-radius);
   background: var(--om-surface);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
 }
 
@@ -887,7 +904,7 @@ pre {
 }
 
 .om-feature-card__title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--om-text);
   letter-spacing: -0.01em;
@@ -1037,16 +1054,18 @@ pre {
 .om-topbar-search {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 32px;
-  width: 300px;
-  padding: 0 10px;
-  border-radius: 6px;
+  gap: 8px;
+  height: 40px;
+  width: 40%;
+  min-width: 220px;
+  max-width: 520px;
+  padding: 0 14px;
+  border-radius: 9999px;
   border: 0.5px solid var(--om-border);
   background: var(--input);
   color: var(--om-text-secondary);
-  font-size: 11px;
-  transition: border-color 140ms ease, color 140ms ease;
+  font-size: 14px;
+  transition: border-color 160ms ease, color 160ms ease;
 }
 
 .om-topbar-search:focus-within {
@@ -1061,7 +1080,7 @@ pre {
   border: none;
   outline: none;
   color: inherit;
-  font-size: 11px;
+  font-size: 14px;
 }
 
 .om-topbar-search input::placeholder {

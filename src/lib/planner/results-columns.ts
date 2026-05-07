@@ -20,55 +20,64 @@ export function defaultColumnsByTab(): PlannerResultsColumnsStateV1["columnsByTa
       { id: "no", label: "No.", enabled: true, order: 0 },
       { id: "shipmentId", label: "Shipment", enabled: true, order: 1 },
       { id: "dcName", label: "DC Name", enabled: true, order: 2 },
-      { id: "dropSequence", label: "Drop #", enabled: true, order: 3 },
-      { id: "startPicking", label: "Pick time", enabled: true, order: 4 },
-      { id: "plt", label: "Ready time", enabled: true, order: 5 },
-      { id: "legKm", label: "Drive km", enabled: true, order: 6 },
-      { id: "legMin", label: "Drive min", enabled: true, order: 7 },
-      { id: "arrive", label: "Arrive", enabled: true, order: 8 },
-      { id: "unloadStart", label: "Unload start", enabled: true, order: 9 },
-      { id: "depart", label: "Depart", enabled: true, order: 10 },
-      { id: "tripDur", label: "Trip dur", enabled: true, order: 11 },
-      { id: "totalQty", label: "Qty", enabled: true, order: 12 },
-      { id: "totalKg", label: "KG", enabled: true, order: 13 },
-      { id: "totalCbm", label: "Volume", enabled: true, order: 14 },
-      { id: "utilizationPct", label: "Util %", enabled: true, order: 15 },
-      { id: "truckType", label: "Truck type", enabled: true, order: 16 },
-      { id: "serviceType", label: "Service", enabled: true, order: 17 },
-      { id: "pld", label: "PLD", enabled: true, order: 18 },
-      { id: "rad", label: "RAD", enabled: true, order: 19 },
+      { id: "channelType", label: "Channel Type", enabled: true, order: 3 },
+      { id: "dropSequence", label: "Drop #", enabled: true, order: 4 },
+      { id: "startPicking", label: "Pick time", enabled: true, order: 5 },
+      { id: "plt", label: "Ready time", enabled: true, order: 6 },
+      { id: "legKm", label: "Drive km", enabled: true, order: 7 },
+      { id: "legMin", label: "Drive min", enabled: true, order: 8 },
+      { id: "arrive", label: "Arrive", enabled: true, order: 9 },
+      { id: "unloadStart", label: "Unload start", enabled: true, order: 10 },
+      { id: "depart", label: "Depart", enabled: true, order: 11 },
+      { id: "tripDur", label: "Trip dur", enabled: true, order: 12 },
+      { id: "totalQty", label: "Qty", enabled: true, order: 13 },
+      { id: "totalKg", label: "KG", enabled: true, order: 14 },
+      { id: "totalCbm", label: "Volume", enabled: true, order: 15 },
+      { id: "utilizationPct", label: "Util %", enabled: true, order: 16 },
+      { id: "truckType", label: "Truck type", enabled: true, order: 17 },
+      { id: "serviceType", label: "Service", enabled: true, order: 18 },
+      { id: "pld", label: "PLD", enabled: true, order: 19 },
+      { id: "rad", label: "RAD", enabled: true, order: 20 },
     ],
     po: [
       { id: "no", label: "No.", enabled: true, order: 0 },
       { id: "shipmentId", label: "Shipment", enabled: true, order: 1 },
       { id: "dcName", label: "DC Name", enabled: true, order: 2 },
-      { id: "poNumber", label: "PO Number", enabled: true, order: 3 },
-      { id: "dropSequence", label: "Drop #", enabled: true, order: 4 },
-      { id: "startPicking", label: "Pick time", enabled: true, order: 5 },
-      { id: "plt", label: "Ready time", enabled: true, order: 6 },
-      { id: "totalQty", label: "Qty", enabled: true, order: 7 },
-      { id: "totalKg", label: "KG", enabled: true, order: 8 },
-      { id: "totalCbm", label: "Volume", enabled: true, order: 9 },
-      { id: "utilizationPct", label: "Util %", enabled: true, order: 10 },
-      { id: "truckType", label: "Truck type", enabled: true, order: 11 },
-      { id: "serviceType", label: "Service", enabled: true, order: 12 },
-      { id: "tripDur", label: "Trip dur", enabled: true, order: 13 },
-      { id: "pld", label: "PLD", enabled: true, order: 14 },
-      { id: "rad", label: "RAD", enabled: true, order: 15 },
-      { id: "poExpiredDate", label: "PO Exp", enabled: true, order: 16 },
+      { id: "channelType", label: "Channel Type", enabled: true, order: 3 },
+      { id: "poNumber", label: "PO Number", enabled: true, order: 4 },
+      { id: "dropSequence", label: "Drop #", enabled: true, order: 5 },
+      { id: "startPicking", label: "Pick time", enabled: true, order: 6 },
+      { id: "plt", label: "Ready time", enabled: true, order: 7 },
+      { id: "totalQty", label: "Qty", enabled: true, order: 8 },
+      { id: "totalKg", label: "KG", enabled: true, order: 9 },
+      { id: "totalCbm", label: "Volume", enabled: true, order: 10 },
+      { id: "utilizationPct", label: "Util %", enabled: true, order: 11 },
+      { id: "truckType", label: "Truck type", enabled: true, order: 12 },
+      { id: "serviceType", label: "Service", enabled: true, order: 13 },
+      { id: "tripDur", label: "Trip dur", enabled: true, order: 14 },
+      { id: "pld", label: "PLD", enabled: true, order: 15 },
+      { id: "rad", label: "RAD", enabled: true, order: 16 },
+      { id: "poExpiredDate", label: "PO Exp", enabled: true, order: 17 },
     ],
     unassigned: [
       { id: "no", label: "No.", enabled: true, order: 0 },
       { id: "shipmentId", label: "Shipment", enabled: true, order: 1 },
       { id: "dcName", label: "DC Name", enabled: true, order: 2 },
-      { id: "dropSequence", label: "Drop #", enabled: true, order: 3 },
-      { id: "startPicking", label: "Pick time", enabled: true, order: 4 },
-      { id: "plt", label: "Ready time", enabled: true, order: 5 },
+      { id: "channelType", label: "Channel Type", enabled: true, order: 3 },
+      { id: "dropSequence", label: "Drop #", enabled: true, order: 4 },
+      { id: "startPicking", label: "Pick time", enabled: true, order: 5 },
+      { id: "plt", label: "Ready time", enabled: true, order: 6 },
     ],
   };
 }
 
 export function normalizeOrder(columns: PlannerColumnConfig[]): PlannerColumnConfig[] {
+  // Preserve current array order and just rewrite `order` to be contiguous.
+  // Use `sortAndNormalizeOrder` when you need to respect existing `order` fields.
+  return columns.slice().map((c, index) => ({ ...c, order: index }));
+}
+
+export function sortAndNormalizeOrder(columns: PlannerColumnConfig[]): PlannerColumnConfig[] {
   return columns
     .slice()
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
@@ -106,15 +115,15 @@ export function mergeStoredWithDefaults(args: {
     merged.push({ ...d, order: maxOrder });
   }
 
-  return normalizeOrder(merged);
+  return sortAndNormalizeOrder(merged);
 }
 
 export function buildStateFromStorage(raw: unknown): PlannerResultsColumnsStateV1 {
   const defaultsByTab = defaultColumnsByTab();
   const normalizedDefaults: PlannerResultsColumnsStateV1["columnsByTab"] = {
-    dc: normalizeOrder(defaultsByTab.dc),
-    po: normalizeOrder(defaultsByTab.po),
-    unassigned: normalizeOrder(defaultsByTab.unassigned),
+    dc: sortAndNormalizeOrder(defaultsByTab.dc),
+    po: sortAndNormalizeOrder(defaultsByTab.po),
+    unassigned: sortAndNormalizeOrder(defaultsByTab.unassigned),
   };
 
   const base: PlannerResultsColumnsStateV1 = { version: 1, columnsByTab: normalizedDefaults };

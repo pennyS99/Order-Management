@@ -31,7 +31,7 @@ const PlannerShipmentsOverviewMap = dynamic(
     ssr: false,
     loading: () => (
       <div className="flex h-[min(420px,55vh)] items-center justify-center rounded-lg border border-[#2a2a2a] bg-[#141414] text-xs font-medium text-[#888888]">
-        Loading map…
+        Loading map...
       </div>
     ),
   },
@@ -106,12 +106,12 @@ export function SavedPlanDetailClient({ plan }: { plan: SavedPlan }) {
             <p className="mt-1 text-sm text-[#888888]">{summary}</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button onClick={loadIntoPlanner}>Load into planner</Button>
+            <Button onClick={loadIntoPlanner}>Open in Planner</Button>
             <Link
               href="/planner/saved"
               className="inline-flex min-h-9 items-center rounded-lg border border-[#2a2a2a] bg-[#141414] px-3 py-2 text-xs font-semibold text-[#e0e0e0] hover:border-[#1D9E75]/45 hover:text-[#1D9E75]"
             >
-              Back
+              Back to shipments
             </Link>
           </div>
         </div>
@@ -145,9 +145,9 @@ export function SavedPlanDetailClient({ plan }: { plan: SavedPlan }) {
         {dcRows.length > 0 && <SavedPlanDetailDcTable rows={dcRows} />}
 
         <div className="rounded-xl border border-zinc-800 bg-[#141414] p-4">
-          <h3 className="text-sm font-semibold text-slate-100">Unassigned</h3>
+          <h3 className="text-sm font-semibold text-slate-100">Unassigned orders</h3>
           {plan.consolidationResult.unassignedOrders.length === 0 ? (
-            <p className="mt-2 text-xs text-slate-500">All lines routed.</p>
+            <p className="mt-2 text-xs text-slate-500">All order lines are routed.</p>
           ) : (
             <div className="mt-3 space-y-2 text-sm">
               {plan.consolidationResult.unassignedOrders.map((entry, index) => (

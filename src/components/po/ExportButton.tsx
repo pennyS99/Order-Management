@@ -26,7 +26,7 @@ export function ExportButton({
   data,
   headers,
   disabled = false,
-  label = "Download .xlsx",
+  label = "Export XLSX",
   variant = "default",
   size = "sm",
   className,
@@ -78,7 +78,7 @@ export function ExportButton({
           "Generating..."
         ) : (
           <>
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="mr-2 h-4 w-4" />
             {label}
           </>
         )}

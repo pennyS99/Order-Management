@@ -71,6 +71,7 @@ export function useTableFilterSort<T>(rows: readonly T[], options: TableFilterSo
     filterText,
     setFilterText,
     activeFilterColumn,
+    setActiveFilterColumn,
     sortColumn,
     sortDir,
     displayRows,

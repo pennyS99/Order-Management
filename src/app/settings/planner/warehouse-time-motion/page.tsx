@@ -17,17 +17,17 @@ export default async function WarehouseTimeMotionPage() {
               className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to Settings
+              Back to configure
             </Link>
           </div>
           <div className="mb-2 flex items-center gap-3">
             <BrandMark size="sm" />
             <h1 className="font-display text-xl font-black tracking-tight text-[#e0e0e0]">
-              Warehouse Time Motion
+              Warehouse time motion
             </h1>
           </div>
           <p className="mt-1 text-sm text-[#888888]">
-            Configure warehouse manpower and throughput rates used by planner settings.
+            Configure picking and loading capacity used by route planning.
           </p>
         </div>
       </header>

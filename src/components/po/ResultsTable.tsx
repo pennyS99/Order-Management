@@ -83,8 +83,8 @@ export function ResultsTable({
   const retailers = useMemo(() => Array.from(new Set(data.map((r) => r.retailer || "Unknown"))), [data]);
 
   const filterPlaceholder = activeFilterColumn
-    ? `Filter ${activeHeaders.find((h) => h.key === activeFilterColumn)?.label ?? activeFilterColumn}...`
-    : "Filter...";
+    ? `Search ${activeHeaders.find((h) => h.key === activeFilterColumn)?.label ?? activeFilterColumn}...`
+    : "Search PO lines...";
 
   return (
     <div

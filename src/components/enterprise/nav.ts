@@ -14,10 +14,10 @@ export function matchEnterpriseNavItem(pathname: string): EnterpriseNavItem | nu
 }
 
 export const enterpriseNav: EnterpriseNavItem[] = [
-  { href: "/extract", label: "PO Extract", section: "Operations" },
+  { href: "/extract", label: "Extract POs", section: "Operations" },
   { href: "/planner", label: "Planner", section: "Planning" },
   { href: "/shipments", label: "Shipments", section: "Planning" },
-  { href: "/shipments/map", label: "Shipments Map", section: "Planning" },
-  { href: "/configure", label: "Settings", section: "Admin" },
+  { href: "/shipments/map", label: "Map", section: "Planning" },
+  { href: "/configure", label: "Configure", section: "Admin" },
 ];
 

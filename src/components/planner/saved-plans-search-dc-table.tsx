@@ -50,6 +50,47 @@ const COL_IDS = [
   "serviceType",
 ] as const;
 
+const TH_CLASS =
+  "border-b border-zinc-800 bg-[#151515] px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-200";
+
+function SearchDcHeader({
+  id,
+  label,
+  align = "left",
+  activeFilterColumn,
+  sortColumn,
+  sortDir,
+  onFilterClick,
+  onSortClick,
+}: {
+  id: (typeof COL_IDS)[number];
+  label: string;
+  align?: "left" | "right" | "center";
+  activeFilterColumn: string | null;
+  sortColumn: string | null;
+  sortDir: "asc" | "desc" | null;
+  onFilterClick: (columnId: string) => void;
+  onSortClick: (columnId: string) => void;
+}) {
+  return (
+    <th className={`${TH_CLASS} ${align === "right" ? "text-right" : align === "center" ? "text-center" : ""}`}>
+      <div className={align === "right" ? "flex justify-end" : align === "center" ? "flex justify-center" : ""}>
+        <TableColumnHeaderControlButtons
+          label={label}
+          columnId={id}
+          filterActive={activeFilterColumn === id}
+          sortActive={sortColumn === id}
+          sortDir={sortColumn === id ? sortDir : null}
+          onFilterClick={onFilterClick}
+          onSortClick={onSortClick}
+          variant="slate"
+          labelClassName="text-inherit font-semibold uppercase tracking-wide"
+        />
+      </div>
+    </th>
+  );
+}
+
 export function SavedPlansSearchDcTable({
   rows,
   tableMaxHeightClassName,
@@ -117,45 +158,17 @@ export function SavedPlansSearchDcTable({
   });
 
   const filterPlaceholder = useMemo(() => {
-    if (!activeFilterColumn) return "Filter...";
+    if (!activeFilterColumn) return "Search DC stops...";
     const labels: Record<string, string> = Object.fromEntries(
       COL_IDS.map((id) => [id, id.replace(/([A-Z])/g, " $1").trim()]),
     );
-    return `Filter ${labels[activeFilterColumn] ?? activeFilterColumn}...`;
+    return `Search ${labels[activeFilterColumn] ?? activeFilterColumn}...`;
   }, [activeFilterColumn]);
-
-  const th = "border-b border-zinc-800 bg-[#151515] px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-200";
-
-  const Header = ({
-    id,
-    label,
-    align = "left",
-  }: {
-    id: (typeof COL_IDS)[number];
-    label: string;
-    align?: "left" | "right" | "center";
-  }) => (
-    <th className={`${th} ${align === "right" ? "text-right" : align === "center" ? "text-center" : ""}`}>
-      <div className={align === "right" ? "flex justify-end" : align === "center" ? "flex justify-center" : ""}>
-        <TableColumnHeaderControlButtons
-          label={label}
-          columnId={id}
-          filterActive={activeFilterColumn === id}
-          sortActive={sortColumn === id}
-          sortDir={sortColumn === id ? sortDir : null}
-          onFilterClick={toggleFilterColumn}
-          onSortClick={toggleSort}
-          variant="slate"
-          labelClassName="text-inherit font-semibold uppercase tracking-wide"
-        />
-      </div>
-    </th>
-  );
 
   return (
     <div className="overflow-hidden rounded-xl border border-zinc-800 bg-[#0d0d0d]">
       <div className="border-b border-zinc-800 bg-[#151515] px-4 py-2.5">
-        <h3 className="text-sm font-semibold text-slate-100">By DC</h3>
+        <h3 className="text-sm font-semibold text-slate-100">DC stops</h3>
         <p className="mt-0.5 text-xs text-[#888888]">
           {displayRows.length} row{displayRows.length === 1 ? "" : "s"} shown
         </p>
@@ -173,26 +186,26 @@ export function SavedPlansSearchDcTable({
         <table className="min-w-full whitespace-nowrap text-sm text-slate-200">
           <thead className="sticky top-0 z-10">
             <tr>
-              <th className={th}>No.</th>
-              <Header id="savedPlanName" label="Saved Plan" />
-              <Header id="origin" label="Origin" />
-              <Header id="shipmentId" label="Shipment ID" />
-              <Header id="dropSequence" label="Drop #" align="right" />
-              <Header id="dcName" label="DC Name" />
-              <Header id="poNumber" label="PO Number" />
-              <Header id="pld" label="PLD" align="center" />
-              <Header id="rad" label="RAD" align="center" />
-              <Header id="legKm" label="Drive km" align="right" />
-              <Header id="legMin" label="Drive min" align="right" />
-              <Header id="arriveClock" label="Arrive" align="right" />
-              <Header id="unloadStartClock" label="Unload start" align="right" />
-              <Header id="departClock" label="Depart" align="right" />
-              <Header id="tripDurationMin" label="Trip duration" align="right" />
-              <Header id="totalQty" label="Qty" align="right" />
-              <Header id="totalKg" label="KG" align="right" />
-              <Header id="totalCbm" label="CBM" align="right" />
-              <Header id="truckType" label="Truck Type" />
-              <Header id="serviceType" label="Service" />
+              <th className={TH_CLASS}>No.</th>
+              <SearchDcHeader id="savedPlanName" label="Saved Plan" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="origin" label="Origin" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="shipmentId" label="Shipment ID" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="dropSequence" label="Drop #" align="right" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="dcName" label="DC Name" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="poNumber" label="PO Number" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="pld" label="PLD" align="center" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="rad" label="RAD" align="center" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="legKm" label="Drive km" align="right" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="legMin" label="Drive min" align="right" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="arriveClock" label="Arrive" align="right" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="unloadStartClock" label="Unload start" align="right" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="departClock" label="Depart" align="right" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="tripDurationMin" label="Trip duration" align="right" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="totalQty" label="Qty" align="right" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="totalKg" label="KG" align="right" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="totalCbm" label="CBM" align="right" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="truckType" label="Truck Type" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
+              <SearchDcHeader id="serviceType" label="Service" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
             </tr>
           </thead>
           <tbody>

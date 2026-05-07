@@ -80,7 +80,7 @@ export function WarehouseTimeMotionClient({ initialSettings }: Props) {
     const res = await saveWarehouseTimeMotionSettingsAction(payload);
     if (res.success && res.data) {
       setForm(toFormState(res.data));
-      setMessage({ type: "success", text: "Warehouse Time Motion settings saved." });
+      setMessage({ type: "success", text: "Warehouse time motion settings saved." });
     } else {
       setMessage({ type: "error", text: res.error ?? "Failed to save settings" });
     }
@@ -90,9 +90,9 @@ export function WarehouseTimeMotionClient({ initialSettings }: Props) {
   return (
     <section className="mx-auto w-full max-w-4xl space-y-4 px-4 py-6">
       <div className="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] p-5">
-        <h2 className="text-lg font-semibold text-[#e0e0e0]">Warehouse Time Motion</h2>
+        <h2 className="text-lg font-semibold text-[#e0e0e0]">Warehouse time motion</h2>
         <p className="mt-1 text-sm text-[#888888]">
-          Configure warehouse throughput settings for planner operations.
+          Set the picking and loading assumptions used in route planning.
         </p>
       </div>
 

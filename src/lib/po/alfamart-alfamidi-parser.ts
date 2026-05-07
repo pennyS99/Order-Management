@@ -73,7 +73,7 @@ function parseDcName(text: string): string | null {
 
   const satMatch = text.match(/D\.C\.\s*SAT\s+([A-Za-z0-9\s]+?)(?:\s+JL\.?|\s+Mobil|$)/i);
   if (satMatch) {
-    let loc = satMatch[1].trim().replace(/([A-Za-z])(\d+)$/, "$1 $2");
+    const loc = satMatch[1].trim().replace(/([A-Za-z])(\d+)$/, "$1 $2");
     return `ALFAMART DC ${loc}`;
   }
   return null;
@@ -94,7 +94,7 @@ function parseLineItems(text: string): Array<{ product_code: string; quantity: n
     const quantity = parseInt(m[3], 10);
     if (quantity <= 0 || quantity >= 100000) continue;
 
-    let productName = m[1].trim();
+    const productName = m[1].trim();
     // Skip header rows
     if (/^NO|^NAMA|^BARANG|^PLU|^Q_Crt|^Q_CRT/i.test(productName)) continue;
     if (productName.length < 2) continue;

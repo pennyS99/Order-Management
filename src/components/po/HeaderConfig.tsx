@@ -82,7 +82,7 @@ export function HeaderConfig({ headers, onHeadersChange }: HeaderConfigProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-heading font-semibold text-slate-800 text-sm">
-          Configure Excel Columns
+          Excel export columns
         </h3>
         <div className="flex items-center gap-3">
           <span className="text-sm text-slate-600">
@@ -90,7 +90,7 @@ export function HeaderConfig({ headers, onHeadersChange }: HeaderConfigProps) {
           </span>
           <Button variant="outline" size="sm" onClick={resetToDefault}>
             <RotateCcw className="h-4 w-4 mr-1" />
-            Reset to Default
+            Reset defaults
           </Button>
         </div>
       </div>

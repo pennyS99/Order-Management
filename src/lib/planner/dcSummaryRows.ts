@@ -95,6 +95,7 @@ export type DcSummaryRow = {
   utilizationPct: number;
   dcName: string;
   origin: string;
+  channelType: string;
   province: string;
   totalQty: number;
   totalKg: number;
@@ -149,6 +150,7 @@ export function buildDcSummaryRows(shipments: Shipment[]): DcSummaryRow[] {
         utilizationPct: Math.max(shipment.cbmUtilizationPct, shipment.weightUtilizationPct),
         dcName,
         origin: first.origin?.trim() ?? "",
+        channelType: (first as unknown as { channelType?: string }).channelType?.trim?.() ?? "",
         province: first.province?.trim() ?? "",
         totalQty: lines.reduce((acc, o) => acc + o.cases, 0),
         totalKg: lines.reduce((acc, o) => acc + o.totalWeightKg, 0),

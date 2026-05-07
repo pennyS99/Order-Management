@@ -27,7 +27,7 @@ export function SavePlanDialog({
   initialName,
   summaryText,
   confirmLabel = "Save",
-  loadingLabel = "Saving…",
+  loadingLabel = "Saving...",
   onClose,
   buildPayload,
   mode,
@@ -178,7 +178,7 @@ export function SavePlanDialog({
             aria-label="Close"
             ref={closeRef}
           >
-            ✕
+            X
           </button>
         </div>
 
@@ -209,7 +209,7 @@ export function SavePlanDialog({
           {collisionId ? (
             <>
               <Button variant="outline" size="sm" onClick={() => { setCollisionId(null); inputRef.current?.focus(); }} disabled={saving}>
-                Save as…
+                Save as new
               </Button>
               <Button size="sm" variant="destructive" onClick={handleReplace} disabled={saving}>
                 {saving ? loadingLabel : "Replace existing"}

@@ -8,7 +8,7 @@ type TableFilterToolbarProps = {
   className?: string;
 };
 
-export function TableFilterToolbar({ id, value, onChange, placeholder = "Filter...", className }: TableFilterToolbarProps) {
+export function TableFilterToolbar({ id, value, onChange, placeholder = "Search rows...", className }: TableFilterToolbarProps) {
   return (
     <>
       <label htmlFor={id} className="sr-only">

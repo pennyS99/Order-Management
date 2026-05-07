@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   ChevronRight,
+  Columns,
   Download,
   Upload,
   Plus,
@@ -21,6 +22,7 @@ import { BrandMark } from "@/components/po/BrandMark";
 import { Button } from "@/components/po/ui/button";
 import { ConfirmDialog } from "@/components/po/ui/confirm-dialog";
 import { Input } from "@/components/po/ui/input";
+import { PlannerResultsColumnsConfig } from "@/components/planner/PlannerResultsColumnsConfig";
 
 type ItemRow = { id: number; item: string; cbm: number; weightKg: number };
 type AddressRow = {
@@ -41,7 +43,7 @@ type AddressRow = {
   unloadDurationMin: number | null;
 };
 type TruckRow = { id: number; truckType: string; maxKg: number; maxCbm: number };
-type PlannerCategory = "list" | "item" | "address" | "truck";
+type PlannerCategory = "list" | "columns" | "item" | "address" | "truck";
 type ConfirmActionState = {
   title: string;
   description: string;
@@ -288,6 +290,24 @@ export function MasterSettingsClient({
       <li>
         <button
           type="button"
+          onClick={() => { setCategory("columns"); resetCategoryState(); }}
+          className={categoryListButtonClass}
+        >
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-2">
+              <Columns className="h-5 w-5 text-[#1D9E75]" />
+            </div>
+            <div>
+              <span className="font-semibold text-[#e0e0e0]">Results columns</span>
+              <p className="text-sm text-[#888888]">Show, rename, and reorder planner results columns</p>
+            </div>
+          </div>
+          <ChevronRight className="h-5 w-5 shrink-0 text-[#888888]" />
+        </button>
+      </li>
+      <li>
+        <button
+          type="button"
           onClick={() => { setCategory("item"); resetCategoryState(); }}
           className={categoryListButtonClass}
         >
@@ -296,8 +316,8 @@ export function MasterSettingsClient({
               <Package className="h-5 w-5 text-[#1D9E75]" />
             </div>
             <div>
-              <span className="font-semibold text-[#e0e0e0]">Item Master</span>
-              <p className="text-sm text-[#888888]">Manage item, CBM, and weight</p>
+              <span className="font-semibold text-[#e0e0e0]">Item master</span>
+              <p className="text-sm text-[#888888]">Maintain item codes, CBM, and weight</p>
             </div>
           </div>
           <ChevronRight className="h-5 w-5 shrink-0 text-[#888888]" />
@@ -314,8 +334,8 @@ export function MasterSettingsClient({
               <MapPin className="h-5 w-5 text-[#1D9E75]" />
             </div>
             <div>
-              <span className="font-semibold text-[#e0e0e0]">Address Master</span>
-              <p className="text-sm text-[#888888]">Manage DC mapping, mode/channel, coordinates, and LTL/LCL limit</p>
+              <span className="font-semibold text-[#e0e0e0]">Address master</span>
+              <p className="text-sm text-[#888888]">Maintain DC mapping, channels, coordinates, and LTL/LCL limits</p>
             </div>
           </div>
           <ChevronRight className="h-5 w-5 shrink-0 text-[#888888]" />
@@ -332,8 +352,8 @@ export function MasterSettingsClient({
               <Truck className="h-5 w-5 text-[#1D9E75]" />
             </div>
             <div>
-              <span className="font-semibold text-[#e0e0e0]">Truck Master</span>
-              <p className="text-sm text-[#888888]">Manage truck capacity (kg/cbm)</p>
+              <span className="font-semibold text-[#e0e0e0]">Truck master</span>
+              <p className="text-sm text-[#888888]">Maintain truck capacity in kg and CBM</p>
             </div>
           </div>
           <ChevronRight className="h-5 w-5 shrink-0 text-[#888888]" />
@@ -346,8 +366,8 @@ export function MasterSettingsClient({
               <ListChecks className="h-5 w-5 text-[#1D9E75]" />
             </div>
             <div>
-              <span className="font-semibold text-[#e0e0e0]">Warehouse Time Motion</span>
-              <p className="text-sm text-[#888888]">Manage picking/loading capacity and rate settings</p>
+              <span className="font-semibold text-[#e0e0e0]">Warehouse time motion</span>
+              <p className="text-sm text-[#888888]">Set picking and loading capacity, timing, and rates</p>
             </div>
           </div>
           <ChevronRight className="h-5 w-5 shrink-0 text-[#888888]" />
@@ -385,6 +405,23 @@ export function MasterSettingsClient({
 
       {category === "list" && renderCategoryList}
 
+      {category === "columns" && (
+        <div className="space-y-4">
+          {!embedded && (
+            <button
+              type="button"
+              onClick={() => setCategory("list")}
+              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
+            >
+              <ArrowLeft className="h-4 w-4" /> Back to configure
+            </button>
+          )}
+          <div className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-4">
+            <PlannerResultsColumnsConfig />
+          </div>
+        </div>
+      )}
+
       {category === "item" && (
         <div className="space-y-4">
           {!embedded && (
@@ -393,7 +430,7 @@ export function MasterSettingsClient({
               onClick={() => setCategory("list")}
               className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
             >
-              <ArrowLeft className="h-4 w-4" /> Back to Settings
+              <ArrowLeft className="h-4 w-4" /> Back to configure
             </button>
           )}
 
@@ -438,7 +475,7 @@ export function MasterSettingsClient({
                 });
               }}
             >
-              Delete Selected ({selectedItemIds.size})
+              Delete selected ({selectedItemIds.size})
             </Button>
             <Button
               type="button"
@@ -449,7 +486,7 @@ export function MasterSettingsClient({
               disabled={items.length === 0}
             >
               <Download className="h-4 w-4" />
-              Download CSV
+              Export CSV
             </Button>
             <label className="inline-flex">
               <input
@@ -485,7 +522,7 @@ export function MasterSettingsClient({
               }}
             >
               <Plus className="h-4 w-4" />
-              Add Item
+              Add item
             </Button>
           </div>
 
@@ -825,11 +862,11 @@ export function MasterSettingsClient({
               onClick={() => setCategory("list")}
               className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
             >
-              <ArrowLeft className="h-4 w-4" /> Back to Settings
+              <ArrowLeft className="h-4 w-4" /> Back to configure
             </button>
           )}
           <p className="text-sm text-[#888888]">
-            Edit DC coordinates, channel, transport mode, and time windows. Export street addresses still come from the{" "}
+            Manage DC coordinates, channels, transport modes, and receiving windows. Export street addresses still come from the{" "}
             <span className="font-semibold text-[#e0e0e0]">Address</span> column on each orders CSV row.
           </p>
 
@@ -874,7 +911,7 @@ export function MasterSettingsClient({
                 });
               }}
             >
-              Delete Selected ({selectedAddressIds.size})
+              Delete selected ({selectedAddressIds.size})
             </Button>
             <Button
               type="button"
@@ -921,7 +958,7 @@ export function MasterSettingsClient({
               }
             >
               <Download className="h-4 w-4" />
-              Download CSV
+              Export CSV
             </Button>
             <label className="inline-flex">
               <input
@@ -1458,7 +1495,7 @@ export function MasterSettingsClient({
               onClick={() => setCategory("list")}
               className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
             >
-              <ArrowLeft className="h-4 w-4" /> Back to Settings
+              <ArrowLeft className="h-4 w-4" /> Back to configure
             </button>
           )}
 
@@ -1503,7 +1540,7 @@ export function MasterSettingsClient({
                 });
               }}
             >
-              Delete Selected ({selectedTruckIds.size})
+              Delete selected ({selectedTruckIds.size})
             </Button>
             <Button
               type="button"
@@ -1514,7 +1551,7 @@ export function MasterSettingsClient({
               disabled={trucks.length === 0}
             >
               <Download className="h-4 w-4" />
-              Download CSV
+              Export CSV
             </Button>
             <label className="inline-flex">
               <input
@@ -1550,7 +1587,7 @@ export function MasterSettingsClient({
               }}
             >
               <Plus className="h-4 w-4" />
-              Add Truck
+              Add truck
             </Button>
           </div>
 
@@ -1900,15 +1937,15 @@ export function MasterSettingsClient({
               className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
             >
               <ArrowLeft className="h-4 w-4" />
-              Back to Settings
+              Back to configure
             </Link>
           </div>
           <div className="flex items-center gap-3 mb-2">
             <BrandMark size="sm" />
-            <h1 className="font-display text-xl font-black tracking-tight text-[#e0e0e0]">OM Masters</h1>
+            <h1 className="font-display text-xl font-black tracking-tight text-[#e0e0e0]">Planner masters</h1>
           </div>
           <p className="mt-1 text-sm text-[#888888]">
-            Manage Item, Address, and Truck masters for Planner.
+            Manage the item, address, and truck data used by route planning.
           </p>
         </div>
       </header>

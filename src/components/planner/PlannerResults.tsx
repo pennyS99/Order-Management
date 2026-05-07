@@ -314,7 +314,7 @@ const PlannerShipmentsOverviewMap = dynamic(
     ssr: false,
     loading: () => (
       <div className="flex h-[min(420px,55vh)] items-center justify-center rounded-lg border border-[#2a2a2a] bg-[#141414] text-xs font-medium text-[#888888]">
-        Loading map…
+        Loading map...
       </div>
     ),
   },
@@ -716,6 +716,7 @@ const RESULT_COLS_DC = {
   depart: "Depart (unload end)",
   tripDur: "Trip duration",
   dcName: "DC Name",
+  channelType: "Channel Type",
   totalQty: "Qty",
   totalKg: "KG",
   totalCbm: "CBM",
@@ -729,6 +730,7 @@ const RESULT_COLS = {
   origin: "Origin",
   shipmentId: "Shipment ID",
   dcName: "DC Name",
+  channelType: "Channel Type",
   poNumber: "PO Number",
   startPicking: "Start Picking Time",
   plt: "PLT",
@@ -755,10 +757,12 @@ const EXPORT_BORDER = {
 function buildPlannerWarehouseSheetAoA(
   shipments: Shipment[],
   scheduleByShipmentId?: Map<string, PlannerPickLoadScheduleRow>,
+  channelTypeByDcName?: Map<string, string>,
 ): (string | number | Date)[][] {
   const headerRow = [
     "Shipment ID",
     "DC Name",
+    "Channel Type",
     "PO Number",
     "Loading Sequence",
     "Address",
@@ -844,6 +848,7 @@ function buildPlannerWarehouseSheetAoA(
     return [
       s.id,
       o.dcName,
+      channelTypeByDcName?.get(o.dcName)?.trim() || "",
       o.purchaseOrder,
       loadingSequence,
       o.address ?? "",
@@ -911,6 +916,7 @@ const CT_DC_EXPORT_HEADERS: readonly string[] = [
   RESULT_COLS_DC.shipmentId,
   RESULT_COLS_DC.dropSequence,
   RESULT_COLS_DC.dcName,
+  RESULT_COLS_DC.channelType,
   RESULT_COLS_DC.poNumber,
   RESULT_COLS_DC.startPicking,
   RESULT_COLS_DC.plt,
@@ -944,6 +950,7 @@ function applyCtSheetDcPresentationStyles(
     [RESULT_COLS_DC.shipmentId]: { width: 14, align: "left" },
     [RESULT_COLS_DC.dropSequence]: { width: 8, align: "right" },
     [RESULT_COLS_DC.dcName]: { width: 28, align: "left" },
+    [RESULT_COLS_DC.channelType]: { width: 14, align: "left" },
     [RESULT_COLS_DC.poNumber]: { width: 16, align: "left" },
     [RESULT_COLS_DC.startPicking]: { width: 16, align: "right" },
     [RESULT_COLS_DC.plt]: { width: 10, align: "right" },
@@ -1271,7 +1278,11 @@ const RESULTS_TH_BASE =
   "px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]";
 const RESULTS_TD_BASE = "px-3 py-2 align-top";
 
-const DC_COLS: RenderCol<DcSummaryRow>[] = [
+function buildDcCols(args: {
+  channelTypeByDcName: Map<string, string>;
+}): RenderCol<DcSummaryRow>[] {
+  const { channelTypeByDcName } = args;
+  return [
   {
     id: "no",
     thClassName: cn("w-9", RESULTS_TH_BASE),
@@ -1299,6 +1310,12 @@ const DC_COLS: RenderCol<DcSummaryRow>[] = [
     thClassName: RESULTS_TH_BASE,
     tdClassName: cn("min-w-0 text-[#ccc]", RESULTS_TD_BASE),
     getValue: (row) => <div>{row.dcName}</div>,
+  },
+  {
+    id: "channelType",
+    thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-[#aaa]"),
+    getValue: (row) => channelTypeByDcName.get(row.dcName)?.trim() || "—",
   },
   {
     id: "dropSequence",
@@ -1402,9 +1419,14 @@ const DC_COLS: RenderCol<DcSummaryRow>[] = [
     tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[#aaa]"),
     getValue: (row) => row.rad,
   },
-];
+  ];
+}
 
-const PO_COLS: RenderCol<PoSummaryRow>[] = [
+function buildPoCols(args: {
+  channelTypeByDcName: Map<string, string>;
+}): RenderCol<PoSummaryRow>[] {
+  const { channelTypeByDcName } = args;
+  return [
   {
     id: "no",
     thClassName: cn("w-9", RESULTS_TH_BASE),
@@ -1432,6 +1454,12 @@ const PO_COLS: RenderCol<PoSummaryRow>[] = [
     thClassName: RESULTS_TH_BASE,
     tdClassName: cn("min-w-0 text-[#ccc]", RESULTS_TD_BASE),
     getValue: (row) => <div>{row.dcName}</div>,
+  },
+  {
+    id: "channelType",
+    thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-[#aaa]"),
+    getValue: (row) => channelTypeByDcName.get(row.dcName)?.trim() || "—",
   },
   {
     id: "poNumber",
@@ -1517,9 +1545,14 @@ const PO_COLS: RenderCol<PoSummaryRow>[] = [
     tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[#aaa]"),
     getValue: (row) => row.poExpiredDate,
   },
-];
+  ];
+}
 
-const UNASSIGNED_COLS: RenderCol<UnassignedRow>[] = [
+function buildUnassignedCols(args: {
+  channelTypeByDcName: Map<string, string>;
+}): RenderCol<UnassignedRow>[] {
+  const { channelTypeByDcName } = args;
+  return [
   {
     id: "no",
     thClassName: cn("w-9", RESULTS_TH_BASE),
@@ -1552,6 +1585,15 @@ const UNASSIGNED_COLS: RenderCol<UnassignedRow>[] = [
     getValue: (o) => o.dcName?.trim() || "—",
   },
   {
+    id: "channelType",
+    thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-[#aaa]"),
+    getValue: (o) => {
+      const dc = o.dcName?.trim() || "";
+      return dc ? channelTypeByDcName.get(dc)?.trim() || "—" : "—";
+    },
+  },
+  {
     id: "dropSequence",
     thClassName: cn("w-20", RESULTS_TH_BASE),
     tdClassName: cn("w-20", RESULTS_TD_BASE),
@@ -1569,7 +1611,8 @@ const UNASSIGNED_COLS: RenderCol<UnassignedRow>[] = [
     tdClassName: cn("w-20 text-[#aaa]", RESULTS_TD_BASE),
     getValue: () => "—",
   },
-];
+  ];
+}
 
 function buildVisibleColumns<Row>(
   defs: readonly RenderCol<Row>[],
@@ -1719,6 +1762,18 @@ export function PlannerResults() {
     return m;
   }, [data.rawAddressMaster]);
 
+  const dcChannelTypeMap = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const row of data.rawAddressMaster) {
+      const dc = String(row.dcName ?? row.DC ?? "").trim();
+      if (!dc) continue;
+      const channelType = String(row["Channel Type"] ?? "").trim();
+      if (!channelType) continue;
+      if (!m.has(dc)) m.set(dc, channelType);
+    }
+    return m;
+  }, [data.rawAddressMaster]);
+
   const dcSummaryRowsBase = useMemo(
     () => (consolidationResult ? buildDcSummaryRows(consolidationResult.shipments) : []),
     [consolidationResult],
@@ -1766,17 +1821,24 @@ export function PlannerResults() {
   const poColumnConfig = getTabColumns("po");
   const unassignedColumnConfig = getTabColumns("unassigned");
 
+  const dcColDefs = useMemo(() => buildDcCols({ channelTypeByDcName: dcChannelTypeMap }), [dcChannelTypeMap]);
+  const poColDefs = useMemo(() => buildPoCols({ channelTypeByDcName: dcChannelTypeMap }), [dcChannelTypeMap]);
+  const unassignedColDefs = useMemo(
+    () => buildUnassignedCols({ channelTypeByDcName: dcChannelTypeMap }),
+    [dcChannelTypeMap],
+  );
+
   const visibleDcColumns = useMemo(
-    () => buildVisibleColumns(DC_COLS, dcColumnConfig, fallbackColumnsByTab.dc),
-    [dcColumnConfig, fallbackColumnsByTab.dc],
+    () => buildVisibleColumns(dcColDefs, dcColumnConfig, fallbackColumnsByTab.dc),
+    [dcColDefs, dcColumnConfig, fallbackColumnsByTab.dc],
   );
   const visiblePoColumns = useMemo(
-    () => buildVisibleColumns(PO_COLS, poColumnConfig, fallbackColumnsByTab.po),
-    [fallbackColumnsByTab.po, poColumnConfig],
+    () => buildVisibleColumns(poColDefs, poColumnConfig, fallbackColumnsByTab.po),
+    [fallbackColumnsByTab.po, poColDefs, poColumnConfig],
   );
   const visibleUnassignedColumns = useMemo(
-    () => buildVisibleColumns(UNASSIGNED_COLS, unassignedColumnConfig, fallbackColumnsByTab.unassigned),
-    [fallbackColumnsByTab.unassigned, unassignedColumnConfig],
+    () => buildVisibleColumns(unassignedColDefs, unassignedColumnConfig, fallbackColumnsByTab.unassigned),
+    [fallbackColumnsByTab.unassigned, unassignedColDefs, unassignedColumnConfig],
   );
 
   const exportResultsToXlsx = async () => {
@@ -1797,6 +1859,7 @@ export function PlannerResults() {
         row.shipmentId,
         row.dropSequence > 0 ? row.dropSequence : emDash,
         row.dcName,
+        dcChannelTypeMap.get(row.dcName)?.trim() || emDash,
         row.poNumber,
         row.startPickingClock,
         row.pltClock,
@@ -1825,7 +1888,11 @@ export function PlannerResults() {
 
     XLSX.utils.book_append_sheet(workbook, worksheet, "CT");
 
-    const warehouseAoA = buildPlannerWarehouseSheetAoA(consolidationResult.shipments, scheduleByShipmentId);
+    const warehouseAoA = buildPlannerWarehouseSheetAoA(
+      consolidationResult.shipments,
+      scheduleByShipmentId,
+      dcChannelTypeMap,
+    );
     const warehouseWs = XLSX.utils.aoa_to_sheet(warehouseAoA, { cellDates: true });
     const whRange = XLSX.utils.decode_range(warehouseWs["!ref"] ?? "A1");
     applyWarehouseSheetPresentationStyles(warehouseWs, whRange);
@@ -1851,6 +1918,43 @@ export function PlannerResults() {
     setMoveSuccess("Updated.");
   };
 
+  const shipmentsForSummary = consolidationResult?.shipments ?? [];
+
+  const totalCases = useMemo(() => {
+    return shipmentsForSummary.reduce((sum, shipment) => {
+      const shipmentCases = shipment.orders.reduce((acc, o) => acc + (Number.isFinite(o.cases) ? o.cases : 0), 0);
+      return sum + shipmentCases;
+    }, 0);
+  }, [shipmentsForSummary]);
+
+  const qtyByChannelType = useMemo(() => {
+    const byType = new Map<string, number>();
+
+    for (const shipment of shipmentsForSummary) {
+      for (const order of shipment.orders) {
+        const dcName = String(order.dcName ?? "").trim();
+        const channelType = (dcName ? dcChannelTypeMap.get(dcName) : null) ?? "—";
+        const cases = Number.isFinite(order.cases) ? order.cases : 0;
+        byType.set(channelType, (byType.get(channelType) ?? 0) + cases);
+      }
+    }
+
+    return Array.from(byType.entries())
+      .map(([channelType, qty]) => ({ channelType, qty }))
+      .sort((a, b) => b.qty - a.qty || a.channelType.localeCompare(b.channelType, undefined, { sensitivity: "base" }));
+  }, [dcChannelTypeMap, shipmentsForSummary]);
+
+  const truckTypeCounts = useMemo(() => {
+    const byType = new Map<string, number>();
+    for (const s of shipmentsForSummary) {
+      const t = String(s.truckType ?? "").trim() || "—";
+      byType.set(t, (byType.get(t) ?? 0) + 1);
+    }
+    return Array.from(byType.entries())
+      .map(([truckType, count]) => ({ truckType, count }))
+      .sort((a, b) => b.count - a.count || a.truckType.localeCompare(b.truckType, undefined, { sensitivity: "base" }));
+  }, [shipmentsForSummary]);
+
   if (!consolidationResult) {
     return null;
   }
@@ -1859,7 +1963,7 @@ export function PlannerResults() {
     <section className="om-panel space-y-5 rounded-lg p-6 md:p-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="font-display text-lg font-black tracking-tight text-[#e0e0e0]">Results</h2>
+          <h2 className="font-display text-lg font-black tracking-tight text-[#e0e0e0]">Route results</h2>
           <p className="mt-0.5 text-xs text-[#888888]">
             {consolidationResult.shipments.length} shipment
             {consolidationResult.shipments.length === 1 ? "" : "s"}
@@ -1893,7 +1997,7 @@ export function PlannerResults() {
         <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm font-semibold text-emerald-100">
-              Loaded from saved plan: <span className="font-mono">{loadedFromSavedPlan.name}</span>
+              Loaded plan: <span className="font-mono">{loadedFromSavedPlan.name}</span>
             </p>
             <Button
               size="sm"
@@ -1902,7 +2006,7 @@ export function PlannerResults() {
                 clearPlannerState();
               }}
             >
-              Clear
+              Clear plan
             </Button>
           </div>
         </div>
@@ -1911,7 +2015,7 @@ export function PlannerResults() {
       {saveSuccess && (
         <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3">
           <p className="text-sm font-semibold text-emerald-100">
-            Saved as <span className="font-mono">{saveSuccess.name}</span>.{" "}
+            Saved <span className="font-mono">{saveSuccess.name}</span>.{" "}
             <Link className="underline decoration-emerald-300/60 hover:decoration-emerald-200" href="/shipments">
               View shipments
             </Link>
@@ -1921,7 +2025,7 @@ export function PlannerResults() {
 
       <SavePlanDialog
         open={isSaveDialogOpen}
-        title="Save routed plan"
+        title="Save route plan"
         summaryText={`${consolidationResult.shipments.length} shipments · ${consolidationResult.shipments.reduce(
           (acc, s) => acc + s.orders.length,
           0,
@@ -2028,7 +2132,7 @@ export function PlannerResults() {
                   : "border-b-transparent text-[#888]",
               )}
             >
-              By DC
+              DC stops
               <span style={tabBadgeStyle(resultsTab === "dc")}>{dcSummaryRows.length}</span>
             </button>
             <button
@@ -2041,7 +2145,7 @@ export function PlannerResults() {
                   : "border-b-transparent text-[#888]",
               )}
             >
-              By PO
+              PO lines
               <span style={tabBadgeStyle(resultsTab === "po")}>{poSummaryRows.length}</span>
             </button>
             <button
@@ -2072,7 +2176,7 @@ export function PlannerResults() {
           <div className="border-b border-[#2a2a2a] bg-[#0d0d0d] px-4 py-2">
             {(warehouseTimeMotionError || pickLoadSchedule.error) && (
               <p className="text-xs text-amber-200/90" role="status">
-                {warehouseTimeMotionError || pickLoadSchedule.error} Start Picking Time / PLT will show as &quot;—&quot;
+                {warehouseTimeMotionError || pickLoadSchedule.error} Start Picking Time / PLT will show as &quot;-&quot;
                 until fixed.
               </p>
             )}
@@ -2100,7 +2204,7 @@ export function PlannerResults() {
 
         <div className="om-results-table-scroll max-h-80 min-h-[200px] overflow-x-auto overflow-y-auto">
           {resultsTab === "unassigned" && consolidationResult.unassignedOrders.length === 0 ? (
-            <p className="px-4 py-8 text-center text-[13px] text-[#555]">{"✓  All lines routed"}</p>
+            <p className="px-4 py-8 text-center text-[13px] text-[#555]">All order lines are routed.</p>
           ) : resultsTab === "unassigned" ? (
             <table className="w-full border-separate border-spacing-0 text-[12px] whitespace-nowrap">
               <thead className="sticky top-0 z-[1] border-b-[0.5px] border-[#2a2a2a] bg-[#161616] [&_th]:bg-[#161616]">
@@ -2343,6 +2447,86 @@ export function PlannerResults() {
               </tbody>
             </table>
           )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="om-kpi-card">
+          <span className="om-kpi-label">Truck types</span>
+          <span className="mt-0.5 text-xs text-[var(--om-text-muted)]">Stops by equipment</span>
+
+          {truckTypeCounts.length === 0 ? (
+            <div className="mt-3">
+              <span className="om-kpi-value">—</span>
+            </div>
+          ) : (
+            <ul className="mt-3 space-y-2">
+              {(() => {
+                const max = Math.max(1, ...truckTypeCounts.map((r) => r.count));
+                return truckTypeCounts.map((row) => (
+                  <li key={row.truckType} className="flex items-center gap-3">
+                    <span
+                      className="min-w-[88px] truncate text-sm font-semibold text-[var(--om-text)]"
+                      title={row.truckType}
+                    >
+                      {row.truckType}
+                    </span>
+                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-[rgba(255,255,255,0.05)] ring-1 ring-[rgba(255,255,255,0.06)]">
+                      <div
+                        className="h-full rounded-full bg-[color-mix(in_oklch,var(--om-accent)_78%,#0b1511)]"
+                        style={{ width: `${Math.round((row.count / max) * 100)}%` }}
+                      />
+                    </div>
+                    <span className="w-8 shrink-0 text-right text-sm font-semibold tabular-nums text-[var(--om-text-secondary)]">
+                      {row.count}
+                    </span>
+                  </li>
+                ));
+              })()}
+            </ul>
+          )}
+        </div>
+        <div className="om-kpi-card">
+          <span className="om-kpi-label">Qty</span>
+          <span className="mt-0.5 text-xs text-[var(--om-text-muted)]">Cases by channel type</span>
+
+          {qtyByChannelType.length === 0 ? (
+            <div className="mt-3">
+              <span className="om-kpi-value">—</span>
+            </div>
+          ) : (
+            <ul className="mt-3 space-y-2">
+              {(() => {
+                const max = Math.max(1, ...qtyByChannelType.map((r) => r.qty));
+                return qtyByChannelType.map((row) => (
+                  <li key={row.channelType} className="flex items-center gap-3">
+                    <span
+                      className="min-w-[120px] truncate text-sm font-semibold text-[var(--om-text)]"
+                      title={row.channelType}
+                    >
+                      {row.channelType}
+                    </span>
+                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-[rgba(255,255,255,0.05)] ring-1 ring-[rgba(255,255,255,0.06)]">
+                      <div
+                        className="h-full rounded-full bg-[color-mix(in_oklch,var(--om-accent)_78%,#0b1511)]"
+                        style={{ width: `${Math.round((row.qty / max) * 100)}%` }}
+                      />
+                    </div>
+                    <span className="w-16 shrink-0 text-right text-sm font-semibold tabular-nums text-[var(--om-text-secondary)]">
+                      {Math.round(row.qty).toLocaleString()}
+                    </span>
+                  </li>
+                ));
+              })()}
+            </ul>
+          )}
+
+          <div className="mt-4 flex items-baseline justify-between gap-3 border-t border-[rgba(255,255,255,0.06)] pt-3">
+            <span className="text-xs font-medium text-[var(--muted-foreground)]">Total</span>
+            <span className="text-sm font-bold tabular-nums text-[var(--text)]">
+              {Math.round(totalCases).toLocaleString()}
+            </span>
+          </div>
         </div>
       </div>
     </section>

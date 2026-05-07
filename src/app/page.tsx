@@ -8,28 +8,35 @@ export default function LandingPage() {
     <main className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-5xl flex-col px-6 py-10">
       <section className="flex flex-1 flex-col items-center justify-center px-2 pb-12 pt-4 text-center md:py-16">
         <div className="om-hero-reveal max-w-3xl space-y-8" data-step="1">
-          <AnnouncementBadge>Planner v1 — consolidation ready</AnnouncementBadge>
+          <AnnouncementBadge>Planner ready for daily routing</AnnouncementBadge>
         </div>
 
         <h1
-          className="om-hero-reveal mt-2 max-w-4xl font-display text-4xl font-black leading-[1.05] tracking-tight text-[var(--text)] sm:text-5xl md:text-6xl lg:text-7xl"
+          className="om-hero-reveal mt-3 max-w-4xl font-display text-4xl font-black leading-[1.05] tracking-tight text-[var(--text)] sm:text-5xl md:text-6xl lg:text-7xl"
           data-step="2"
         >
-          Route every stop.
+          Plan every shipment.
           <br />
-          <span className="text-[var(--primary)]">Ship with precision.</span>
+          <span className="text-[var(--primary)]">Move with clarity.</span>
         </h1>
 
-        <div className="om-hero-reveal mt-2 flex flex-col items-center gap-3 sm:flex-row sm:gap-4" data-step="3">
+        <p
+          className="om-hero-reveal mt-5 max-w-2xl text-sm leading-6 text-[var(--muted-foreground)] sm:text-base"
+          data-step="3"
+        >
+          Upload orders, consolidate routes, review saved shipments, and export PO lines from one focused operations hub.
+        </p>
+
+        <div className="om-hero-reveal mt-8 flex flex-col items-center gap-3 sm:flex-row sm:gap-4" data-step="4">
           <Button asChild size="lg" className="om-cta-pulse min-w-[180px]">
-            <Link href="/planner">Open workspace</Link>
+            <Link href="/planner">Open Planner</Link>
           </Button>
           <Button asChild variant="outline" size="lg" className="min-w-[180px] font-semibold">
-            <Link href="/extract">PO Extract</Link>
+            <Link href="/extract">Extract POs</Link>
           </Button>
         </div>
 
-        <div className="om-hero-reveal mt-10 w-full max-w-xl px-2" data-step="4">
+        <div className="om-hero-reveal mt-10 w-full max-w-xl px-2" data-step="5">
           <TerminalSnippet command="om planner consolidate --orders ./orders.csv" className="w-full justify-between" />
         </div>
       </section>

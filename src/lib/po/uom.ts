@@ -51,6 +51,10 @@ function uomMasterFilePath(): string {
   return path.join(process.cwd(), "data", "uom-master.json");
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return value !== null && typeof value === "object" ? (value as Record<string, unknown>) : {};
+}
+
 function loadUomMasterSync(): UomMasterRow[] {
   const filePath = uomMasterFilePath();
   try {
@@ -61,11 +65,12 @@ function loadUomMasterSync(): UomMasterRow[] {
     if (!Array.isArray(parsed)) return [];
     return parsed
       .map((r) => {
-        const sku = String((r as any)?.sku ?? "").trim().replace(/\s/g, "");
-        const item = String((r as any)?.item ?? "").trim();
-        const pcsPerCtn = Number((r as any)?.pcsPerCtn ?? (r as any)?.pcs_per_ctn ?? 1);
-        const packPerCtn = Number((r as any)?.packPerCtn ?? (r as any)?.pack_per_ctn ?? 1);
-        const ctn = Number((r as any)?.ctn ?? 1);
+        const row = asRecord(r);
+        const sku = String(row.sku ?? "").trim().replace(/\s/g, "");
+        const item = String(row.item ?? "").trim();
+        const pcsPerCtn = Number(row.pcsPerCtn ?? row.pcs_per_ctn ?? 1);
+        const packPerCtn = Number(row.packPerCtn ?? row.pack_per_ctn ?? 1);
+        const ctn = Number(row.ctn ?? 1);
         if (!sku || !item) return null;
         return {
           sku,
@@ -86,7 +91,7 @@ export async function loadUomMaster(): Promise<UomMasterRow[]> {
   return loadUomMasterSync();
 }
 
-function usePackConversion(
+function shouldUsePackConversion(
   productCode: string | null,
   productName: string | null,
   row: UomMasterRow | null,
@@ -165,7 +170,7 @@ export async function convertToCtn(
   if (!row) return { quantity, unit: u };
 
   if (PCS_VARIANTS.some((re) => re.test(u))) {
-    const usePack = usePackConversion(productCode, productName ?? null, row);
+    const usePack = shouldUsePackConversion(productCode, productName ?? null, row);
     const divisor = usePack
       ? (row.packPerCtn > 0 ? row.packPerCtn : 1)
       : (row.pcsPerCtn > 0 ? row.pcsPerCtn : 1);

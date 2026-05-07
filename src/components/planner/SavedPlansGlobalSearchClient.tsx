@@ -28,7 +28,7 @@ const PlannerShipmentsOverviewMap = dynamic(
     ssr: false,
     loading: () => (
       <div className="flex h-[min(420px,55vh)] items-center justify-center rounded-lg border border-[#2a2a2a] bg-[#141414] text-xs font-medium text-[#888888]">
-        Loading map…
+        Loading map...
       </div>
     ),
   },
@@ -264,7 +264,7 @@ export function SavedPlansGlobalSearchClient({
           Clear
         </Button>
         <Button onClick={runSearch} disabled={loading}>
-          {loading ? "Searching…" : "Search"}
+          {loading ? "Searching..." : "Search"}
         </Button>
       </div>
 
@@ -293,7 +293,7 @@ export function SavedPlansGlobalSearchClient({
 
   if (layout === "gmaps") {
     const activeCount = hasSearched ? byDcList.length : 0;
-    const subtitle = "All saved plans";
+    const subtitle = "Saved route plans";
 
     const scrollToDc = (dcName: string) => {
       const el = rowRefs.current[dcName];
@@ -382,7 +382,7 @@ export function SavedPlansGlobalSearchClient({
                     disabled={loading}
                     className="rounded-[6px] bg-[#1D9E75] px-2 py-1 text-[11px] font-black text-black disabled:opacity-70"
                   >
-                    {loading ? "Searching…" : "Search"}
+                    {loading ? "Searching..." : "Search"}
                   </button>
                 </div>
               </div>
@@ -390,11 +390,11 @@ export function SavedPlansGlobalSearchClient({
               {/* Section 3 — Results list */}
               <div className="min-h-0 flex-1 overflow-auto">
                 <div className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase text-[#888]">
-                  BY DC · {hasSearched ? `${activeCount} RESULTS` : "—"}
+                  DC stops · {hasSearched ? `${activeCount} results` : "none yet"}
                 </div>
 
                 {!hasSearched ? (
-                  <div className="px-3 py-3 text-[12px] text-[#666]">Choose filters then click Search.</div>
+                  <div className="px-3 py-3 text-[12px] text-[#666]">Choose filters, then search saved plans.</div>
                 ) : byDcList.length === 0 ? (
                   <div className="px-3 py-3 text-[12px] text-[#666]">No matches for the current filters.</div>
                 ) : (
@@ -402,7 +402,7 @@ export function SavedPlansGlobalSearchClient({
                     {byDcList.map((item) => {
                       const active = selectedDcName === item.dcName;
                       const extra = item.poNumbers.length > 1 ? ` +${item.poNumbers.length - 1} more` : "";
-                      const poLine = item.poNumbers.length > 0 ? `${item.poNumbers[0]}${extra}` : "—";
+                      const poLine = item.poNumbers.length > 0 ? `${item.poNumbers[0]}${extra}` : "No PO";
                       return (
                         <div
                           key={item.key}
@@ -434,7 +434,7 @@ export function SavedPlansGlobalSearchClient({
                               </span>
                             )}
                             <span className="truncate">
-                              {item.pld ?? "—"}→{item.rad ?? "—"}
+                              {item.pld ?? "-"} to {item.rad ?? "-"}
                             </span>
                           </div>
                         </div>
@@ -457,7 +457,7 @@ export function SavedPlansGlobalSearchClient({
                   }
                 }}
               >
-                ◀ Collapse
+                Collapse
               </div>
             </div>
           </aside>
@@ -468,9 +468,9 @@ export function SavedPlansGlobalSearchClient({
               onClick={() => setSidebarOpen(true)}
               className="absolute left-0 top-24 z-20 rounded-r-lg border border-[#333] bg-[rgba(14,14,14,0.92)] px-2 py-2 text-[11px] font-semibold text-[#aaa] shadow-lg shadow-black/50"
               aria-label="Expand sidebar"
-              title="Expand"
+              title="Expand filters"
             >
-              ▶
+              Open
             </button>
           )}
         </div>
@@ -523,7 +523,7 @@ export function SavedPlansGlobalSearchClient({
 
             {!hasSearched ? (
               <div className="rounded-xl border border-[#2a2a2a] bg-[#0d0d0d] p-8 text-center text-sm text-[#888888]">
-                Choose filters then click Search.
+                Choose filters, then search saved plans.
               </div>
             ) : (
               resultsUi
@@ -540,7 +540,7 @@ export function SavedPlansGlobalSearchClient({
                 aria-label="Expand filters"
                 title="Expand filters"
               >
-                ≡
+                Open
               </button>
             </div>
           )}
@@ -564,7 +564,7 @@ export function SavedPlansGlobalSearchClient({
                   className="inline-flex min-h-9 min-w-9 items-center justify-center rounded-lg border border-[#2a2a2a] bg-[#141414] text-xs font-semibold text-[#e0e0e0]"
                   aria-label="Close filters"
                 >
-                  ✕
+                  X
                 </button>
               </div>
               {filtersUi}
