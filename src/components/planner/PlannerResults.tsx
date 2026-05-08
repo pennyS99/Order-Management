@@ -113,6 +113,24 @@ function formatTripDurationMin(m: number | null | undefined): string {
 function parseDateForOutput(raw: string | undefined): Date | null {
   const value = (raw ?? "").trim();
   if (!value) return null;
+  // IMPORTANT: Avoid `new Date("YYYY-MM-DD")` timezone-dependent behavior.
+  // Normalize date-only strings to a local Date so formatting is stable across runtimes (Vercel/local).
+  const isoDateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (isoDateOnly) {
+    const year = Number(isoDateOnly[1]);
+    const month = Number(isoDateOnly[2]);
+    const day = Number(isoDateOnly[3]);
+    const normalized = new Date(year, month - 1, day);
+    return Number.isNaN(normalized.getTime()) ? null : normalized;
+  }
+  const isoSlashDateOnly = /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/.exec(value);
+  if (isoSlashDateOnly) {
+    const year = Number(isoSlashDateOnly[1]);
+    const month = Number(isoSlashDateOnly[2]);
+    const day = Number(isoSlashDateOnly[3]);
+    const normalized = new Date(year, month - 1, day);
+    return Number.isNaN(normalized.getTime()) ? null : normalized;
+  }
   const direct = new Date(value);
   if (!Number.isNaN(direct.getTime())) return direct;
   const match = /^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/.exec(value);

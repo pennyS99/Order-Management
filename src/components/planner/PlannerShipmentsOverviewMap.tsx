@@ -7,7 +7,9 @@ import type { Shipment } from "@/types/planner";
 
 import "leaflet/dist/leaflet.css";
 
-const OSRM_BASE = "https://router.project-osrm.org/route/v1/driving";
+const DEFAULT_OSRM_BASE = "https://router.project-osrm.org/route/v1/driving";
+const OSRM_BASE =
+  (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_OSRM_BASE_URL?.trim()) || DEFAULT_OSRM_BASE;
 
 const MAX_CONCURRENT_OSRM_REQUESTS = 4;
 let activeOsrmRequests = 0;
@@ -100,6 +102,14 @@ const inFlightRouteFetchByCoordPath = new Map<
   Promise<LoadedRouteState>
 >();
 
+function sleep(ms: number) {
+  return new Promise<void>((resolve) => window.setTimeout(resolve, ms));
+}
+
+function isRetriableHttpStatus(status: number) {
+  return status === 408 || status === 425 || status === 429 || status === 500 || status === 502 || status === 503 || status === 504;
+}
+
 async function fetchOsrmRoute(coordPath: string): Promise<LoadedRouteState> {
   const cached = routeCacheByCoordPath.get(coordPath);
   if (cached) return cached;
@@ -111,18 +121,59 @@ async function fetchOsrmRoute(coordPath: string): Promise<LoadedRouteState> {
     const url = `${OSRM_BASE}/${coordPath}?overview=full&geometries=geojson`;
     try {
       await acquireOsrmSlot();
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = (await res.json()) as OsrmRouteResponse;
-      if (data.code !== "Ok") throw new Error("No route");
-      const coords = data.routes?.[0]?.geometry?.coordinates;
-      if (!coords?.length) throw new Error("Empty geometry");
-      const latLngs: [number, number][] = coords.map(([lon, lat]) => [lat, lon]);
-      return { kind: "ok" as const, latLngs };
-    } catch {
+      const timeoutMs = 12_000;
+      const maxAttempts = 2;
+      let lastErrorMessage = "Road route could not be loaded from OSRM.";
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        const controller = new AbortController();
+        const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          const res = await fetch(url, { signal: controller.signal });
+          if (!res.ok) {
+            const msg = `OSRM HTTP ${res.status}`;
+            lastErrorMessage = msg;
+            if (attempt < maxAttempts && isRetriableHttpStatus(res.status)) {
+              await sleep(250 * attempt);
+              continue;
+            }
+            throw new Error(msg);
+          }
+          const data = (await res.json()) as OsrmRouteResponse;
+          if (data.code !== "Ok") {
+            const msg = `OSRM response: ${data.code || "Unknown"}`;
+            lastErrorMessage = msg;
+            throw new Error(msg);
+          }
+          const coords = data.routes?.[0]?.geometry?.coordinates;
+          if (!coords?.length) {
+            const msg = "OSRM returned empty geometry";
+            lastErrorMessage = msg;
+            throw new Error(msg);
+          }
+          const latLngs: [number, number][] = coords.map(([lon, lat]) => [lat, lon]);
+          return { kind: "ok" as const, latLngs };
+        } catch (err) {
+          const aborted = err instanceof DOMException && err.name === "AbortError";
+          if (aborted) lastErrorMessage = `OSRM timeout after ${timeoutMs}ms`;
+          if (attempt < maxAttempts) {
+            await sleep(250 * attempt);
+            continue;
+          }
+          throw err;
+        } finally {
+          window.clearTimeout(timeoutId);
+        }
+      }
+
       return {
         kind: "error" as const,
-        message: "Road route could not be loaded from OSRM.",
+        message: lastErrorMessage,
+      };
+    } catch (err) {
+      return {
+        kind: "error" as const,
+        message: err instanceof Error ? err.message : "Road route could not be loaded from OSRM.",
       };
     } finally {
       releaseOsrmSlot();
