@@ -1,14 +1,10 @@
-import fs from "node:fs/promises";
-import sharp from "sharp";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
-import path from "node:path";
-import os from "node:os";
-import { randomUUID } from "node:crypto";
 import { loadUomMaster } from "@/lib/po/uom";
+import { extractTextWithDatalabChandraOcr2 } from "@/lib/po/datalab-ocr";
+import { readMasters } from "@/lib/mastersStore";
 
 export type HariHariItem = {
   barcode: string | null;
+  description?: string | null;
   qty: number;
   uom: "CTN";
 };
@@ -23,13 +19,7 @@ export type HariHariExtractionResult = {
   warnings: string[];
 };
 
-const DPI = 300;
-const execFileAsync = promisify(execFile);
-let hariHariSchedulerPromise: Promise<{
-  scheduler: {
-    addJob: (job: "recognize", image: Buffer) => Promise<{ data: { text: string } }>;
-  };
-}> | null = null;
+const HARIHARI_TIMEOUT_MS = 110_000;
 
 const MONTHS: Record<string, string> = {
   JAN: "01",
@@ -45,62 +35,6 @@ const MONTHS: Record<string, string> = {
   NOV: "11",
   DEC: "12",
 };
-
-async function getLocalEngLangPath(): Promise<string | null> {
-  const root = process.cwd();
-  const candidates = [
-    path.join(root, "node_modules", "@tesseract.js-data", "eng", "4.0.0"),
-    path.join(root, "node_modules", "@tesseract.js-data", "eng", "4.0.0_best_int"),
-  ];
-
-  for (const candidate of candidates) {
-    try {
-      await fs.access(path.join(candidate, "eng.traineddata.gz"));
-      return candidate;
-    } catch {
-      // keep trying other candidates
-    }
-  }
-
-  return null;
-}
-
-async function getHariHariScheduler() {
-  if (hariHariSchedulerPromise) {
-    return hariHariSchedulerPromise;
-  }
-
-  hariHariSchedulerPromise = (async () => {
-    const { createWorker, createScheduler, PSM } = await import("tesseract.js");
-    const scheduler = createScheduler();
-    const localEngLangPath = await getLocalEngLangPath();
-    const workerCount = Math.min(Math.max(1, os.cpus().length - 1), 4);
-
-    const workers = await Promise.all(
-      Array.from({ length: workerCount }, async () => {
-        const worker = await createWorker(
-          "eng",
-          undefined,
-          localEngLangPath ? { langPath: localEngLangPath, logger: () => {} } : { logger: () => {} },
-        );
-        await worker.setParameters({
-          tessedit_pageseg_mode: PSM.SINGLE_BLOCK,
-          tessedit_char_whitelist:
-            "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-/:.() ",
-        });
-        return worker;
-      }),
-    );
-
-    workers.forEach((worker) => scheduler.addWorker(worker));
-    return { scheduler };
-  })().catch((err) => {
-    hariHariSchedulerPromise = null;
-    throw err;
-  });
-
-  return hariHariSchedulerPromise;
-}
 
 function validateEAN13(barcode: string) {
   if (!/^\d{13}$/.test(barcode)) return false;
@@ -149,16 +83,6 @@ function normalizeForDateSearch(text: string): string {
     .replace(/TGI\b/gi, "TGL")
     .replace(/TG1\b/gi, "TGL")
     .replace(/PES4N/gi, "PESAN");
-}
-
-function preprocessForOcr(image: Buffer): Promise<Buffer> {
-  return sharp(image)
-    .grayscale()
-    .normalize()
-    .sharpen()
-    .threshold(170)
-    .jpeg({ quality: 85 })
-    .toBuffer();
 }
 
 function extractDateByLabel(text: string, label: "Tgl Pesan" | "Tgl Kadaluwarsa"): string {
@@ -264,8 +188,71 @@ function extractDateByLabel(text: string, label: "Tgl Pesan" | "Tgl Kadaluwarsa"
   return "";
 }
 
-function extractDcName(text: string): string {
-  const normalizeStore = (raw: string): string => {
+const HARIHARI_MASTERS_PREFIX = "HARIHARI - DC ";
+let hariHariDcCandidatesPromise: Promise<string[]> | null = null;
+
+async function getHariHariDcCandidates(): Promise<string[]> {
+  if (hariHariDcCandidatesPromise) return hariHariDcCandidatesPromise;
+  hariHariDcCandidatesPromise = (async () => {
+    const masters = await readMasters();
+    const suffixes = masters.addresses
+      .map((a) => String(a.dcName ?? "").toUpperCase())
+      .filter((name) => name.startsWith(HARIHARI_MASTERS_PREFIX))
+      .map((name) => name.slice(HARIHARI_MASTERS_PREFIX.length).trim())
+      .filter((s) => s.length > 0);
+    return Array.from(new Set(suffixes));
+  })().catch(() => {
+    hariHariDcCandidatesPromise = null;
+    return [];
+  });
+  return hariHariDcCandidatesPromise;
+}
+
+function normDc(s: string) {
+  return s.toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
+function levenshtein(a: string, b: string): number {
+  if (a === b) return 0;
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+  const v0 = new Array(b.length + 1).fill(0).map((_, i) => i);
+  const v1 = new Array(b.length + 1).fill(0);
+  for (let i = 0; i < a.length; i++) {
+    v1[0] = i + 1;
+    for (let j = 0; j < b.length; j++) {
+      const cost = a[i] === b[j] ? 0 : 1;
+      v1[j + 1] = Math.min(v1[j] + 1, v0[j + 1] + 1, v0[j] + cost);
+    }
+    for (let j = 0; j <= b.length; j++) v0[j] = v1[j]!;
+  }
+  return v0[b.length]!;
+}
+
+async function canonicalizeHariHariDcSuffix(suffix: string): Promise<string> {
+  const cleaned = suffix.trim();
+  if (!cleaned) return "";
+  const candidates = await getHariHariDcCandidates();
+  if (candidates.length === 0) return cleaned;
+
+  const n = normDc(cleaned);
+  if (n.length < 3) return cleaned;
+
+  let best: { cand: string; dist: number } | null = null;
+  for (const cand of candidates) {
+    const d = levenshtein(n, normDc(cand));
+    if (!best || d < best.dist) best = { cand, dist: d };
+    if (best.dist === 0) break;
+  }
+  if (!best) return cleaned;
+
+  // Conservative threshold: allow small OCR slips, but avoid aggressive remapping.
+  const maxAllowed = Math.max(1, Math.floor(n.length * 0.2));
+  return best.dist <= maxAllowed ? best.cand : cleaned;
+}
+
+async function extractDcName(text: string): Promise<string> {
+  const normalizeStore = async (raw: string): Promise<string> => {
     let cleaned = raw
       .toUpperCase()
       .replace(/\b(PT|CV|TBK)\b.*$/g, "")
@@ -282,6 +269,7 @@ function extractDcName(text: string): string {
       .replace(/\bSUPPLIER\b.*$/g, "")
       .replace(/\bTGL\s*CETAK\b.*$/g, "")
       .replace(/\bTGL\s*PESAN\b.*$/g, "")
+      .replace(/\bTGL\s*KIRIM\b.*$/g, "")
       .replace(/\bNO\s*PO\b.*$/g, "")
       .replace(/\b\d{1,2}-[A-Z]{3}-?\d{2,4}\b.*$/g, "")
       .replace(/\s+/g, " ")
@@ -296,14 +284,35 @@ function extractDcName(text: string): string {
       cleaned = markerCut[1].trim();
     }
 
+    // Canonicalize against masters list (prevents subtle OCR typos, e.g. KALUBATA->KALIBATA).
+    // If masters does not contain a close match, we keep the raw cleaned value.
+    cleaned = await canonicalizeHariHariDcSuffix(cleaned);
+
     if (!cleaned) return "";
     return `HARI-HARI DC ${cleaned}`;
   };
 
+  const lines = text.split(/\r?\n/);
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] ?? "";
+    // Only accept explicit destination labels (avoid matching "TGL KIRIM").
+    if (!/(Diki[rl]m\s*ke|Dikirim\s*ke|Kirim\s*Ke|KRM\s*KE|Tujuan\s*Pengiriman)/i.test(line)) continue;
+
+    const ctx = `${line}\n${lines[i + 1] ?? ""}`;
+    // Strip label and keep the first content line
+    const afterLabel =
+      ctx
+        .replace(/.*?(?:Diki[rl]m\s*ke|Dikirim\s*ke|Kirim\s*Ke|KRM\s*KE|Tujuan\s*Pengiriman)\s*[:\-]?\s*/i, "")
+        .trim() || (lines[i + 1] ?? "").trim();
+
+    const formatted = await normalizeStore(afterLabel);
+    if (formatted) return formatted;
+  }
+
   const patterns = [
     /(?:DC(?:\s*Name)?|Distribution\s*Center)\s*[:\-]\s*([^\n\r]+)/i,
-    /(?:Kirim\s*Ke|KRM\s*KE|Tujuan\s*Pengiriman)\s*[:\-]\s*([^\n\r]+)/i,
-    /(?:Kirim\s*Ke|KRM\s*KE|Tujuan\s*Pengiriman)\s*[:\-]?\s*[^\n\r]*\n([^\n\r]+)/i,
+    /(?:Diki[rl]m\s*ke|Dikirim\s*ke|Kirim\s*Ke|KRM\s*KE|Tujuan\s*Pengiriman)\s*[:\-]\s*([^\n\r]+)/i,
+    /(?:Diki[rl]m\s*ke|Dikirim\s*ke|Kirim\s*Ke|KRM\s*KE|Tujuan\s*Pengiriman)\s*[:\-]?\s*[^\n\r]*\n([^\n\r]+)/i,
     /\b\d{2,4}\s+([A-Z][A-Z\s]+?)(?=\s+JL\.|\s+JLN|\s+JALAN|\s+ITC|\s+JAKARTA|,|$)/i,
     /ITC\s+([A-Z][A-Z\s]+?)(?=\s+BASEMENT|\s+LT|,|$)/i,
   ];
@@ -311,7 +320,7 @@ function extractDcName(text: string): string {
   for (const p of patterns) {
     const m = text.match(p);
     if (m?.[1]) {
-      const formatted = normalizeStore(m[1]);
+      const formatted = await normalizeStore(m[1]);
       if (formatted) return formatted;
     }
   }
@@ -323,6 +332,76 @@ async function extractItemsFromOcrText(ocrText: string, warnings: string[]): Pro
   const lines = ocrText.split(/\r?\n/);
   const barcodeRegex = /\b(8\d{12})\b/g;
 
+  const normalizeQtyContext = (s: string) =>
+    s
+      .replaceAll("|", " ")
+      .replace(/\*\*/g, " ")
+      .replace(/[^\S\r\n]+/g, " ")
+      .trim();
+
+  const extractQtyFromContext = (rawContext: string): number => {
+    const ctx = normalizeQtyContext(rawContext);
+
+    // Common cases in Datalab markdown tables:
+    //   "| 899... | 12 | KTN |"  or  "12 | CTN"
+    // Also allow OCR confusions: KTN/K1N/KIN and spaced variants.
+    const qtyBeforeUnit = ctx.match(
+      /(?:^|\D)(\d{1,6})\s*(?:\|\s*)?(?:K\s*[T1I]\s*N|C\s*T\s*N|KTN|K1N|KIN|CTN)(?:\D|$)/i
+    );
+    if (qtyBeforeUnit?.[1]) return Number(qtyBeforeUnit[1]);
+
+    // Fallback: if a unit exists nearby, grab the nearest plausible integer.
+    if (/(?:K\s*[T1I]\s*N|C\s*T\s*N|KTN|K1N|KIN|CTN)/i.test(ctx)) {
+      const ints = Array.from(ctx.matchAll(/(?:^|\D)(\d{1,6})(?:\D|$)/g), (m) => Number(m[1]));
+      const plausible = ints.filter((n) => Number.isFinite(n) && n > 0 && n < 100000);
+      if (plausible.length > 0) return plausible[plausible.length - 1]!;
+    }
+
+    return NaN;
+  };
+
+  const extractDescriptionForBarcode = (rawLine: string, barcode: string): string | null => {
+    const line = rawLine.trim();
+    // Guard: if the "line" is actually the whole document (no real line breaks),
+    // do not treat it as a description.
+    if (line.length > 220) return null;
+
+    // Prefer markdown table parsing when available.
+    if (line.includes("|")) {
+      const cells = line
+        .split("|")
+        .map((c) => c.replace(/\*\*/g, "").trim())
+        .filter((c) => c.length > 0);
+
+      const idx = cells.findIndex((c) => c.includes(barcode));
+      if (idx !== -1) {
+        // Heuristic: description is typically adjacent to barcode cell and is not a pure number/unit.
+        const candidates = [cells[idx + 1], cells[idx - 1], cells[idx + 2], cells[idx - 2]].filter(
+          (c): c is string => typeof c === "string" && c.trim().length > 0
+        );
+        for (const c of candidates) {
+          const s = c.trim();
+          if (/^\d+$/.test(s)) continue;
+          if (/^(?:K\s*[T1I]\s*N|C\s*T\s*N|KTN|K1N|KIN|CTN)$/i.test(s.replace(/\s+/g, ""))) continue;
+          if (s.length < 3) continue;
+          return s;
+        }
+      }
+    }
+
+    // Fallback: remove barcode + qty/unit patterns and keep remaining text.
+    const withoutBarcode = line.replace(barcode, " ").replace(/[^\S\r\n]+/g, " ").trim();
+    const cleaned = withoutBarcode
+      .replace(/(?:^|\D)\d{1,6}\s*(?:K\s*[T1I]\s*N|C\s*T\s*N|KTN|K1N|KIN|CTN)(?:\D|$)/gi, " ")
+      .replace(/\b(?:K\s*[T1I]\s*N|C\s*T\s*N|KTN|K1N|KIN|CTN)\b/gi, " ")
+      .replace(/\b(?:DIPESAN|QTY|PCS|PACK)\b/gi, " ")
+      .replace(/[^\p{L}\p{N}\s\-\/().]/gu, " ")
+      .replace(/[^\S\r\n]+/g, " ")
+      .trim();
+
+    return cleaned.length >= 3 ? cleaned : null;
+  };
+
   // Build a Set of known SKUs from UOM master for fast lookup
   const master = await loadUomMaster();
   const knownSkus = new Set(master.map((r) => r.sku));
@@ -332,9 +411,8 @@ async function extractItemsFromOcrText(ocrText: string, warnings: string[]): Pro
     const barcodes = Array.from(line.matchAll(barcodeRegex), (m) => m[1]);
     if (barcodes.length === 0) continue;
 
-    const qtyContext = `${line} ${lines[i + 1] ?? ""}`;
-    const qtyMatches = Array.from(qtyContext.matchAll(/(\d+)\s*K[TI]?N/gi), (m) => Number(m[1]));
-    const qty = qtyMatches.length > 0 ? qtyMatches[qtyMatches.length - 1] : NaN;
+    const qtyContext = `${line} ${lines[i + 1] ?? ""} ${lines[i + 2] ?? ""}`;
+    const qty = extractQtyFromContext(qtyContext);
 
     for (const barcode of barcodes) {
       if (!Number.isFinite(qty)) {
@@ -386,6 +464,7 @@ async function extractItemsFromOcrText(ocrText: string, warnings: string[]): Pro
 
       items.push({
         barcode: resolvedBarcode,
+        description: extractDescriptionForBarcode(line, barcode),
         qty,
         uom: "CTN",
       });
@@ -395,7 +474,7 @@ async function extractItemsFromOcrText(ocrText: string, warnings: string[]): Pro
   return items;
 }
 
-export async function extractHariHariPO(pdfPath: string): Promise<HariHariExtractionResult> {
+export async function extractHariHariPO(pdfBuffer: Buffer): Promise<HariHariExtractionResult> {
   const warnings: string[] = [];
   const fallback: HariHariExtractionResult = {
     poNumber: "",
@@ -408,84 +487,58 @@ export async function extractHariHariPO(pdfPath: string): Promise<HariHariExtrac
   };
 
   try {
-    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "harihari-"));
-    const prefix = path.join(tempDir, `page-${randomUUID()}`);
-
-    try {
-      await execFileAsync("pdftoppm", ["-r", String(DPI), "-jpeg", "-jpegopt", "quality=85", pdfPath, prefix]);
-      const files = await fs.readdir(tempDir);
-      const pageImages = files
-        .filter((name) => name.startsWith(path.basename(prefix)) && name.endsWith(".jpg"))
-        .map((name) => path.join(tempDir, name))
-        .sort((a, b) => {
-          const aNum = Number(a.match(/-(\d+)\.jpg$/)?.[1] ?? "0");
-          const bNum = Number(b.match(/-(\d+)\.jpg$/)?.[1] ?? "0");
-          return aNum - bNum;
-        });
-
-      if (pageImages.length === 0) {
-        throw new Error("Rasterization produced no page images.");
-      }
-
-      let fullOcrText = "";
-      const { scheduler } = await getHariHariScheduler();
-      const results = await Promise.all(
-        pageImages.map(async (imagePath) => {
-          const pageImage = await fs.readFile(imagePath);
-          const preprocessed = await preprocessForOcr(pageImage);
-          return scheduler.addJob("recognize", preprocessed);
-        }),
-      );
-      fullOcrText = results.map((r) => `\n${r.data.text}\n`).join("");
-
-      const poMatch = fullOcrText.match(/No\s*PO\s*[:\.]?\s*(\d{7,10})/i);
-      const poNumber = poMatch?.[1] ?? "";
-      if (!poNumber) warnings.push("PO number not found with /No\\s*PO\\s*[:\\.]?\\s*(\\d{7,10})/i.");
-
-      const poDate = extractDateByLabel(fullOcrText, "Tgl Pesan");
-      if (!poDate) warnings.push("PO date (Tgl Pesan) not found or invalid format.");
-
-      const deliveryDate = extractDateByLabel(fullOcrText, "Tgl Kadaluwarsa");
-      if (!deliveryDate) warnings.push("Delivery date (Tgl Kadaluwarsa) not found or invalid format.");
-
-      const dcName = extractDcName(fullOcrText);
-      if (!dcName) warnings.push("DC name not found.");
-
-      const items = await extractItemsFromOcrText(fullOcrText, warnings);
-      if (items.length === 0) {
-        warnings.push("No line items found from OCR text (possible OCR failure).");
-      }
-
-      for (const item of items) {
-        if (item.barcode && !validateEAN13(item.barcode)) {
-          const rawLine =
-            fullOcrText
-              .split(/\r?\n/)
-              .find((line) => line.includes(item.barcode!))
-              ?.trim() ?? item.barcode;
-          warnings.push(
-            `EAN-13 checksum failed for barcode ${item.barcode}; raw OCR string: "${rawLine}"`
-          );
-        }
-      }
-
-      const confidence: "high" | "low" =
-        items.length > 0 && warnings.every((w) => !w.includes("EAN-13 checksum failed"))
-          ? "high"
-          : "low";
-
-      return {
-        poNumber,
-        poDate,
-        deliveryDate,
-        dcName,
-        items,
-        confidence,
-        warnings,
-      };
-    } finally {
-      await fs.rm(tempDir, { recursive: true, force: true }).catch(() => undefined);
+    const apiKey = process.env.DATALAB_API_KEY?.trim();
+    if (!apiKey) {
+      warnings.push("Missing DATALAB_API_KEY; Hari-Hari extraction requires Datalab OCR.");
+      return fallback;
     }
+
+    const { text: fullOcrText } = await extractTextWithDatalabChandraOcr2(pdfBuffer, {
+      apiKey,
+      timeoutMs: HARIHARI_TIMEOUT_MS,
+    });
+
+    const poMatch = fullOcrText.match(/No\s*PO\s*[:\.]?\s*(\d{7,10})/i);
+    const poNumber = poMatch?.[1] ?? "";
+    if (!poNumber) warnings.push("PO number not found with /No\\s*PO\\s*[:\\.]?\\s*(\\d{7,10})/i.");
+
+    const poDate = extractDateByLabel(fullOcrText, "Tgl Pesan");
+    if (!poDate) warnings.push("PO date (Tgl Pesan) not found or invalid format.");
+
+    const deliveryDate = extractDateByLabel(fullOcrText, "Tgl Kadaluwarsa");
+    if (!deliveryDate) warnings.push("Delivery date (Tgl Kadaluwarsa) not found or invalid format.");
+
+    const dcName = await extractDcName(fullOcrText);
+    if (!dcName) warnings.push("DC name not found.");
+
+    const items = await extractItemsFromOcrText(fullOcrText, warnings);
+    if (items.length === 0) {
+      warnings.push("No line items found from OCR text (possible OCR failure).");
+    }
+
+    for (const item of items) {
+      if (item.barcode && !validateEAN13(item.barcode)) {
+        const rawLine =
+          fullOcrText
+            .split(/\r?\n/)
+            .find((line) => line.includes(item.barcode!))
+            ?.trim() ?? item.barcode;
+        warnings.push(`EAN-13 checksum failed for barcode ${item.barcode}; raw OCR string: "${rawLine}"`);
+      }
+    }
+
+    const confidence: "high" | "low" =
+      items.length > 0 && warnings.every((w) => !w.includes("EAN-13 checksum failed")) ? "high" : "low";
+
+    return {
+      poNumber,
+      poDate,
+      deliveryDate,
+      dcName,
+      items,
+      confidence,
+      warnings,
+    };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     warnings.push(`Extraction error: ${message}`);

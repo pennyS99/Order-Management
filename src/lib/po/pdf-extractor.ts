@@ -1,6 +1,7 @@
 import type { ExtractionMetadata } from "./types";
 import { preprocessForOcr } from "./image-preprocess";
 import { config } from "./config";
+import { extractTextWithDatalabChandraOcr2 } from "./datalab-ocr";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -64,7 +65,7 @@ async function extractText(buffer: Buffer): Promise<{ text: string; numPages: nu
     if (/XRef|xref|Invalid|bad/i.test(msg)) {
       try {
         return await extractWithUnpdf(buffer);
-      } catch (unpdfErr) {
+      } catch {
         throw new Error(
           "PDF parsing failed (bad XRef). The file may be corrupted. Try re-saving the PDF (e.g. 'Print to PDF' in another app) or use a different file."
         );
@@ -78,6 +79,15 @@ async function extractWithOcr(
   buffer: Buffer,
   numPages: number
 ): Promise<{ text: string }> {
+  const datalabApiKey = process.env.DATALAB_API_KEY;
+  if (datalabApiKey && datalabApiKey.trim().length > 0) {
+    const { text } = await extractTextWithDatalabChandraOcr2(buffer, {
+      apiKey: datalabApiKey.trim(),
+      timeoutMs: 110_000,
+    });
+    return { text };
+  }
+
   const { getDocumentProxy, renderPageAsImage } = await import("unpdf");
   const { createWorker, createScheduler, PSM } = await import("tesseract.js");
   const os = await import("node:os");
@@ -163,7 +173,7 @@ export async function extractPdfText(buffer: Buffer): Promise<PdfExtractionResul
         pageCount: numPages,
       },
     };
-  } catch (ocrError) {
+  } catch {
     return {
       text: initialText,
       metadata: {

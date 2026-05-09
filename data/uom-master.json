@@ -1510,5 +1510,68 @@
     "pcsPerCtn": 24,
     "packPerCtn": 24,
     "ctn": 1
+  },
+  {
+    "sku": "8997240600997P",
+    "item": "20100064",
+    "pcsPerCtn": 24,
+    "packPerCtn": 24,
+    "ctn": 1
+  },
+  {
+    "sku": "04303657P",
+    "item": "20100064",
+    "pcsPerCtn": 24,
+    "packPerCtn": 24,
+    "ctn": 1
+  },
+  {
+    "sku": "03879849P",
+    "item": "20100089",
+    "pcsPerCtn": 24,
+    "packPerCtn": 24,
+    "ctn": 1
+  },
+  {
+    "sku": "2000098188350P",
+    "item": "20100089",
+    "pcsPerCtn": 24,
+    "packPerCtn": 24,
+    "ctn": 1
+  },
+  {
+    "sku": "2000098188428P",
+    "item": "20100088",
+    "pcsPerCtn": 24,
+    "packPerCtn": 24,
+    "ctn": 1
+  },
+  {
+    "sku": "2000098188664P",
+    "item": "20100064",
+    "pcsPerCtn": 24,
+    "packPerCtn": 24,
+    "ctn": 1
+  },
+  {
+    "sku": "8997240601154",
+    "item": "MCIDN200MLC",
+    "pcsPerCtn": 24,
+    "packPerCtn": 24,
+    "ctn": 1
+  },
+  {
+    "sku": "03879856P",
+    "item": "20100088",
+    "pcsPerCtn": 24,
+    "packPerCtn": 24,
+    "ctn": 1
+  },
+  {
+    "sku": "CHIDN200MLSN",
+    "item": "CHIDN200MLSN",
+    "pcsPerCtn": 24,
+    "packPerCtn": 24,
+    "ctn": 1
   }
 ]

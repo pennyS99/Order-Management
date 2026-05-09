@@ -39,6 +39,18 @@ npm run dev
 
 Open `http://localhost:3000`.
 
+## Datalab Chandra OCR 2 (scanned PDFs)
+
+This app can use **Datalab Chandra OCR 2** for scanned PDFs (instead of local `tesseract.js`).
+
+- Set **`DATALAB_API_KEY`** in your environment (recommended via local `.env.local`):
+
+```dotenv
+DATALAB_API_KEY="your_api_key_here"
+```
+
+When `DATALAB_API_KEY` is set, scanned PDFs will route to Datalab’s `/api/v1/marker` pipeline (Chandra OCR2) and the result markdown will be used for downstream PO parsing. If the key is missing, the app falls back to local OCR.
+
 ## Scripts
 
 ```powershell

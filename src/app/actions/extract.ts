@@ -1,9 +1,5 @@
 "use server";
 
-import fs from "node:fs/promises";
-import os from "node:os";
-import path from "node:path";
-import { randomUUID } from "node:crypto";
 import { extractPdfText } from "@/lib/po/pdf-extractor";
 import { isAeonPo, parseAeonPo } from "@/lib/po/aeon-parser";
 import { isIndomarcoPo, parseIndomarcoPo } from "@/lib/po/indomarco-parser";
@@ -98,13 +94,10 @@ export async function extractPdfAction(formData: FormData): Promise<{
         return { success: false, error: "FOODHALL PO format detected but no line items could be extracted." };
       }
     } else if (shouldUseHariHariExtractor(text)) {
-      parserUsed = "harihari-ocr";
-      const tempPdfPath = path.join(os.tmpdir(), `harihari-${randomUUID()}.pdf`);
-      try {
-        await fs.writeFile(tempPdfPath, buffer);
-        const hh = await extractHariHariPO(tempPdfPath);
+      parserUsed = "harihari-datalab";
+      const hh = await extractHariHariPO(buffer);
 
-        data = hh.items.map((item) => ({
+      data = hh.items.map((item) => ({
           po_number: hh.poNumber || null,
           po_date: hh.poDate || null,
           retailer: "Hari-Hari",
@@ -114,7 +107,7 @@ export async function extractPdfAction(formData: FormData): Promise<{
           delivery_date: hh.deliveryDate || null,
           product_code: item.barcode,
           item: null,
-          product_name: null,
+          product_name: item.description ?? null,
           quantity: item.qty,
           unit: "CTN",
           unit_price: null,
@@ -122,18 +115,15 @@ export async function extractPdfAction(formData: FormData): Promise<{
           discount: null,
           tax: null,
           notes: hh.warnings.length > 0 ? hh.warnings.join(" | ") : null,
-          extraction_method: "harihari_ocr",
+          extraction_method: "harihari_datalab",
           confidence: hh.confidence === "high" ? 1 : 0,
-        }));
+      }));
 
-        if (data.length === 0) {
-          return {
-            success: false,
-            error: hh.warnings.join(" | ") || "Hari-Hari detected but no items could be extracted.",
-          };
-        }
-      } finally {
-        await fs.unlink(tempPdfPath).catch(() => undefined);
+      if (data.length === 0) {
+        return {
+          success: false,
+          error: hh.warnings.join(" | ") || "Hari-Hari detected but no items could be extracted.",
+        };
       }
     } else {
       const isScanned = metadata.method === "ocr" || metadata.method === "mixed";
@@ -183,7 +173,7 @@ export async function extractPdfAction(formData: FormData): Promise<{
       }
       // Fix blank PO date from raw text.
       const hasBlankPoDate = data.some((item) => !item.po_date || !String(item.po_date).trim());
-      if (hasBlankPoDate && parserUsed !== "harihari-ocr") {
+      if (hasBlankPoDate && parserUsed !== "harihari-datalab") {
         const poDateFromText = parsePoDateFromText(text);
         if (poDateFromText) {
           data = data.map((item) => ({ ...item, po_date: poDateFromText }));
