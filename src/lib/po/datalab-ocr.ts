@@ -57,7 +57,7 @@ export async function extractTextWithDatalabChandraOcr2(
     form.set("langs", "English,Indonesian");
     form.set("ocr_all_pages", "true");
     // Node/Next provides Blob; if not, this will throw early and caller can fall back.
-    form.set("file", new Blob([pdfBuffer], { type: "application/pdf" }), "document.pdf");
+    form.set("file", new Blob([new Uint8Array(pdfBuffer)], { type: "application/pdf" }), "document.pdf");
 
     const startedAt = Date.now();
     let initRes: Response | null = null;

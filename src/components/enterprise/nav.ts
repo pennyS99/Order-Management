@@ -1,7 +1,7 @@
 export type EnterpriseNavItem = {
   href: string;
   label: string;
-  section: "Operations" | "Planning" | "Admin";
+  section: "Workspace" | "Operations" | "Planning" | "Admin";
 };
 
 /**
@@ -14,6 +14,7 @@ export function matchEnterpriseNavItem(pathname: string): EnterpriseNavItem | nu
 }
 
 export const enterpriseNav: EnterpriseNavItem[] = [
+  { href: "/", label: "Overview", section: "Workspace" },
   { href: "/extract", label: "Extract POs", section: "Operations" },
   { href: "/planner", label: "Planner", section: "Planning" },
   { href: "/shipments", label: "Shipments", section: "Planning" },

@@ -26,7 +26,7 @@ const ICONS: Record<string, LucideIcon> = {
   "/configure": SettingsIcon,
 };
 
-const MAIN_SECTIONS = ["Operations", "Planning"] as const;
+const MAIN_SECTIONS = ["Workspace", "Operations", "Planning"] as const;
 
 export function EnterpriseSidebar({
   className,

@@ -766,7 +766,7 @@ pre {
 }
 
 .om-kpi-value {
-  font-family: "Chivo", "IBM Plex Sans", system-ui, sans-serif;
+  font-family: "Inter", system-ui, sans-serif;
   font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
@@ -1193,3 +1193,26 @@ pre {
 .om-cli-cmd { color: var(--om-text); }
 .om-cli-flag { color: var(--om-accent); }
 .om-cli-val { color: var(--om-text-muted); }
+
+/* Compact page header helpers (shared across modules) */
+.om-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.om-page-title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.om-page-subtitle {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
