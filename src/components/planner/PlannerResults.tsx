@@ -331,7 +331,7 @@ const PlannerShipmentsOverviewMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-[min(420px,55vh)] items-center justify-center rounded-lg border border-[#2a2a2a] bg-[#141414] text-xs font-medium text-[#888888]">
+      <div className="flex h-[min(420px,55vh)] items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--card)] text-xs font-medium text-[var(--om-text-muted)]">
         Loading map...
       </div>
     ),
@@ -1190,15 +1190,15 @@ function formatUtilization(serviceType: Shipment["serviceType"], utilizationPct:
 const tabBadgeStyle = (active: boolean): CSSProperties =>
   active
     ? {
-        background: "rgba(29,158,117,0.12)",
-        color: "#1D9E75",
+        background: "color-mix(in oklch, var(--primary) 16%, var(--card))",
+        color: "var(--primary)",
         fontSize: 11,
         padding: "1px 7px",
         borderRadius: 99,
       }
     : {
-        background: "#2a2a2a",
-        color: "#888",
+        background: "var(--surface-elevated)",
+        color: "var(--om-text-muted)",
         fontSize: 11,
         padding: "1px 7px",
         borderRadius: 99,
@@ -1207,28 +1207,40 @@ const tabBadgeStyle = (active: boolean): CSSProperties =>
 function DragHandleDotsSvg({ className }: { className?: string }) {
   return (
     <svg width="8" height="12" viewBox="0 0 8 12" fill="none" className={className} aria-hidden>
-      <circle cx="2" cy="2" r="1" fill="#444" />
-      <circle cx="6" cy="2" r="1" fill="#444" />
-      <circle cx="2" cy="5.5" r="1" fill="#444" />
-      <circle cx="6" cy="5.5" r="1" fill="#444" />
-      <circle cx="2" cy="9" r="1" fill="#444" />
-      <circle cx="6" cy="9" r="1" fill="#444" />
+      <circle cx="2" cy="2" r="1" fill="var(--om-text-muted)" />
+      <circle cx="6" cy="2" r="1" fill="var(--om-text-muted)" />
+      <circle cx="2" cy="5.5" r="1" fill="var(--om-text-muted)" />
+      <circle cx="6" cy="5.5" r="1" fill="var(--om-text-muted)" />
+      <circle cx="2" cy="9" r="1" fill="var(--om-text-muted)" />
+      <circle cx="6" cy="9" r="1" fill="var(--om-text-muted)" />
     </svg>
   );
 }
 
 function DropSequenceBadge({ dropSequence }: { dropSequence: number }) {
   if (!Number.isFinite(dropSequence) || dropSequence <= 0) {
-    return <span className="text-[11px] text-[#666]">—</span>;
+    return <span className="text-[11px] text-[var(--om-text-muted)]">—</span>;
   }
   const palette =
     dropSequence === 1
-      ? { background: "#1e2e1e", color: "#1D9E75" }
+      ? {
+          background: "color-mix(in oklch, var(--primary) 14%, var(--card))",
+          color: "var(--primary)",
+        }
       : dropSequence === 2
-        ? { background: "#1e1e2e", color: "#7a9aff" }
+        ? {
+            background: "color-mix(in oklch, var(--info) 14%, var(--card))",
+            color: "var(--info)",
+          }
         : dropSequence === 3
-          ? { background: "#2e2a1e", color: "#ffcc7a" }
-          : { background: "#2e1e1e", color: "#ff9a7a" };
+          ? {
+              background: "color-mix(in oklch, var(--warning) 16%, var(--card))",
+              color: "var(--warning)",
+            }
+          : {
+              background: "color-mix(in oklch, var(--destructive) 12%, var(--card))",
+              color: "var(--destructive)",
+            };
   return (
     <span
       className="inline-block whitespace-nowrap rounded px-2 py-0.5 text-[11px] font-medium"
@@ -1264,7 +1276,7 @@ function OverlapWithSavedPlanChip({ overlaps }: { overlaps?: SavedPlanOverlapRef
         event.stopPropagation();
       }}
       draggable={false}
-      className="inline-flex max-w-full items-center gap-1 truncate rounded-full border border-[#2c3a55] bg-[#16223a] px-2 py-[1px] text-[10px] font-medium text-[#9bb3ff] transition-colors hover:bg-[#1c2c4a] hover:text-[#b6c5ff]"
+      className="inline-flex max-w-full items-center gap-1 truncate rounded-full border border-[color-mix(in_oklch,var(--info)_38%,var(--border))] bg-[color-mix(in_oklch,var(--info)_10%,var(--card))] px-2 py-[1px] text-[10px] font-medium text-[var(--info)] transition-colors hover:bg-[color-mix(in_oklch,var(--info)_16%,var(--card))] hover:text-[color-mix(in_oklch,var(--info)_92%,var(--text))]"
     >
       {single ? (
         <>
@@ -1293,7 +1305,7 @@ type UnassignedRow = ConsolidationResult["unassignedOrders"][number]["order"] & 
 };
 
 const RESULTS_TH_BASE =
-  "px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]";
+  "px-3 py-2 text-left text-[11px] font-normal uppercase tracking-[0.04em] text-[var(--om-text-faint)]";
 const RESULTS_TD_BASE = "px-3 py-2 align-top";
 
 function buildDcCols(args: {
@@ -1304,7 +1316,7 @@ function buildDcCols(args: {
   {
     id: "no",
     thClassName: cn("w-9", RESULTS_TH_BASE),
-    tdClassName: cn("w-9 text-[#666]", RESULTS_TD_BASE),
+    tdClassName: cn("w-9 text-[var(--om-text-muted)]", RESULTS_TD_BASE),
     getValue: (_row, index) => index + 1,
   },
   {
@@ -1314,8 +1326,8 @@ function buildDcCols(args: {
     getValue: (row) => (
       <div className="flex min-w-0 flex-col gap-1">
         <div className="truncate" title={`${row.shipmentId} · ${row.origin?.trim() || "—"}`}>
-          <span className="font-medium text-white">{row.shipmentId}</span>
-          <span className="text-[11px] text-[#888]"> · {row.origin?.trim() || "—"}</span>
+          <span className="font-medium text-[var(--text)]">{row.shipmentId}</span>
+          <span className="text-[11px] text-[var(--om-text-muted)]"> · {row.origin?.trim() || "—"}</span>
         </div>
         {row.overlapsSavedPlans && row.overlapsSavedPlans.length > 0 && (
           <OverlapWithSavedPlanChip overlaps={row.overlapsSavedPlans} />
@@ -1326,13 +1338,13 @@ function buildDcCols(args: {
   {
     id: "dcName",
     thClassName: RESULTS_TH_BASE,
-    tdClassName: cn("min-w-0 text-[#ccc]", RESULTS_TD_BASE),
+    tdClassName: cn("min-w-0 text-[var(--muted-foreground)]", RESULTS_TD_BASE),
     getValue: (row) => <div>{row.dcName}</div>,
   },
   {
     id: "channelType",
     thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE),
-    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-[#aaa]"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-[var(--om-text-muted)]"),
     getValue: (row) => channelTypeByDcName.get(row.dcName)?.trim() || "—",
   },
   {
@@ -1344,97 +1356,97 @@ function buildDcCols(args: {
   {
     id: "startPicking",
     thClassName: cn("w-20", RESULTS_TH_BASE),
-    tdClassName: cn("w-20 text-[#aaa]", RESULTS_TD_BASE),
+    tdClassName: cn("w-20 text-[var(--om-text-muted)]", RESULTS_TD_BASE),
     getValue: (row) => row.startPickingClock,
   },
   {
     id: "plt",
     thClassName: cn("w-20", RESULTS_TH_BASE),
-    tdClassName: cn("w-20 text-[#aaa]", RESULTS_TD_BASE),
+    tdClassName: cn("w-20 text-[var(--om-text-muted)]", RESULTS_TD_BASE),
     getValue: (row) => row.pltClock,
   },
   {
     id: "legKm",
     thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
-    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[var(--om-text-muted)]"),
     getValue: (row) => (row.legFromPreviousKm != null ? row.legFromPreviousKm.toFixed(1) : "—"),
   },
   {
     id: "legMin",
     thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
-    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[var(--om-text-muted)]"),
     getValue: (row) => (row.legFromPreviousMin != null ? Math.round(row.legFromPreviousMin) : "—"),
   },
   {
     id: "arrive",
     thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE, "text-right"),
-    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[var(--om-text-muted)]"),
     getValue: (row) => row.arriveClock,
   },
   {
     id: "unloadStart",
     thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE, "text-right"),
-    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[var(--om-text-muted)]"),
     getValue: (row) => row.unloadStartClock,
   },
   {
     id: "depart",
     thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE, "text-right"),
-    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[var(--om-text-muted)]"),
     getValue: (row) => row.departClock,
   },
   {
     id: "tripDur",
     thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-right"),
-    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[var(--om-text-muted)]"),
     getValue: (row) => formatTripDurationMin(row.tripDurationMin),
   },
   {
     id: "totalQty",
     thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
-    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[var(--om-text-muted)]"),
     getValue: (row) => row.totalQty,
   },
   {
     id: "totalKg",
     thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
-    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[var(--om-text-muted)]"),
     getValue: (row) => row.totalKg.toFixed(2),
   },
   {
     id: "totalCbm",
     thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
-    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[var(--om-text-muted)]"),
     getValue: (row) => row.totalCbm.toFixed(2),
   },
   {
     id: "utilizationPct",
     thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-right"),
-    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[var(--om-text-muted)]"),
     getValue: (row) => formatUtilization(row.serviceType, row.utilizationPct),
   },
   {
     id: "truckType",
     thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE),
-    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-[#ccc]"),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-[var(--muted-foreground)]"),
     getValue: (row) => row.truckType,
   },
   {
     id: "serviceType",
     thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE),
-    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-[#ccc]"),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-[var(--muted-foreground)]"),
     getValue: (row) => row.serviceType,
   },
   {
     id: "pld",
     thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-center"),
-    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[#aaa]"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[var(--om-text-muted)]"),
     getValue: (row) => row.pld,
   },
   {
     id: "rad",
     thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-center"),
-    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[#aaa]"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[var(--om-text-muted)]"),
     getValue: (row) => row.rad,
   },
   ];
@@ -1448,7 +1460,7 @@ function buildPoCols(args: {
   {
     id: "no",
     thClassName: cn("w-9", RESULTS_TH_BASE),
-    tdClassName: cn("w-9 text-[#666]", RESULTS_TD_BASE),
+    tdClassName: cn("w-9 text-[var(--om-text-muted)]", RESULTS_TD_BASE),
     getValue: (_row, index) => index + 1,
   },
   {
@@ -1458,8 +1470,8 @@ function buildPoCols(args: {
     getValue: (row) => (
       <div className="flex min-w-0 flex-col gap-1">
         <div className="truncate" title={`${row.shipmentId} · ${row.origin?.trim() || "—"}`}>
-          <span className="font-medium text-white">{row.shipmentId}</span>
-          <span className="text-[11px] text-[#888]"> · {row.origin?.trim() || "—"}</span>
+          <span className="font-medium text-[var(--text)]">{row.shipmentId}</span>
+          <span className="text-[11px] text-[var(--om-text-muted)]"> · {row.origin?.trim() || "—"}</span>
         </div>
         {row.overlapsSavedPlans && row.overlapsSavedPlans.length > 0 && (
           <OverlapWithSavedPlanChip overlaps={row.overlapsSavedPlans} />
@@ -1470,19 +1482,19 @@ function buildPoCols(args: {
   {
     id: "dcName",
     thClassName: RESULTS_TH_BASE,
-    tdClassName: cn("min-w-0 text-[#ccc]", RESULTS_TD_BASE),
+    tdClassName: cn("min-w-0 text-[var(--muted-foreground)]", RESULTS_TD_BASE),
     getValue: (row) => <div>{row.dcName}</div>,
   },
   {
     id: "channelType",
     thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE),
-    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-[#aaa]"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-[var(--om-text-muted)]"),
     getValue: (row) => channelTypeByDcName.get(row.dcName)?.trim() || "—",
   },
   {
     id: "poNumber",
     thClassName: RESULTS_TH_BASE,
-    tdClassName: cn("min-w-0 text-[#ccc]", RESULTS_TD_BASE),
+    tdClassName: cn("min-w-0 text-[var(--muted-foreground)]", RESULTS_TD_BASE),
     getValue: (row) => row.purchaseOrder,
   },
   {
@@ -1494,73 +1506,73 @@ function buildPoCols(args: {
   {
     id: "startPicking",
     thClassName: cn("w-20", RESULTS_TH_BASE),
-    tdClassName: cn("w-20 text-[#aaa]", RESULTS_TD_BASE),
+    tdClassName: cn("w-20 text-[var(--om-text-muted)]", RESULTS_TD_BASE),
     getValue: (row) => row.startPickingClock,
   },
   {
     id: "plt",
     thClassName: cn("w-20", RESULTS_TH_BASE),
-    tdClassName: cn("w-20 text-[#aaa]", RESULTS_TD_BASE),
+    tdClassName: cn("w-20 text-[var(--om-text-muted)]", RESULTS_TD_BASE),
     getValue: (row) => row.pltClock,
   },
   {
     id: "totalQty",
     thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
-    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[var(--om-text-muted)]"),
     getValue: (row) => row.totalQty,
   },
   {
     id: "totalKg",
     thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
-    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[var(--om-text-muted)]"),
     getValue: (row) => row.totalKg.toFixed(2),
   },
   {
     id: "totalCbm",
     thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE, "text-right"),
-    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[var(--om-text-muted)]"),
     getValue: (row) => row.totalCbm.toFixed(2),
   },
   {
     id: "utilizationPct",
     thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE, "text-right"),
-    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[var(--om-text-muted)]"),
     getValue: (row) => formatUtilization(row.serviceType, row.utilizationPct),
   },
   {
     id: "truckType",
     thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE),
-    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-[#ccc]"),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-[var(--muted-foreground)]"),
     getValue: (row) => row.truckType,
   },
   {
     id: "serviceType",
     thClassName: cn("hidden lg:table-cell", RESULTS_TH_BASE),
-    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-[#ccc]"),
+    tdClassName: cn("hidden lg:table-cell", RESULTS_TD_BASE, "text-[var(--muted-foreground)]"),
     getValue: (row) => row.serviceType,
   },
   {
     id: "tripDur",
     thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-right"),
-    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[#aaa]"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-right tabular-nums text-[var(--om-text-muted)]"),
     getValue: (row) => formatTripDurationMin(row.tripDurationMin),
   },
   {
     id: "pld",
     thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-center"),
-    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[#aaa]"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[var(--om-text-muted)]"),
     getValue: (row) => row.pld,
   },
   {
     id: "rad",
     thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-center"),
-    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[#aaa]"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[var(--om-text-muted)]"),
     getValue: (row) => row.rad,
   },
   {
     id: "poExpiredDate",
     thClassName: cn("hidden xl:table-cell", RESULTS_TH_BASE, "text-center"),
-    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[#aaa]"),
+    tdClassName: cn("hidden xl:table-cell", RESULTS_TD_BASE, "text-center text-[var(--om-text-muted)]"),
     getValue: (row) => row.poExpiredDate,
   },
   ];
@@ -1574,7 +1586,7 @@ function buildUnassignedCols(args: {
   {
     id: "no",
     thClassName: cn("w-9", RESULTS_TH_BASE),
-    tdClassName: cn("w-9 text-[#666]", RESULTS_TD_BASE),
+    tdClassName: cn("w-9 text-[var(--om-text-muted)]", RESULTS_TD_BASE),
     getValue: (_row, index) => index + 1,
   },
   {
@@ -1587,9 +1599,9 @@ function buildUnassignedCols(args: {
       return (
         <div className="flex min-w-0 flex-col gap-1">
           <div className="truncate" title={`${po} · ${origin}${o._reason ? ` · ${o._reason}` : ""}`}>
-            <span className="font-medium text-white">{po}</span>
-            <span className="text-[11px] text-[#888]"> · {origin}</span>
-            {o._reason && <span className="text-[11px] text-[#ff9a7a]"> · {o._reason}</span>}
+            <span className="font-medium text-[var(--text)]">{po}</span>
+            <span className="text-[11px] text-[var(--om-text-muted)]"> · {origin}</span>
+            {o._reason && <span className="text-[11px] text-[var(--destructive)]"> · {o._reason}</span>}
           </div>
           {o._overlaps && o._overlaps.length > 0 && <OverlapWithSavedPlanChip overlaps={o._overlaps} />}
         </div>
@@ -1599,13 +1611,13 @@ function buildUnassignedCols(args: {
   {
     id: "dcName",
     thClassName: RESULTS_TH_BASE,
-    tdClassName: cn("min-w-0 text-[#ccc]", RESULTS_TD_BASE),
+    tdClassName: cn("min-w-0 text-[var(--muted-foreground)]", RESULTS_TD_BASE),
     getValue: (o) => o.dcName?.trim() || "—",
   },
   {
     id: "channelType",
     thClassName: cn("hidden md:table-cell", RESULTS_TH_BASE),
-    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-[#aaa]"),
+    tdClassName: cn("hidden md:table-cell", RESULTS_TD_BASE, "text-[var(--om-text-muted)]"),
     getValue: (o) => {
       const dc = o.dcName?.trim() || "";
       return dc ? channelTypeByDcName.get(dc)?.trim() || "—" : "—";
@@ -1620,13 +1632,13 @@ function buildUnassignedCols(args: {
   {
     id: "startPicking",
     thClassName: cn("w-20", RESULTS_TH_BASE),
-    tdClassName: cn("w-20 text-[#aaa]", RESULTS_TD_BASE),
+    tdClassName: cn("w-20 text-[var(--om-text-muted)]", RESULTS_TD_BASE),
     getValue: () => "—",
   },
   {
     id: "plt",
     thClassName: cn("w-20", RESULTS_TH_BASE),
-    tdClassName: cn("w-20 text-[#aaa]", RESULTS_TD_BASE),
+    tdClassName: cn("w-20 text-[var(--om-text-muted)]", RESULTS_TD_BASE),
     getValue: () => "—",
   },
   ];
@@ -1981,8 +1993,8 @@ export function PlannerResults() {
     <section className="om-panel space-y-5 rounded-lg p-6 md:p-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="font-display text-lg font-black tracking-tight text-[#e0e0e0]">Route results</h2>
-          <p className="mt-0.5 text-xs text-[#888888]">
+          <h2 className="font-display text-lg font-black tracking-tight text-[var(--text)]">Route results</h2>
+          <p className="mt-0.5 text-xs text-[var(--om-text-muted)]">
             {consolidationResult.shipments.length} shipment
             {consolidationResult.shipments.length === 1 ? "" : "s"}
             {consolidationResult.unassignedOrders.length > 0
@@ -2073,14 +2085,14 @@ export function PlannerResults() {
       />
 
       {consolidationResult.shipments.length > 0 && (
-        <div className="overflow-hidden rounded-lg border border-[#2a2a2a] bg-[#0d0d0d] shadow-inner shadow-black/30">
-          <div className="flex items-center justify-between gap-3 border-b border-[#2a2a2a] bg-[#141414] px-4 py-2.5">
-            <h3 className="text-sm font-bold text-[#e0e0e0]">Route map</h3>
+        <div className="overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)] shadow-inner shadow-black/30">
+          <div className="flex items-center justify-between gap-3 border-b border-[var(--border)] bg-[var(--surface-elevated)] px-4 py-2.5">
+            <h3 className="text-sm font-bold text-[var(--text)]">Route map</h3>
               <button
                 type="button"
                 onClick={() => setIsMapFullscreen(true)}
                 aria-label="Expand route map"
-                className="inline-flex min-h-9 touch-manipulation items-center gap-1.5 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-1.5 text-xs font-semibold text-[#e0e0e0] transition-[border-color,box-shadow,color] hover:border-[#1D9E75]/45 hover:text-[#1D9E75] hover:shadow-[0_0_14px_rgba(29,158,117,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75]/40"
+                className="inline-flex min-h-9 touch-manipulation items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-[var(--text)] transition-[border-color,box-shadow,color] hover:border-[color-mix(in_oklch,var(--primary)_45%,var(--border))] hover:text-[var(--primary)] hover:shadow-[0_0_14px_color-mix(in_oklch,var(--primary)_14%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_oklch,var(--primary)_40%,transparent)]"
               >
               <Maximize2 className="size-3.5" aria-hidden />
               Expand
@@ -2100,24 +2112,24 @@ export function PlannerResults() {
         consolidationResult.shipments.length > 0 &&
         createPortal(
           <div
-            className="fixed inset-0 z-[1000] flex items-center justify-center bg-[#0d0d0d]/90 p-3 backdrop-blur-sm sm:p-4"
+            className="fixed inset-0 z-[1000] flex items-center justify-center bg-[var(--card)]/90 p-3 backdrop-blur-sm sm:p-4"
             onClick={() => setIsMapFullscreen(false)}
           >
             <div
-              className="flex h-[92vh] w-[96vw] max-w-7xl min-h-0 flex-col overflow-hidden rounded-lg border border-[#2a2a2a] bg-[#0d0d0d] shadow-2xl shadow-black/60"
+              className="flex h-[92vh] w-[96vw] max-w-7xl min-h-0 flex-col overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)] shadow-2xl shadow-black/60"
               onClick={(event) => event.stopPropagation()}
               role="dialog"
               aria-modal="true"
               aria-labelledby="planner-map-dialog-title"
               ref={mapDialogRef}
             >
-              <div className="flex items-center justify-between gap-3 border-b border-[#2a2a2a] bg-[#141414] px-3 py-2.5 sm:px-4 sm:py-3">
-                <h3 id="planner-map-dialog-title" className="text-sm font-bold text-[#e0e0e0]">Route map</h3>
+              <div className="flex items-center justify-between gap-3 border-b border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2.5 sm:px-4 sm:py-3">
+                <h3 id="planner-map-dialog-title" className="text-sm font-bold text-[var(--text)]">Route map</h3>
                 <button
                   type="button"
                   aria-label="Close map"
                   onClick={() => setIsMapFullscreen(false)}
-                  className="inline-flex min-h-9 min-w-9 touch-manipulation items-center justify-center gap-1 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-2.5 py-1.5 text-xs font-semibold text-[#e0e0e0] transition-[border-color,color,box-shadow] hover:border-[#1D9E75]/45 hover:text-[#1D9E75] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75]/40"
+                  className="inline-flex min-h-9 min-w-9 touch-manipulation items-center justify-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-2.5 py-1.5 text-xs font-semibold text-[var(--text)] transition-[border-color,color,box-shadow] hover:border-[color-mix(in_oklch,var(--primary)_45%,var(--border))] hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_oklch,var(--primary)_40%,transparent)]"
                   ref={mapDialogCloseRef}
                 >
                   <X className="size-3.5" aria-hidden />
@@ -2137,8 +2149,8 @@ export function PlannerResults() {
           document.body,
         )}
 
-      <div className="overflow-hidden rounded-xl border border-zinc-800 bg-[#0d0d0d]">
-        <div className="flex flex-wrap items-stretch border-b-[0.5px] border-[#2a2a2a]">
+      <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)]">
+        <div className="flex flex-wrap items-stretch border-b-[0.5px] border-[var(--border)]">
           <div className="flex min-w-0 flex-wrap">
             <button
               type="button"
@@ -2146,8 +2158,8 @@ export function PlannerResults() {
               className={cn(
                 "flex items-center gap-2 border-b-2 px-4 py-2 text-[12px] font-normal transition-colors",
                 resultsTab === "dc"
-                  ? "border-b-[#1D9E75] text-[#1D9E75]"
-                  : "border-b-transparent text-[#888]",
+                  ? "border-b-[var(--primary)] text-[var(--primary)]"
+                  : "border-b-transparent text-[var(--om-text-muted)]",
               )}
             >
               DC stops
@@ -2159,8 +2171,8 @@ export function PlannerResults() {
               className={cn(
                 "flex items-center gap-2 border-b-2 px-4 py-2 text-[12px] font-normal transition-colors",
                 resultsTab === "po"
-                  ? "border-b-[#1D9E75] text-[#1D9E75]"
-                  : "border-b-transparent text-[#888]",
+                  ? "border-b-[var(--primary)] text-[var(--primary)]"
+                  : "border-b-transparent text-[var(--om-text-muted)]",
               )}
             >
               PO lines
@@ -2172,8 +2184,8 @@ export function PlannerResults() {
               className={cn(
                 "flex items-center gap-2 border-b-2 px-4 py-2 text-[12px] font-normal transition-colors",
                 resultsTab === "unassigned"
-                  ? "border-b-[#1D9E75] text-[#1D9E75]"
-                  : "border-b-transparent text-[#888]",
+                  ? "border-b-[var(--primary)] text-[var(--primary)]"
+                  : "border-b-transparent text-[var(--om-text-muted)]",
               )}
             >
               Unassigned
@@ -2182,7 +2194,7 @@ export function PlannerResults() {
               </span>
             </button>
           </div>
-          <div className="ml-auto flex shrink-0 items-center gap-1.5 px-3.5 py-0 text-[11px] text-[#555]">
+          <div className="ml-auto flex shrink-0 items-center gap-1.5 px-3.5 py-0 text-[11px] text-[var(--om-text-faint)]">
             <DragHandleDotsSvg className="shrink-0" />
             <span>Drag rows to reassign</span>
           </div>
@@ -2191,7 +2203,7 @@ export function PlannerResults() {
           pickLoadSchedule.error ||
           moveError ||
           moveSuccess) && (
-          <div className="border-b border-[#2a2a2a] bg-[#0d0d0d] px-4 py-2">
+          <div className="border-b border-[var(--border)] bg-[var(--card)] px-4 py-2">
             {(warehouseTimeMotionError || pickLoadSchedule.error) && (
               <p className="text-xs text-amber-200/90" role="status">
                 {warehouseTimeMotionError || pickLoadSchedule.error} Start Picking Time / PLT will show as &quot;-&quot;
@@ -2222,13 +2234,13 @@ export function PlannerResults() {
 
         <div className="om-results-table-scroll max-h-80 min-h-[200px] overflow-x-auto overflow-y-auto">
           {resultsTab === "unassigned" && consolidationResult.unassignedOrders.length === 0 ? (
-            <p className="px-4 py-8 text-center text-[13px] text-[#555]">All order lines are routed.</p>
+            <p className="px-4 py-8 text-center text-[13px] text-[var(--om-text-faint)]">All order lines are routed.</p>
           ) : resultsTab === "unassigned" ? (
             <table className="w-full border-separate border-spacing-0 text-[12px] whitespace-nowrap">
-              <thead className="sticky top-0 z-[1] border-b-[0.5px] border-[#2a2a2a] bg-[#161616] [&_th]:bg-[#161616]">
+              <thead className="sticky top-0 z-[1] border-b-[0.5px] border-[var(--border)] bg-[var(--surface-elevated)] [&_th]:bg-[var(--surface-elevated)]">
                 <tr>
                   <th
-                    className="w-8 px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]"
+                    className="w-8 px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[var(--om-text-faint)]"
                     aria-hidden
                   />
                   {visibleUnassignedColumns.map((col) => (
@@ -2244,7 +2256,7 @@ export function PlannerResults() {
                   return (
                     <tr
                       key={`unassigned-${index}`}
-                      className="border-b-[0.5px] border-[#1e1e1e] shadow-[inset_2px_0_0_0_#ff9a7a] even:bg-[#0c0c0c] hover:bg-[#1a1a1a]"
+                      className="border-b-[0.5px] border-[var(--border)] shadow-[inset_2px_0_0_0_var(--destructive)] even:bg-[color-mix(in_oklch,var(--surface)_98%,var(--border))] hover:bg-[var(--surface)]"
                     >
                       <td className="w-8 px-3 py-2 text-center align-middle opacity-60">
                         <span className="inline-flex justify-center">
@@ -2270,13 +2282,13 @@ export function PlannerResults() {
             </table>
           ) : resultsTab === "dc" ? (
             dcSummaryRows.length === 0 ? (
-              <p className="px-4 py-8 text-center text-[13px] text-[#555]">No rows.</p>
+              <p className="px-4 py-8 text-center text-[13px] text-[var(--om-text-faint)]">No rows.</p>
             ) : (
               <table className="w-full border-separate border-spacing-0 text-[12px] whitespace-nowrap">
-                <thead className="sticky top-0 z-[1] border-b-[0.5px] border-[#2a2a2a] bg-[#161616] [&_th]:bg-[#161616]">
+                <thead className="sticky top-0 z-[1] border-b-[0.5px] border-[var(--border)] bg-[var(--surface-elevated)] [&_th]:bg-[var(--surface-elevated)]">
                   <tr>
                     <th
-                      className="w-8 px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]"
+                      className="w-8 px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[var(--om-text-faint)]"
                       aria-hidden
                     />
                     {visibleDcColumns.map((col) => (
@@ -2337,10 +2349,10 @@ export function PlannerResults() {
                           void handleMoveDc(payload.sourceShipmentId, payload.dcName, row.shipmentId);
                         }}
                         className={cn(
-                          "border-b-[0.5px] border-[#1e1e1e] transition-colors",
+                          "border-b-[0.5px] border-[var(--border)] transition-colors",
                           isDropTarget
-                            ? "bg-[rgba(29,158,117,0.07)] shadow-[inset_2px_0_0_0_#1D9E75]"
-                            : "even:bg-[#0c0c0c] hover:bg-[#1a1a1a]",
+                            ? "bg-[color-mix(in_oklch,var(--primary)_10%,var(--card))] shadow-[inset_2px_0_0_0_var(--primary)]"
+                            : "even:bg-[color-mix(in_oklch,var(--surface)_98%,var(--border))] hover:bg-[var(--surface)]",
                           isDragging && "cursor-grabbing opacity-70",
                           !isDragging && (grabCursor ? "cursor-grabbing" : "cursor-grab"),
                         )}
@@ -2368,13 +2380,13 @@ export function PlannerResults() {
               </table>
             )
           ) : poSummaryRows.length === 0 ? (
-            <p className="px-4 py-8 text-center text-[13px] text-[#555]">No rows.</p>
+            <p className="px-4 py-8 text-center text-[13px] text-[var(--om-text-faint)]">No rows.</p>
           ) : (
             <table className="w-full border-separate border-spacing-0 text-[12px] whitespace-nowrap">
-              <thead className="sticky top-0 z-[1] border-b-[0.5px] border-[#2a2a2a] bg-[#161616] [&_th]:bg-[#161616]">
+              <thead className="sticky top-0 z-[1] border-b-[0.5px] border-[var(--border)] bg-[var(--surface-elevated)] [&_th]:bg-[var(--surface-elevated)]">
                 <tr>
                   <th
-                    className="w-8 px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[#555]"
+                    className="w-8 px-3 py-2 text-center text-[11px] font-normal uppercase tracking-[0.04em] text-[var(--om-text-faint)]"
                     aria-hidden
                   />
                   {visiblePoColumns.map((col) => (
@@ -2435,10 +2447,10 @@ export function PlannerResults() {
                         void handleMoveDc(payload.sourceShipmentId, payload.dcName, row.shipmentId);
                       }}
                       className={cn(
-                        "border-b-[0.5px] border-[#1e1e1e] transition-colors",
+                        "border-b-[0.5px] border-[var(--border)] transition-colors",
                         isDropTarget
-                          ? "bg-[rgba(29,158,117,0.07)] shadow-[inset_2px_0_0_0_#1D9E75]"
-                          : "even:bg-[#0c0c0c] hover:bg-[#1a1a1a]",
+                          ? "bg-[color-mix(in_oklch,var(--primary)_10%,var(--card))] shadow-[inset_2px_0_0_0_var(--primary)]"
+                          : "even:bg-[color-mix(in_oklch,var(--surface)_98%,var(--border))] hover:bg-[var(--surface)]",
                         isDragging && "cursor-grabbing opacity-70",
                         !isDragging && (grabCursor ? "cursor-grabbing" : "cursor-grab"),
                       )}
@@ -2491,7 +2503,7 @@ export function PlannerResults() {
                     </span>
                     <div className="h-2 flex-1 overflow-hidden rounded-full bg-[rgba(255,255,255,0.05)] ring-1 ring-[rgba(255,255,255,0.06)]">
                       <div
-                        className="h-full rounded-full bg-[color-mix(in_oklch,var(--om-accent)_78%,#0b1511)]"
+                        className="h-full rounded-full bg-[color-mix(in_oklch,var(--om-accent)_78%,var(--card))]"
                         style={{ width: `${Math.round((row.count / max) * 100)}%` }}
                       />
                     </div>
@@ -2526,7 +2538,7 @@ export function PlannerResults() {
                     </span>
                     <div className="h-2 flex-1 overflow-hidden rounded-full bg-[rgba(255,255,255,0.05)] ring-1 ring-[rgba(255,255,255,0.06)]">
                       <div
-                        className="h-full rounded-full bg-[color-mix(in_oklch,var(--om-accent)_78%,#0b1511)]"
+                        className="h-full rounded-full bg-[color-mix(in_oklch,var(--om-accent)_78%,var(--card))]"
                         style={{ width: `${Math.round((row.qty / max) * 100)}%` }}
                       />
                     </div>

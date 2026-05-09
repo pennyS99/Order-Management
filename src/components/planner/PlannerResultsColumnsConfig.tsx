@@ -74,13 +74,13 @@ export function PlannerResultsColumnsConfig() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-[#e0e0e0]">Results columns</h3>
-          <p className="mt-0.5 text-xs text-[#888888]">
+          <h3 className="text-sm font-semibold text-[var(--text)]">Results columns</h3>
+          <p className="mt-0.5 text-xs text-[var(--muted-foreground)]">
             Configure how columns appear in Planner results tables. Saved locally in this browser.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-[#888888]">
+          <span className="text-xs text-[var(--muted-foreground)]">
             {activeCount} of {columns.length} active
           </span>
           <Button variant="outline" size="sm" onClick={() => resetTab(tab)}>
@@ -98,8 +98,8 @@ export function PlannerResultsColumnsConfig() {
             onClick={() => setTab(t)}
             className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
               tab === t
-                ? "border-[#1D9E75]/55 bg-[rgba(29,158,117,0.12)] text-[#1D9E75]"
-                : "border-[#2a2a2a] bg-[#141414] text-[#888888] hover:text-[#e0e0e0]"
+                ? "border-[color-mix(in_oklch,var(--primary)_45%,var(--border))] bg-[color-mix(in_oklch,var(--primary)_14%,var(--card))] text-[var(--primary)]"
+                : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--muted-foreground)] hover:text-[var(--text)]"
             }`}
           >
             {TAB_LABEL[t]}
@@ -115,13 +115,13 @@ export function PlannerResultsColumnsConfig() {
             onDragStart={(e) => handleDragStart(e, index)}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, index)}
-            className="flex items-center gap-3 rounded-lg border border-[#2a2a2a] bg-[#141414] p-3 cursor-grab active:cursor-grabbing"
+            className="flex cursor-grab items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-3 active:cursor-grabbing"
           >
-            <GripVertical className="h-5 w-5 text-[#555]" />
+            <GripVertical className="h-5 w-5 text-[var(--om-text-muted)]" />
             <div className="flex items-center gap-1">
               <button
                 type="button"
-                className="rounded p-1 text-[#888888] hover:bg-[#1a1a1a] disabled:opacity-40"
+                className="rounded p-1 text-[var(--muted-foreground)] hover:bg-[color-mix(in_oklch,var(--primary)_8%,var(--card))] disabled:opacity-40"
                 onClick={() => reorder(index, Math.max(0, index - 1))}
                 disabled={index === 0}
                 aria-label={`Move ${c.label} up`}
@@ -130,7 +130,7 @@ export function PlannerResultsColumnsConfig() {
               </button>
               <button
                 type="button"
-                className="rounded p-1 text-[#888888] hover:bg-[#1a1a1a] disabled:opacity-40"
+                className="rounded p-1 text-[var(--muted-foreground)] hover:bg-[color-mix(in_oklch,var(--primary)_8%,var(--card))] disabled:opacity-40"
                 onClick={() => reorder(index, Math.min(columns.length - 1, index + 1))}
                 disabled={index === columns.length - 1}
                 aria-label={`Move ${c.label} down`}
@@ -150,7 +150,7 @@ export function PlannerResultsColumnsConfig() {
               className="flex-1"
               aria-label={`Column label for ${c.id}`}
             />
-            <span className="shrink-0 font-mono text-[11px] text-[#555]">{c.id}</span>
+            <span className="shrink-0 font-mono text-[11px] text-[var(--om-text-muted)]">{c.id}</span>
           </li>
         ))}
       </ul>

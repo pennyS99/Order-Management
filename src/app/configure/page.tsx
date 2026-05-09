@@ -472,13 +472,13 @@ export default function ConfigurePage() {
           void confirmAction.onConfirm();
         }}
       />
-      <header className="z-20 border-b border-[#2a2a2a] bg-[#0d0d0d]">
+      <header className="z-20 border-b border-[var(--border)] bg-[var(--card)]">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between gap-4 mb-4">
             {view === "list" ? (
               <Link
                 href="/extract"
-                className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
+                className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[var(--muted-foreground)] transition-colors duration-150 hover:text-[var(--primary)]"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to extraction
@@ -497,7 +497,7 @@ export default function ConfigurePage() {
                   }
                   setView("list");
                 }}
-                className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
+                className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[var(--muted-foreground)] transition-colors duration-150 hover:text-[var(--primary)]"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to configure
@@ -506,7 +506,7 @@ export default function ConfigurePage() {
           </div>
           <div className="flex items-center gap-3 mb-2">
             <BrandMark size="sm" />
-            <h1 className="font-display text-xl font-black tracking-tight text-[#e0e0e0]">
+            <h1 className="font-display text-xl font-black tracking-tight text-[var(--text)]">
               {view === "list"
                 ? "Configure"
                 : view === "poExtract"
@@ -526,7 +526,7 @@ export default function ConfigurePage() {
                       : "UOM master"}
             </h1>
           </div>
-          <p className="mt-1 text-sm text-[#888888]">
+          <p className="mt-1 text-sm text-[var(--muted-foreground)]">
             {view === "list"
               ? "Manage the data and export settings used across the workspace."
               : view === "poExtract"
@@ -555,36 +555,36 @@ export default function ConfigurePage() {
               <button
                 type="button"
                 onClick={() => setView("poExtract")}
-                className="flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] p-4 text-left transition-[border-color,box-shadow] hover:border-[#1D9E75]/35 hover:shadow-[0_0_20px_rgba(29,158,117,0.06)]"
+                className="flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 text-left transition-[border-color,box-shadow] hover:border-[color-mix(in_oklch,var(--primary)_35%,transparent)] hover:shadow-[0_0_20px_color-mix(in_oklch,var(--primary)_10%,transparent)]"
               >
                 <div className="flex items-center gap-3">
-                  <div className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-2">
-                    <Columns className="h-5 w-5 text-[#1D9E75]" />
+                  <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-2">
+                    <Columns className="h-5 w-5 text-[var(--primary)]" />
                   </div>
                   <div>
-                    <span className="font-semibold text-[#e0e0e0]">PO extraction</span>
-                    <p className="text-sm text-[#888888]">Export columns, UOM conversion, and history</p>
+                    <span className="font-semibold text-[var(--text)]">PO extraction</span>
+                    <p className="text-sm text-[var(--muted-foreground)]">Export columns, UOM conversion, and history</p>
                   </div>
                 </div>
-                <ChevronRight className="h-5 w-5 text-[#888888]" />
+                <ChevronRight className="h-5 w-5 text-[var(--muted-foreground)]" />
               </button>
             </li>
             <li>
               <button
                 type="button"
                 onClick={() => setView("planner")}
-                className="flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] p-4 text-left transition-[border-color,box-shadow] hover:border-[#1D9E75]/35 hover:shadow-[0_0_20px_rgba(29,158,117,0.06)]"
+                className="flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 text-left transition-[border-color,box-shadow] hover:border-[color-mix(in_oklch,var(--primary)_35%,transparent)] hover:shadow-[0_0_20px_color-mix(in_oklch,var(--primary)_10%,transparent)]"
               >
                 <div className="flex items-center gap-3">
-                  <div className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-2">
-                    <Boxes className="h-5 w-5 text-[#1D9E75]" />
+                  <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-2">
+                    <Boxes className="h-5 w-5 text-[var(--primary)]" />
                   </div>
                   <div>
-                    <span className="font-semibold text-[#e0e0e0]">Planner data</span>
-                    <p className="text-sm text-[#888888]">Item, address, and truck masters for routing</p>
+                    <span className="font-semibold text-[var(--text)]">Planner data</span>
+                    <p className="text-sm text-[var(--muted-foreground)]">Item, address, and truck masters for routing</p>
                   </div>
                 </div>
-                <ChevronRight className="h-5 w-5 text-[#888888]" />
+                <ChevronRight className="h-5 w-5 text-[var(--muted-foreground)]" />
               </button>
             </li>
           </ul>
@@ -596,53 +596,53 @@ export default function ConfigurePage() {
               <button
                 type="button"
                 onClick={() => setView("headers")}
-                className="flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] p-4 text-left transition-[border-color,box-shadow] hover:border-[#1D9E75]/35 hover:shadow-[0_0_20px_rgba(29,158,117,0.06)]"
+                className="flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 text-left transition-[border-color,box-shadow] hover:border-[color-mix(in_oklch,var(--primary)_35%,transparent)] hover:shadow-[0_0_20px_color-mix(in_oklch,var(--primary)_10%,transparent)]"
               >
                 <div className="flex items-center gap-3">
-                  <div className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-2">
-                    <Columns className="h-5 w-5 text-[#1D9E75]" />
+                  <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-2">
+                    <Columns className="h-5 w-5 text-[var(--primary)]" />
                   </div>
                   <div>
-                    <span className="font-semibold text-[#e0e0e0]">Excel export columns</span>
-                    <p className="text-sm text-[#888888]">Show, rename, and reorder exported columns</p>
+                    <span className="font-semibold text-[var(--text)]">Excel export columns</span>
+                    <p className="text-sm text-[var(--muted-foreground)]">Show, rename, and reorder exported columns</p>
                   </div>
                 </div>
-                <ChevronRight className="h-5 w-5 text-[#888888]" />
+                <ChevronRight className="h-5 w-5 text-[var(--muted-foreground)]" />
               </button>
             </li>
             <li>
               <button
                 type="button"
                 onClick={() => setView("uom")}
-                className="flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] p-4 text-left transition-[border-color,box-shadow] hover:border-[#1D9E75]/35 hover:shadow-[0_0_20px_rgba(29,158,117,0.06)]"
+                className="flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 text-left transition-[border-color,box-shadow] hover:border-[color-mix(in_oklch,var(--primary)_35%,transparent)] hover:shadow-[0_0_20px_color-mix(in_oklch,var(--primary)_10%,transparent)]"
               >
                 <div className="flex items-center gap-3">
-                  <div className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-2">
-                    <Package className="h-5 w-5 text-[#1D9E75]" />
+                  <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-2">
+                    <Package className="h-5 w-5 text-[var(--primary)]" />
                   </div>
                   <div>
-                    <span className="font-semibold text-[#e0e0e0]">UOM master</span>
-                    <p className="text-sm text-[#888888]">Manage SKU barcodes and quantity conversion</p>
+                    <span className="font-semibold text-[var(--text)]">UOM master</span>
+                    <p className="text-sm text-[var(--muted-foreground)]">Manage SKU barcodes and quantity conversion</p>
                   </div>
                 </div>
-                <ChevronRight className="h-5 w-5 text-[#888888]" />
+                <ChevronRight className="h-5 w-5 text-[var(--muted-foreground)]" />
               </button>
             </li>
             <li>
               <Link
                 href="/history"
-                className="flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] p-4 text-left transition-[border-color,box-shadow] hover:border-[#1D9E75]/35 hover:shadow-[0_0_20px_rgba(29,158,117,0.06)]"
+                className="flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 text-left transition-[border-color,box-shadow] hover:border-[color-mix(in_oklch,var(--primary)_35%,transparent)] hover:shadow-[0_0_20px_color-mix(in_oklch,var(--primary)_10%,transparent)]"
               >
                 <div className="flex items-center gap-3">
-                  <div className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-2">
-                    <History className="h-5 w-5 text-[#1D9E75]" />
+                  <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-2">
+                    <History className="h-5 w-5 text-[var(--primary)]" />
                   </div>
                   <div>
-                    <span className="font-semibold text-[#e0e0e0]">History</span>
-                    <p className="text-sm text-[#888888]">Review previous extraction batches</p>
+                    <span className="font-semibold text-[var(--text)]">History</span>
+                    <p className="text-sm text-[var(--muted-foreground)]">Review previous extraction batches</p>
                   </div>
                 </div>
-                <ChevronRight className="h-5 w-5 text-[#888888]" />
+                <ChevronRight className="h-5 w-5 text-[var(--muted-foreground)]" />
               </Link>
             </li>
           </ul>
@@ -660,7 +660,7 @@ export default function ConfigurePage() {
         )}
 
         {view === "headers" && (
-          <div className="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] p-6">
+          <div className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-6">
             <HeaderConfig headers={headers} onHeadersChange={setHeaders} />
           </div>
         )}
@@ -672,8 +672,8 @@ export default function ConfigurePage() {
               <div
                 className={`rounded-lg border px-4 py-3 text-sm font-semibold ${
                   uomMessage.type === "success"
-                    ? "border-[#1D9E75]/35 bg-[rgba(29,158,117,0.08)] text-[#1D9E75]"
-                    : "border-[#ff4d4d]/35 bg-[#2a1212] text-[#ffb4b4]"
+                    ? "border-[color-mix(in_oklch,var(--success)_35%,var(--border))] bg-[color-mix(in_oklch,var(--success)_12%,var(--card))] text-[var(--success)]"
+                    : "border-[color-mix(in_oklch,var(--destructive)_35%,var(--border))] bg-[var(--om-status-red-bg)] text-[var(--destructive)]"
                 }`}
               >
                 {uomMessage.text}
@@ -685,7 +685,7 @@ export default function ConfigurePage() {
               <select
                 value={rowsPerPage}
                 onChange={(e) => setRowsPerPage(Number(e.target.value))}
-                className="h-9 rounded-lg border border-[#2a2a2a] bg-[#141414] px-2 text-sm text-[#e0e0e0]"
+                className="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-2 text-sm text-[var(--text)]"
               >
                 <option value={10}>10 / page</option>
                 <option value={25}>25 / page</option>
@@ -742,10 +742,10 @@ export default function ConfigurePage() {
 
             {/* Add form */}
             {showAddForm && (
-              <form onSubmit={handleAdd} className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-4">
+              <form onSubmit={handleAdd} className="rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-4">
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-3 items-end">
                   <div>
-                    <label className="mb-1 block text-xs font-semibold text-[#888888]">SKU *</label>
+                    <label className="mb-1 block text-xs font-semibold text-[var(--muted-foreground)]">SKU *</label>
                     <Input
                       placeholder="8997240600256"
                       value={addForm.sku}
@@ -755,7 +755,7 @@ export default function ConfigurePage() {
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-semibold text-[#888888]">ITEM *</label>
+                    <label className="mb-1 block text-xs font-semibold text-[var(--muted-foreground)]">ITEM *</label>
                     <Input
                       placeholder="BBIDN200MLC"
                       value={addForm.item}
@@ -765,7 +765,7 @@ export default function ConfigurePage() {
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-semibold text-[#888888]">PCS/CTN</label>
+                    <label className="mb-1 block text-xs font-semibold text-[var(--muted-foreground)]">PCS/CTN</label>
                     <Input
                       type="number"
                       min={1}
@@ -776,7 +776,7 @@ export default function ConfigurePage() {
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-semibold text-[#888888]">PACK/CTN</label>
+                    <label className="mb-1 block text-xs font-semibold text-[var(--muted-foreground)]">PACK/CTN</label>
                     <Input
                       type="number"
                       min={1}
@@ -800,14 +800,14 @@ export default function ConfigurePage() {
             )}
 
             {duplicateCandidate && (
-              <div className="rounded-lg border border-[#ffc14a]/35 bg-[#1f1908] px-4 py-3">
-                <p className="text-sm font-semibold text-[#ffc14a]">
+              <div className="rounded-lg border border-[var(--om-status-amber-border)] bg-[var(--om-status-amber-bg)] px-4 py-3">
+                <p className="text-sm font-semibold text-[var(--warning)]">
                   SKU &quot;{duplicateCandidate.sku}&quot; already exists.
                 </p>
-                <p className="mt-1 text-xs text-[#888888]">
+                <p className="mt-1 text-xs text-[var(--muted-foreground)]">
                   Existing: ITEM {duplicateCandidate.item}, PCS/CTN {duplicateCandidate.pcsPerCtn}, PACK/CTN {duplicateCandidate.packPerCtn}
                 </p>
-                <p className="text-xs text-[#888888]">
+                <p className="text-xs text-[var(--muted-foreground)]">
                   New input: ITEM {addForm.item.trim() || "-"}, PCS/CTN {addForm.pcsPerCtn || "-"}, PACK/CTN {addForm.packPerCtn || "-"}
                 </p>
                 <div className="mt-3 flex items-center gap-2">
@@ -835,12 +835,12 @@ export default function ConfigurePage() {
             )}
 
             {/* Table */}
-            <div className="overflow-hidden rounded-lg border border-[#2a2a2a] bg-[#141414]">
+            <div className="overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)]">
               {uomLoading ? (
-                <div className="p-8 text-center text-sm text-[#888888]">Loading UOM data...</div>
+                <div className="p-8 text-center text-sm text-[var(--muted-foreground)]">Loading UOM data...</div>
               ) : (
                 <div className="overflow-x-auto">
-                  <div className="border-b border-[#2a2a2a] bg-[#141414] px-3 py-2">
+                  <div className="border-b border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2">
                     <TableFilterToolbar
                       id="configure-uom-filter"
                       value={filterText}
@@ -854,16 +854,16 @@ export default function ConfigurePage() {
                   </div>
                   <table className="w-full min-w-[620px] md:min-w-[720px] text-sm">
                     <thead>
-                      <tr className="border-b border-[#2a2a2a] bg-[#1a1a1a]">
+                      <tr className="border-b border-[var(--border)] bg-[var(--card)]">
                         <th className="w-10 px-3 py-3 text-center">
                           <input
                             type="checkbox"
                             checked={allVisibleSelected}
                             onChange={toggleSelectAllVisible}
-                            className="h-4 w-4 rounded border-[#2a2a2a] bg-[#0d0d0d] accent-[#1D9E75]"
+                            className="h-4 w-4 rounded border-[var(--border)] bg-[var(--input)] accent-[var(--primary)]"
                           />
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#888888]">
+                        <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
                           <TableColumnHeaderControlButtons
                             label="SKU"
                             columnId="sku"
@@ -876,7 +876,7 @@ export default function ConfigurePage() {
                             labelClassName="text-inherit font-bold uppercase tracking-wider"
                           />
                         </th>
-                        <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#888888]">
+                        <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
                           <TableColumnHeaderControlButtons
                             label="Item"
                             columnId="item"
@@ -889,7 +889,7 @@ export default function ConfigurePage() {
                             labelClassName="text-inherit font-bold uppercase tracking-wider"
                           />
                         </th>
-                        <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-[#888888]">
+                        <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
                           <div className="flex justify-center">
                             <TableColumnHeaderControlButtons
                               label="PCS/CTN"
@@ -904,7 +904,7 @@ export default function ConfigurePage() {
                             />
                           </div>
                         </th>
-                        <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-[#888888]">
+                        <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
                           <div className="flex justify-center">
                             <TableColumnHeaderControlButtons
                               label="PACK/CTN"
@@ -919,7 +919,7 @@ export default function ConfigurePage() {
                             />
                           </div>
                         </th>
-                        <th className="w-28 px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-[#888888]">
+                        <th className="w-28 px-4 py-3 text-right text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]">
                           Actions
                         </th>
                       </tr>
@@ -927,7 +927,7 @@ export default function ConfigurePage() {
                     <tbody>
                       {filteredItems.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="px-4 py-8 text-center text-[#888888]">
+                          <td colSpan={6} className="px-4 py-8 text-center text-[var(--muted-foreground)]">
                             {uomItems.length === 0
                               ? "No items in UOM master."
                               : filterText.trim() || activeFilterColumn
@@ -941,8 +941,10 @@ export default function ConfigurePage() {
                           return (
                             <tr
                               key={`${row.sku}-${row.item}-${row.pcsPerCtn}-${row.packPerCtn}-${rowIndex}`}
-                              className={`group border-b border-[#2a2a2a] transition-colors ${
-                                isEditing ? "bg-[rgba(29,158,117,0.06)]" : "hover:bg-[#1a1a1a]"
+                              className={`group border-b border-[var(--border)] transition-colors ${
+                                isEditing
+                                  ? "bg-[color-mix(in_oklch,var(--primary)_10%,var(--card))]"
+                                  : "hover:bg-[var(--surface-elevated)]"
                               }`}
                             >
                               {isEditing ? (
@@ -952,7 +954,7 @@ export default function ConfigurePage() {
                                       type="checkbox"
                                       checked={selectedRows.has(row.originalIndex)}
                                       onChange={() => toggleRowSelection(row.originalIndex)}
-                                      className="h-4 w-4 rounded border-[#2a2a2a] bg-[#0d0d0d] accent-[#1D9E75]"
+                                      className="h-4 w-4 rounded border-[var(--border)] bg-[var(--input)] accent-[var(--primary)]"
                                     />
                                   </td>
                                   <td className="px-4 py-2">
@@ -993,7 +995,7 @@ export default function ConfigurePage() {
                                         type="button"
                                         onClick={saveEdit}
                                         disabled={uomPending}
-                                        className="rounded-md p-2.5 text-[#1D9E75] transition-colors hover:bg-[rgba(29,158,117,0.1)]"
+                                        className="rounded-md p-2.5 text-[var(--primary)] transition-colors hover:bg-[color-mix(in_oklch,var(--primary)_14%,var(--card))]"
                                         title="Save"
                                         aria-label={`Save SKU ${row.sku}`}
                                       >
@@ -1002,7 +1004,7 @@ export default function ConfigurePage() {
                                       <button
                                         type="button"
                                         onClick={cancelEdit}
-                                        className="rounded-md p-2.5 text-[#888888] transition-colors hover:bg-[#1a1a1a] hover:text-[#e0e0e0]"
+                                        className="rounded-md p-2.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--card)] hover:text-[var(--text)]"
                                         title="Cancel"
                                         aria-label={`Cancel editing SKU ${row.sku}`}
                                       >
@@ -1018,19 +1020,19 @@ export default function ConfigurePage() {
                                       type="checkbox"
                                       checked={selectedRows.has(row.originalIndex)}
                                       onChange={() => toggleRowSelection(row.originalIndex)}
-                                      className="h-4 w-4 rounded border-[#2a2a2a] bg-[#0d0d0d] accent-[#1D9E75]"
+                                      className="h-4 w-4 rounded border-[var(--border)] bg-[var(--input)] accent-[var(--primary)]"
                                     />
                                   </td>
-                                  <td className="px-4 py-3 font-mono tracking-tight text-[#e0e0e0]">{row.sku}</td>
-                                  <td className="px-4 py-3 font-mono text-[#888888]">{row.item}</td>
-                                  <td className="px-4 py-3 text-center text-[#888888]">{row.pcsPerCtn}</td>
-                                  <td className="px-4 py-3 text-center text-[#888888]">{row.packPerCtn}</td>
+                                  <td className="px-4 py-3 font-mono tracking-tight text-[var(--text)]">{row.sku}</td>
+                                  <td className="px-4 py-3 font-mono text-[var(--muted-foreground)]">{row.item}</td>
+                                  <td className="px-4 py-3 text-center text-[var(--muted-foreground)]">{row.pcsPerCtn}</td>
+                                  <td className="px-4 py-3 text-center text-[var(--muted-foreground)]">{row.packPerCtn}</td>
                                   <td className="px-4 py-3 text-right">
                                     <div className="flex items-center justify-end gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:hover:opacity-100 [tr:hover_&]:opacity-100 transition-opacity">
                                       <button
                                         type="button"
                                         onClick={() => startEdit(row)}
-                                        className="rounded-md p-2.5 text-[#888888] transition-colors hover:bg-[rgba(29,158,117,0.08)] hover:text-[#1D9E75]"
+                                        className="rounded-md p-2.5 text-[var(--muted-foreground)] transition-colors hover:bg-[color-mix(in_oklch,var(--primary)_12%,var(--card))] hover:text-[var(--primary)]"
                                         title="Edit"
                                         aria-label={`Edit SKU ${row.sku}`}
                                       >
@@ -1040,7 +1042,7 @@ export default function ConfigurePage() {
                                         type="button"
                                         onClick={() => handleDelete(row.originalIndex, row.sku)}
                                         disabled={uomPending}
-                                        className="rounded-md p-2.5 text-[#888888] transition-colors hover:bg-[#2a1212] hover:text-[#ff6b6b]"
+                                        className="rounded-md p-2.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--om-status-red-bg)] hover:text-[var(--destructive)]"
                                         title="Delete"
                                         aria-label={`Delete SKU ${row.sku}`}
                                       >
@@ -1060,7 +1062,7 @@ export default function ConfigurePage() {
               )}
             </div>
 
-            <p className="text-center text-xs text-[#888888]">
+            <p className="text-center text-xs text-[var(--muted-foreground)]">
               {pagedItems.length} of {filteredItems.length} filtered items shown ({uomItems.length} total)
             </p>
             <div className="flex items-center justify-center gap-2">
@@ -1073,7 +1075,7 @@ export default function ConfigurePage() {
               >
                 Prev
               </Button>
-              <span className="text-xs text-[#888888]">
+              <span className="text-xs text-[var(--muted-foreground)]">
                 Page {safeCurrentPage} / {totalPages}
               </span>
               <Button

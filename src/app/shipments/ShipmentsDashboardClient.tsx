@@ -106,7 +106,7 @@ function FilterSelect({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={cn(
-          "[color-scheme:dark] h-full w-full min-w-0 appearance-none bg-transparent pr-7 text-left",
+          "h-full w-full min-w-0 appearance-none bg-transparent pr-7 text-left",
           "text-[11px] font-semibold text-[var(--text)]",
           "outline-none",
         )}
@@ -339,7 +339,7 @@ export function ShipmentsDashboardClient({ rows }: { rows: SavedShipmentTableRow
                   value={pldIso}
                   onChange={(e) => setPldIso(e.target.value)}
                   aria-label="PLD"
-                  className="[color-scheme:dark] h-full w-full min-w-0 bg-transparent pr-1 text-[11px] font-semibold text-[var(--text)]/85 outline-none"
+                  className="h-full w-full min-w-0 bg-transparent pr-1 text-[11px] font-semibold text-[var(--text)]/85 outline-none"
                 />
               </FilterShell>
 
@@ -373,7 +373,7 @@ export function ShipmentsDashboardClient({ rows }: { rows: SavedShipmentTableRow
                   value={radIso}
                   onChange={(e) => setRadIso(e.target.value)}
                   aria-label="RAD"
-                  className="[color-scheme:dark] h-full w-full min-w-0 bg-transparent pr-1 text-[11px] font-semibold text-[var(--text)]/85 outline-none"
+                  className="h-full w-full min-w-0 bg-transparent pr-1 text-[11px] font-semibold text-[var(--text)]/85 outline-none"
                 />
               </FilterShell>
 

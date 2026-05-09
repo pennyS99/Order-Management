@@ -27,7 +27,7 @@ const PlannerShipmentsOverviewMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-[min(420px,55vh)] items-center justify-center rounded-lg border border-[#2a2a2a] bg-[#141414] text-xs font-medium text-[#888888]">
+      <div className="flex h-[min(420px,55vh)] items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] text-xs font-medium text-[var(--om-text-muted)]">
         Loading map...
       </div>
     ),
@@ -176,14 +176,14 @@ export function SavedPlansGlobalSearchClient({
           value={pld}
           onChange={setPld}
           placeholder="PLD"
-          buttonClassName="inline-flex h-8 w-full items-center justify-between rounded-[6px] border border-[#333] bg-[#1e1e1e] px-2 text-[11px] font-semibold text-[#aaa] hover:bg-[#202020] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1D9E75]/35"
+          buttonClassName="inline-flex h-8 w-full items-center justify-between rounded-[6px] border border-[var(--border-strong)] bg-[var(--surface)] px-2 text-[11px] font-semibold text-[var(--om-text-muted)] hover:bg-[var(--surface-elevated)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_oklch,var(--primary)_35%,transparent)]"
         />
       </div>
       <div className="col-span-1">
         <select
           value={area}
           onChange={(e) => setArea(e.target.value)}
-          className="h-8 w-full rounded-[6px] border border-[#333] bg-[#1e1e1e] px-2 text-[11px] font-semibold text-[#aaa]"
+          className="h-8 w-full rounded-[6px] border border-[var(--border-strong)] bg-[var(--surface)] px-2 text-[11px] font-semibold text-[var(--om-text-muted)]"
         >
           <option value="">Area</option>
           {(facets?.areas ?? []).map((v) => (
@@ -197,7 +197,7 @@ export function SavedPlansGlobalSearchClient({
         <select
           value={truckType}
           onChange={(e) => setTruckType(e.target.value)}
-          className="h-8 w-full rounded-[6px] border border-[#333] bg-[#1e1e1e] px-2 text-[11px] font-semibold text-[#aaa]"
+          className="h-8 w-full rounded-[6px] border border-[var(--border-strong)] bg-[var(--surface)] px-2 text-[11px] font-semibold text-[var(--om-text-muted)]"
         >
           <option value="">Truck</option>
           {(facets?.truckTypes ?? []).map((v) => (
@@ -211,7 +211,7 @@ export function SavedPlansGlobalSearchClient({
         <select
           value={origin}
           onChange={(e) => setOrigin(e.target.value)}
-          className="h-8 w-full rounded-[6px] border border-[#333] bg-[#1e1e1e] px-2 text-[11px] font-semibold text-[#aaa]"
+          className="h-8 w-full rounded-[6px] border border-[var(--border-strong)] bg-[var(--surface)] px-2 text-[11px] font-semibold text-[var(--om-text-muted)]"
         >
           <option value="">Origin</option>
           {(facets?.origins ?? []).map((v) => (
@@ -225,7 +225,7 @@ export function SavedPlansGlobalSearchClient({
         <select
           value={serviceType}
           onChange={(e) => setServiceType(e.target.value)}
-          className="h-8 w-full rounded-[6px] border border-[#333] bg-[#1e1e1e] px-2 text-[11px] font-semibold text-[#aaa]"
+          className="h-8 w-full rounded-[6px] border border-[var(--border-strong)] bg-[var(--surface)] px-2 text-[11px] font-semibold text-[var(--om-text-muted)]"
         >
           <option value="">Service</option>
           {(facets?.serviceTypes ?? []).map((v) => (
@@ -250,7 +250,7 @@ export function SavedPlansGlobalSearchClient({
       )}
 
       {error && (
-        <p className="rounded-lg border border-[#5a2020] bg-[#2a1212] px-3 py-2 text-sm text-[#ffb4b4]" role="alert">
+        <p className="rounded-lg border border-[color-mix(in_oklch,var(--destructive)_35%,var(--border))] bg-[color-mix(in_oklch,var(--destructive)_8%,var(--card))] px-3 py-2 text-sm text-[var(--destructive)]" role="alert">
           {error}
         </p>
       )}
@@ -269,7 +269,7 @@ export function SavedPlansGlobalSearchClient({
       </div>
 
       {hasSearched && (
-        <p className="text-xs font-semibold text-[#888888]" role="status">
+        <p className="text-xs font-semibold text-[var(--om-text-muted)]" role="status">
           {rows.length} row{rows.length === 1 ? "" : "s"} matched
         </p>
       )}
@@ -278,9 +278,9 @@ export function SavedPlansGlobalSearchClient({
 
   const resultsUi = (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-lg border border-[#2a2a2a] bg-[#0d0d0d] shadow-inner shadow-black/30">
-        <div className="border-b border-[#2a2a2a] bg-[#141414] px-4 py-2.5">
-          <h3 className="text-sm font-bold text-[#e0e0e0]">Map</h3>
+      <div className="overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)] shadow-inner shadow-black/30">
+        <div className="border-b border-[var(--border)] bg-[var(--surface-elevated)] px-4 py-2.5">
+          <h3 className="text-sm font-bold text-[var(--text)]">Map</h3>
         </div>
         <div className="p-3 sm:p-4">
           <PlannerShipmentsOverviewMap shipments={shipments} dcCoordMap={dcCoordMap} mapHeightClassName={mapHeightClassName} />
@@ -310,7 +310,7 @@ export function SavedPlansGlobalSearchClient({
         className={
           frame === "none"
             ? "relative"
-            : "relative overflow-hidden rounded-2xl border border-[#2a2a2a] bg-[#0d0d0d]"
+            : "relative overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--card)]"
         }
       >
         {/* Map canvas */}
@@ -339,32 +339,32 @@ export function SavedPlansGlobalSearchClient({
           {/* Left sidebar — unified panel */}
           <aside
             className={
-              "absolute left-0 top-0 z-10 h-full w-[320px] border-r border-[#2a2a2a] bg-[rgba(14,14,14,0.95)] transition-transform duration-200 ease-in-out " +
+              "absolute left-0 top-0 z-10 h-full w-[320px] border-r border-[var(--border)] bg-[color-mix(in_oklch,var(--card)_96%,var(--text))] backdrop-blur-md transition-transform duration-200 ease-in-out " +
               (sidebarOpen ? "translate-x-0" : "-translate-x-full")
             }
           >
             <div className="flex h-full flex-col">
               {/* Section 1 — Header */}
-              <div className="flex items-center justify-between gap-3 border-b border-[#2a2a2a] px-3 py-3">
+              <div className="flex items-center justify-between gap-3 border-b border-[var(--border)] px-3 py-3">
                 <div className="min-w-0">
-                  <p className="truncate text-[14px] font-medium text-white">Shipments</p>
-                  <p className="truncate text-[12px] text-[#666]">{subtitle}</p>
+                  <p className="truncate text-[14px] font-medium text-[var(--text)]">Shipments</p>
+                  <p className="truncate text-[12px] text-[var(--om-text-muted)]">{subtitle}</p>
                 </div>
                 {hasSearched && (
-                  <span className="inline-flex min-w-8 items-center justify-center rounded-full bg-[#1D9E75] px-2 py-0.5 text-[11px] font-bold text-black">
+                  <span className="inline-flex min-w-8 items-center justify-center rounded-full bg-[var(--primary)] px-2 py-0.5 text-[11px] font-bold text-[var(--primary-foreground)]">
                     {activeCount}
                   </span>
                 )}
               </div>
 
               {/* Section 2 — Filters */}
-              <div className="border-b border-[#2a2a2a] px-3 py-2.5">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.06em] text-[#888]">FILTERS</div>
+              <div className="border-b border-[var(--border)] px-3 py-2.5">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.06em] text-[var(--om-text-muted)]">FILTERS</div>
                 <div className="mt-2">{filtersUi}</div>
                 {(facetsError || error) && (
                   <div className="mt-2 space-y-1.5">
                     {facetsError && <p className="text-[11px] text-amber-200/80">{facetsError}</p>}
-                    {error && <p className="text-[11px] text-[#ffb4b4]">{error}</p>}
+                    {error && <p className="text-[11px] text-[var(--destructive)]">{error}</p>}
                   </div>
                 )}
                 <div className="mt-2 flex items-center justify-end gap-2">
@@ -372,7 +372,7 @@ export function SavedPlansGlobalSearchClient({
                     type="button"
                     onClick={clear}
                     disabled={loading}
-                    className="rounded-[6px] border border-[#333] bg-[#1e1e1e] px-2 py-1 text-[11px] font-semibold text-[#aaa] disabled:opacity-60"
+                    className="rounded-[6px] border border-[var(--border-strong)] bg-[var(--surface)] px-2 py-1 text-[11px] font-semibold text-[var(--om-text-muted)] disabled:opacity-60"
                   >
                     Clear
                   </button>
@@ -380,7 +380,7 @@ export function SavedPlansGlobalSearchClient({
                     type="button"
                     onClick={() => void runSearch()}
                     disabled={loading}
-                    className="rounded-[6px] bg-[#1D9E75] px-2 py-1 text-[11px] font-black text-black disabled:opacity-70"
+                    className="rounded-[6px] bg-[var(--primary)] px-2 py-1 text-[11px] font-black text-[var(--primary-foreground)] disabled:opacity-70"
                   >
                     {loading ? "Searching..." : "Search"}
                   </button>
@@ -389,14 +389,14 @@ export function SavedPlansGlobalSearchClient({
 
               {/* Section 3 — Results list */}
               <div className="min-h-0 flex-1 overflow-auto">
-                <div className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase text-[#888]">
+                <div className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase text-[var(--om-text-muted)]">
                   DC stops · {hasSearched ? `${activeCount} results` : "none yet"}
                 </div>
 
                 {!hasSearched ? (
-                  <div className="px-3 py-3 text-[12px] text-[#666]">Choose filters, then search saved plans.</div>
+                  <div className="px-3 py-3 text-[12px] text-[var(--om-text-muted)]">Choose filters, then search saved plans.</div>
                 ) : byDcList.length === 0 ? (
-                  <div className="px-3 py-3 text-[12px] text-[#666]">No matches for the current filters.</div>
+                  <div className="px-3 py-3 text-[12px] text-[var(--om-text-muted)]">No matches for the current filters.</div>
                 ) : (
                   <div>
                     {byDcList.map((item) => {
@@ -411,10 +411,10 @@ export function SavedPlansGlobalSearchClient({
                           }}
                           onClick={() => setSelectedDcName(item.dcName)}
                           className={
-                            "cursor-pointer border-b border-[#1e1e1e] px-3 py-2.5 " +
+                            "cursor-pointer border-b border-[var(--border)] px-3 py-2.5 " +
                             (active
-                              ? "bg-[rgba(29,158,117,0.10)] border-l-2 border-l-[#1D9E75]"
-                              : "border-l-2 border-l-transparent hover:bg-[#1a1a1a]")
+                              ? "bg-[color-mix(in_oklch,var(--primary)_11%,var(--card))] shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--primary)_30%,var(--border))]"
+                              : "hover:bg-[var(--surface-elevated)]")
                           }
                           role="button"
                           tabIndex={0}
@@ -425,11 +425,11 @@ export function SavedPlansGlobalSearchClient({
                             }
                           }}
                         >
-                          <div className="text-[12px] font-medium text-white">{item.dcName}</div>
-                          <div className="mt-0.5 text-[11px] text-[#666]">{poLine}</div>
-                          <div className="mt-1 flex items-center gap-2 text-[10px] text-[#666]">
+                          <div className="text-[12px] font-medium text-[var(--text)]">{item.dcName}</div>
+                          <div className="mt-0.5 text-[11px] text-[var(--om-text-muted)]">{poLine}</div>
+                          <div className="mt-1 flex items-center gap-2 text-[10px] text-[var(--om-text-muted)]">
                             {item.truckType && (
-                              <span className="inline-flex items-center rounded-full bg-[rgba(29,158,117,0.18)] px-2 py-0.5 text-[10px] font-semibold text-[#9ae6c9]">
+                              <span className="inline-flex items-center rounded-full bg-[color-mix(in_oklch,var(--primary)_16%,var(--card))] px-2 py-0.5 text-[10px] font-semibold text-[var(--primary)]">
                                 {item.truckType}
                               </span>
                             )}
@@ -446,7 +446,7 @@ export function SavedPlansGlobalSearchClient({
 
               {/* Section 4 — Collapse tab */}
               <div
-                className="cursor-pointer border-t border-[#2a2a2a] px-3 py-2 text-[11px] text-[#888]"
+                className="cursor-pointer border-t border-[var(--border)] px-3 py-2 text-[11px] text-[var(--om-text-muted)]"
                 onClick={() => setSidebarOpen(false)}
                 role="button"
                 tabIndex={0}
@@ -466,7 +466,7 @@ export function SavedPlansGlobalSearchClient({
             <button
               type="button"
               onClick={() => setSidebarOpen(true)}
-              className="absolute left-0 top-24 z-20 rounded-r-lg border border-[#333] bg-[rgba(14,14,14,0.92)] px-2 py-2 text-[11px] font-semibold text-[#aaa] shadow-lg shadow-black/50"
+              className="absolute left-0 top-24 z-20 rounded-r-lg border border-[var(--border-strong)] bg-[color-mix(in_oklch,var(--card)_94%,var(--text))] px-2 py-2 text-[11px] font-semibold text-[var(--om-text-muted)] shadow-lg shadow-black/10 backdrop-blur-md"
               aria-label="Expand sidebar"
               title="Expand filters"
             >
@@ -490,13 +490,13 @@ export function SavedPlansGlobalSearchClient({
             }
             aria-hidden={!sidebarOpen}
           >
-            <aside className="rounded-xl border border-[#2a2a2a] bg-[#0d0d0d] p-4 lg:sticky lg:top-24 lg:self-start">
+            <aside className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-4 lg:sticky lg:top-24 lg:self-start">
               <div className="mb-3 flex items-center justify-between">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#888888]">Filters</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--om-text-muted)]">Filters</p>
                 <button
                   type="button"
                   onClick={() => setSidebarOpen(false)}
-                  className="inline-flex min-h-8 items-center rounded-lg border border-[#2a2a2a] bg-[#141414] px-2 text-xs font-semibold text-[#e0e0e0] hover:border-[#1D9E75]/45 hover:text-[#1D9E75]"
+                  className="inline-flex min-h-8 items-center rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-2 text-xs font-semibold text-[var(--text)] hover:border-[color-mix(in_oklch,var(--primary)_45%,var(--border))] hover:text-[var(--primary)]"
                 >
                   Collapse
                 </button>
@@ -515,14 +515,14 @@ export function SavedPlansGlobalSearchClient({
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
-                className="inline-flex min-h-9 items-center rounded-lg border border-[#2a2a2a] bg-[#141414] px-3 py-2 text-xs font-semibold text-[#e0e0e0] hover:border-[#1D9E75]/45 hover:text-[#1D9E75]"
+                className="inline-flex min-h-9 items-center rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-xs font-semibold text-[var(--text)] hover:border-[color-mix(in_oklch,var(--primary)_45%,var(--border))] hover:text-[var(--primary)]"
               >
                 Filters
               </button>
             </div>
 
             {!hasSearched ? (
-              <div className="rounded-xl border border-[#2a2a2a] bg-[#0d0d0d] p-8 text-center text-sm text-[#888888]">
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-8 text-center text-sm text-[var(--om-text-muted)]">
                 Choose filters, then search saved plans.
               </div>
             ) : (
@@ -536,7 +536,7 @@ export function SavedPlansGlobalSearchClient({
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
-                className="mt-2 inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl border border-[#2a2a2a] bg-[#141414] text-xs font-black text-[#e0e0e0] hover:border-[#1D9E75]/45 hover:text-[#1D9E75]"
+                className="mt-2 inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] text-xs font-black text-[var(--text)] hover:border-[color-mix(in_oklch,var(--primary)_45%,var(--border))] hover:text-[var(--primary)]"
                 aria-label="Expand filters"
                 title="Expand filters"
               >
@@ -548,20 +548,20 @@ export function SavedPlansGlobalSearchClient({
 
         {/* Mobile overlay sidebar */}
         {sidebarOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 bg-[#0d0d0d]/70 backdrop-blur-sm" onClick={() => setSidebarOpen(false)}>
+          <div className="lg:hidden fixed inset-0 z-50 bg-[var(--card)]/70 backdrop-blur-sm" onClick={() => setSidebarOpen(false)}>
             <div
-              className="absolute left-0 top-0 h-full w-[min(92vw,360px)] overflow-auto border-r border-[#2a2a2a] bg-[#0d0d0d] p-4"
+              className="absolute left-0 top-0 h-full w-[min(92vw,360px)] overflow-auto border-r border-[var(--border)] bg-[var(--card)] p-4"
               onClick={(e) => e.stopPropagation()}
               role="dialog"
               aria-modal="true"
               aria-label="Filters"
             >
               <div className="mb-3 flex items-center justify-between">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#888888]">Filters</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--om-text-muted)]">Filters</p>
                 <button
                   type="button"
                   onClick={() => setSidebarOpen(false)}
-                  className="inline-flex min-h-9 min-w-9 items-center justify-center rounded-lg border border-[#2a2a2a] bg-[#141414] text-xs font-semibold text-[#e0e0e0]"
+                  className="inline-flex min-h-9 min-w-9 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] text-xs font-semibold text-[var(--text)]"
                   aria-label="Close filters"
                 >
                   X
@@ -580,7 +580,7 @@ export function SavedPlansGlobalSearchClient({
   }
 
   return (
-    <section className="space-y-4 rounded-xl border border-[#2a2a2a] bg-[#0d0d0d] p-4">
+    <section className="space-y-4 rounded-xl border border-[var(--border)] bg-[var(--card)] p-4">
       <div className="grid gap-4">
         {filtersUi}
         {filtersMessagesUi}

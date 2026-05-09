@@ -22,7 +22,7 @@ export function TableFilterToolbar({ id, value, onChange, placeholder = "Search 
         onChange={(e) => onChange(e.target.value)}
         className={
           className ??
-          "min-w-[180px] max-w-sm flex-1 rounded-lg border border-[#2a2a2a] bg-[#141414] px-3 py-1.5 text-xs text-[#e0e0e0] placeholder:text-[#5c5c5c] transition-colors duration-150 focus:border-[#1D9E75]/70 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
+          "min-w-[180px] max-w-sm flex-1 rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-1.5 font-sans text-xs text-[var(--text)] placeholder:text-[var(--om-text-muted)] transition-colors duration-150 focus:border-[color-mix(in_oklch,var(--primary)_55%,var(--border))] focus:outline-none focus:ring-2 focus:ring-[color-mix(in_oklch,var(--primary)_35%,transparent)]"
         }
       />
     </>

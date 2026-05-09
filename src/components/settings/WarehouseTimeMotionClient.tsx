@@ -89,9 +89,9 @@ export function WarehouseTimeMotionClient({ initialSettings }: Props) {
 
   return (
     <section className="mx-auto w-full max-w-4xl space-y-4 px-4 py-6">
-      <div className="rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] p-5">
-        <h2 className="text-lg font-semibold text-[#e0e0e0]">Warehouse time motion</h2>
-        <p className="mt-1 text-sm text-[#888888]">
+      <div className="rounded-lg border border-[var(--border)] bg-[var(--card)] p-5">
+        <h2 className="text-lg font-semibold text-[var(--text)]">Warehouse time motion</h2>
+        <p className="mt-1 text-sm text-[var(--muted-foreground)]">
           Set the picking and loading assumptions used in route planning.
         </p>
       </div>
@@ -101,18 +101,18 @@ export function WarehouseTimeMotionClient({ initialSettings }: Props) {
           role="status"
           className={`rounded-lg border px-4 py-3 text-sm font-semibold ${
             message.type === "success"
-              ? "border-[#1D9E75]/35 bg-[rgba(29,158,117,0.08)] text-[#1D9E75]"
-              : "border-[#ff4d4d]/35 bg-[#2a1212] text-[#ffb4b4]"
+              ? "border-[color-mix(in_oklch,var(--success)_35%,var(--border))] bg-[color-mix(in_oklch,var(--success)_12%,var(--card))] text-[var(--success)]"
+              : "border-[color-mix(in_oklch,var(--destructive)_35%,var(--border))] bg-[var(--om-status-red-bg)] text-[var(--destructive)]"
           }`}
         >
           {message.text}
         </div>
       )}
 
-      <form onSubmit={(e) => void onSave(e)} className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-5">
+      <form onSubmit={(e) => void onSave(e)} className="rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-5">
         <div className="grid gap-4 md:grid-cols-2">
           <label className="space-y-1.5">
-            <span className="text-xs font-semibold uppercase tracking-wide text-[#888888]">Picking MP</span>
+            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--muted-foreground)]">Picking MP</span>
             <Input
               type="number"
               min={0}
@@ -124,7 +124,7 @@ export function WarehouseTimeMotionClient({ initialSettings }: Props) {
           </label>
 
           <label className="space-y-1.5">
-            <span className="text-xs font-semibold uppercase tracking-wide text-[#888888]">
+            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--muted-foreground)]">
               Picking Rate (Cases/Hour)
             </span>
             <Input
@@ -138,7 +138,7 @@ export function WarehouseTimeMotionClient({ initialSettings }: Props) {
           </label>
 
           <label className="space-y-1.5">
-            <span className="text-xs font-semibold uppercase tracking-wide text-[#888888]">Loading Dock</span>
+            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--muted-foreground)]">Loading Dock</span>
             <Input
               type="number"
               min={0}
@@ -150,7 +150,7 @@ export function WarehouseTimeMotionClient({ initialSettings }: Props) {
           </label>
 
           <label className="space-y-1.5">
-            <span className="text-xs font-semibold uppercase tracking-wide text-[#888888]">
+            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--muted-foreground)]">
               Loading Rate (Cases/Hour)
             </span>
             <Input
@@ -164,7 +164,7 @@ export function WarehouseTimeMotionClient({ initialSettings }: Props) {
           </label>
 
           <label className="space-y-1.5">
-            <span className="text-xs font-semibold uppercase tracking-wide text-[#888888]">
+            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--muted-foreground)]">
               Start Picking Time
             </span>
             <Input
@@ -176,7 +176,7 @@ export function WarehouseTimeMotionClient({ initialSettings }: Props) {
           </label>
 
           <label className="space-y-1.5">
-            <span className="text-xs font-semibold uppercase tracking-wide text-[#888888]">
+            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--muted-foreground)]">
               Start Loading Time
             </span>
             <Input

@@ -30,7 +30,7 @@ const COL_IDS = [
 ] as const;
 
 const TH_CLASS =
-  "border-b border-zinc-800 bg-[#151515] px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-200";
+  "border-b border-[var(--border)] bg-[var(--surface-elevated)] px-2 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-[var(--muted-foreground)]";
 
 function DetailDcHeader({
   id,
@@ -134,25 +134,25 @@ export function SavedPlanDetailDcTable({ rows }: { rows: DcSummaryRow[] }) {
   }, [activeFilterColumn]);
 
   return (
-    <div className="overflow-hidden rounded-xl border border-zinc-800 bg-[#0d0d0d]">
-      <div className="border-b border-zinc-800 bg-[#151515] px-4 py-2.5">
-        <h3 className="text-sm font-semibold text-slate-100">DC stops</h3>
-        <p className="mt-0.5 text-xs text-[#888888]">
+    <div className="overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)]">
+      <div className="border-b border-[var(--border)] bg-[var(--surface-elevated)] px-4 py-2.5">
+        <h3 className="text-sm font-semibold text-[var(--text)]">DC stops</h3>
+        <p className="mt-0.5 text-xs text-[var(--om-text-muted)]">
           {displayRows.length} row{displayRows.length === 1 ? "" : "s"} shown
         </p>
       </div>
-      <div className="border-b border-zinc-800 bg-[#141414] px-3 py-2">
+      <div className="border-b border-[var(--border)] bg-[var(--surface)] px-3 py-2">
         <TableFilterToolbar
           id="saved-plan-detail-dc-filter"
           value={filterText}
           onChange={setFilterText}
           placeholder={filterPlaceholder}
-          className="w-full max-w-md rounded-lg border border-zinc-700 bg-[#0d0d0d] px-3 py-1.5 text-xs text-slate-200 placeholder:text-zinc-600 focus:border-[#1D9E75]/70 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
+          className="w-full max-w-md rounded-lg border border-[var(--border)] bg-[var(--card)] px-3 py-1.5 text-xs text-[var(--text)] placeholder:text-[var(--om-text-muted)] focus:border-[color-mix(in_oklch,var(--primary)_55%,var(--border))] focus:outline-none focus:ring-2 focus:ring-[color-mix(in_oklch,var(--primary)_35%,transparent)]"
         />
       </div>
       <div className="max-h-[28rem] overflow-auto">
-        <table className="min-w-full whitespace-nowrap text-sm text-slate-200">
-          <thead className="sticky top-0 z-10 border-b border-zinc-800 bg-[#151515] shadow-sm shadow-black/40">
+        <table className="min-w-full font-sans whitespace-nowrap text-sm text-[var(--text)]">
+          <thead className="sticky top-0 z-10 border-b border-[var(--border)] bg-[var(--surface-elevated)] shadow-sm shadow-black/5">
             <tr>
               <th className={TH_CLASS}>No.</th>
               <DetailDcHeader id="origin" label="Origin" activeFilterColumn={activeFilterColumn} sortColumn={sortColumn} sortDir={sortDir} onFilterClick={toggleFilterColumn} onSortClick={toggleSort} />
@@ -178,38 +178,40 @@ export function SavedPlanDetailDcTable({ rows }: { rows: DcSummaryRow[] }) {
           <tbody>
             {displayRows.map((row, index) => (
               <tr key={`${row.shipmentId}-${row.dcName}-${index}`}>
-                <td className="border-t border-zinc-800/90 px-2 py-2">{index + 1}</td>
-                <td className="border-t border-zinc-800/90 px-2 py-2">{row.origin || "—"}</td>
-                <td className="border-t border-zinc-800/90 px-2 py-2">{row.shipmentId}</td>
-                <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">
+                <td className="border-t border-[var(--border)] px-2 py-2">{index + 1}</td>
+                <td className="border-t border-[var(--border)] px-2 py-2">{row.origin || "—"}</td>
+                <td className="border-t border-[var(--border)] px-2 py-2 font-sans text-[13px] font-medium tabular-nums tracking-[-0.02em] text-[var(--text)] antialiased">
+                  {row.shipmentId}
+                </td>
+                <td className="border-t border-[var(--border)] px-2 py-2 text-right tabular-nums">
                   {row.dropSequence > 0 ? row.dropSequence : "—"}
                 </td>
-                <td className="border-t border-zinc-800/90 px-2 py-2">{row.dcName}</td>
-                <td className="border-t border-zinc-800/90 px-2 py-2">{row.poNumber}</td>
-                <td className="border-t border-zinc-800/90 px-2 py-2 text-center">{row.pld}</td>
-                <td className="border-t border-zinc-800/90 px-2 py-2 text-center">{row.rad}</td>
-                <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">
+                <td className="border-t border-[var(--border)] px-2 py-2">{row.dcName}</td>
+                <td className="border-t border-[var(--border)] px-2 py-2 font-mono text-[13px]">{row.poNumber}</td>
+                <td className="border-t border-[var(--border)] px-2 py-2 text-center">{row.pld}</td>
+                <td className="border-t border-[var(--border)] px-2 py-2 text-center">{row.rad}</td>
+                <td className="border-t border-[var(--border)] px-2 py-2 text-right tabular-nums">
                   {row.legFromPreviousKm != null ? row.legFromPreviousKm.toFixed(1) : "—"}
                 </td>
-                <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">
+                <td className="border-t border-[var(--border)] px-2 py-2 text-right tabular-nums">
                   {row.legFromPreviousMin != null ? Math.round(row.legFromPreviousMin) : "—"}
                 </td>
-                <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">{row.arriveClock}</td>
-                <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">{row.unloadStartClock}</td>
-                <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">{row.departClock}</td>
-                <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">
+                <td className="border-t border-[var(--border)] px-2 py-2 text-right tabular-nums">{row.arriveClock}</td>
+                <td className="border-t border-[var(--border)] px-2 py-2 text-right tabular-nums">{row.unloadStartClock}</td>
+                <td className="border-t border-[var(--border)] px-2 py-2 text-right tabular-nums">{row.departClock}</td>
+                <td className="border-t border-[var(--border)] px-2 py-2 text-right tabular-nums">
                   {formatTripDurationCell(row.tripDurationMin)}
                 </td>
-                <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">{row.totalQty}</td>
-                <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">{row.totalKg.toFixed(2)}</td>
-                <td className="border-t border-zinc-800/90 px-2 py-2 text-right tabular-nums">{row.totalCbm.toFixed(2)}</td>
-                <td className="border-t border-zinc-800/90 px-2 py-2">{row.truckType}</td>
-                <td className="border-t border-zinc-800/90 px-2 py-2">{row.serviceType}</td>
+                <td className="border-t border-[var(--border)] px-2 py-2 text-right tabular-nums">{row.totalQty}</td>
+                <td className="border-t border-[var(--border)] px-2 py-2 text-right tabular-nums">{row.totalKg.toFixed(2)}</td>
+                <td className="border-t border-[var(--border)] px-2 py-2 text-right tabular-nums">{row.totalCbm.toFixed(2)}</td>
+                <td className="border-t border-[var(--border)] px-2 py-2">{row.truckType}</td>
+                <td className="border-t border-[var(--border)] px-2 py-2">{row.serviceType}</td>
               </tr>
             ))}
             {rows.length === 0 && (
               <tr>
-                <td className="border-t border-zinc-800/90 px-2 py-6 text-center text-xs text-[#888888]" colSpan={19}>
+                <td className="border-t border-[var(--border)] px-2 py-6 text-center text-xs text-[#888888]" colSpan={19}>
                   No rows for this tab.
                 </td>
               </tr>

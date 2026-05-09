@@ -201,9 +201,9 @@ export function MasterSettingsClient({
   };
 
   const masterTableCheckboxClass =
-    "h-4 w-4 rounded border-[#2a2a2a] bg-[#0d0d0d] accent-[#1D9E75]";
+    "h-4 w-4 rounded border-[var(--border)] bg-[var(--input)] accent-[var(--primary)]";
   const masterThClass =
-    "px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[#888888]";
+    "px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--muted-foreground)]";
 
   const escapeCsvCell = (value: string | number) => {
     const text = String(value);
@@ -283,7 +283,7 @@ export function MasterSettingsClient({
   const truckPage = truckFiltered.slice(pageStart, pageStart + rowsPerPage);
 
   const categoryListButtonClass =
-    "flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] p-4 text-left transition-[border-color,box-shadow] hover:border-[#1D9E75]/35 hover:shadow-[0_0_20px_rgba(29,158,117,0.06)]";
+    "flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 text-left transition-[border-color,box-shadow] hover:border-[color-mix(in_oklch,var(--primary)_35%,transparent)] hover:shadow-[0_0_20px_color-mix(in_oklch,var(--primary)_10%,transparent)]";
 
   const renderCategoryList = (
     <ul className="space-y-2">
@@ -294,15 +294,15 @@ export function MasterSettingsClient({
           className={categoryListButtonClass}
         >
           <div className="flex items-center gap-3">
-            <div className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-2">
-              <Columns className="h-5 w-5 text-[#1D9E75]" />
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-2">
+              <Columns className="h-5 w-5 text-[var(--primary)]" />
             </div>
             <div>
-              <span className="font-semibold text-[#e0e0e0]">Results columns</span>
-              <p className="text-sm text-[#888888]">Show, rename, and reorder planner results columns</p>
+              <span className="font-semibold text-[var(--text)]">Results columns</span>
+              <p className="text-sm text-[var(--muted-foreground)]">Show, rename, and reorder planner results columns</p>
             </div>
           </div>
-          <ChevronRight className="h-5 w-5 shrink-0 text-[#888888]" />
+          <ChevronRight className="h-5 w-5 shrink-0 text-[var(--muted-foreground)]" />
         </button>
       </li>
       <li>
@@ -312,15 +312,15 @@ export function MasterSettingsClient({
           className={categoryListButtonClass}
         >
           <div className="flex items-center gap-3">
-            <div className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-2">
-              <Package className="h-5 w-5 text-[#1D9E75]" />
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-2">
+              <Package className="h-5 w-5 text-[var(--primary)]" />
             </div>
             <div>
-              <span className="font-semibold text-[#e0e0e0]">Item master</span>
-              <p className="text-sm text-[#888888]">Maintain item codes, CBM, and weight</p>
+              <span className="font-semibold text-[var(--text)]">Item master</span>
+              <p className="text-sm text-[var(--muted-foreground)]">Maintain item codes, CBM, and weight</p>
             </div>
           </div>
-          <ChevronRight className="h-5 w-5 shrink-0 text-[#888888]" />
+          <ChevronRight className="h-5 w-5 shrink-0 text-[var(--muted-foreground)]" />
         </button>
       </li>
       <li>
@@ -330,15 +330,15 @@ export function MasterSettingsClient({
           className={categoryListButtonClass}
         >
           <div className="flex items-center gap-3">
-            <div className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-2">
-              <MapPin className="h-5 w-5 text-[#1D9E75]" />
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-2">
+              <MapPin className="h-5 w-5 text-[var(--primary)]" />
             </div>
             <div>
-              <span className="font-semibold text-[#e0e0e0]">Address master</span>
-              <p className="text-sm text-[#888888]">Maintain DC mapping, channels, coordinates, and LTL/LCL limits</p>
+              <span className="font-semibold text-[var(--text)]">Address master</span>
+              <p className="text-sm text-[var(--muted-foreground)]">Maintain DC mapping, channels, coordinates, and LTL/LCL limits</p>
             </div>
           </div>
-          <ChevronRight className="h-5 w-5 shrink-0 text-[#888888]" />
+          <ChevronRight className="h-5 w-5 shrink-0 text-[var(--muted-foreground)]" />
         </button>
       </li>
       <li>
@@ -348,29 +348,29 @@ export function MasterSettingsClient({
           className={categoryListButtonClass}
         >
           <div className="flex items-center gap-3">
-            <div className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-2">
-              <Truck className="h-5 w-5 text-[#1D9E75]" />
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-2">
+              <Truck className="h-5 w-5 text-[var(--primary)]" />
             </div>
             <div>
-              <span className="font-semibold text-[#e0e0e0]">Truck master</span>
-              <p className="text-sm text-[#888888]">Maintain truck capacity in kg and CBM</p>
+              <span className="font-semibold text-[var(--text)]">Truck master</span>
+              <p className="text-sm text-[var(--muted-foreground)]">Maintain truck capacity in kg and CBM</p>
             </div>
           </div>
-          <ChevronRight className="h-5 w-5 shrink-0 text-[#888888]" />
+          <ChevronRight className="h-5 w-5 shrink-0 text-[var(--muted-foreground)]" />
         </button>
       </li>
       <li>
         <Link href="/settings/planner/warehouse-time-motion" className={categoryListButtonClass}>
           <div className="flex items-center gap-3">
-            <div className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-2">
-              <ListChecks className="h-5 w-5 text-[#1D9E75]" />
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-2">
+              <ListChecks className="h-5 w-5 text-[var(--primary)]" />
             </div>
             <div>
-              <span className="font-semibold text-[#e0e0e0]">Warehouse time motion</span>
-              <p className="text-sm text-[#888888]">Set picking and loading capacity, timing, and rates</p>
+              <span className="font-semibold text-[var(--text)]">Warehouse time motion</span>
+              <p className="text-sm text-[var(--muted-foreground)]">Set picking and loading capacity, timing, and rates</p>
             </div>
           </div>
-          <ChevronRight className="h-5 w-5 shrink-0 text-[#888888]" />
+          <ChevronRight className="h-5 w-5 shrink-0 text-[var(--muted-foreground)]" />
         </Link>
       </li>
     </ul>
@@ -395,8 +395,8 @@ export function MasterSettingsClient({
           role="status"
           className={`rounded-lg border px-4 py-3 text-sm font-semibold ${
             message.type === "success"
-              ? "border-[#1D9E75]/35 bg-[rgba(29,158,117,0.08)] text-[#1D9E75]"
-              : "border-[#ff4d4d]/35 bg-[#2a1212] text-[#ffb4b4]"
+              ? "border-[color-mix(in_oklch,var(--success)_35%,var(--border))] bg-[color-mix(in_oklch,var(--success)_12%,var(--card))] text-[var(--success)]"
+              : "border-[color-mix(in_oklch,var(--destructive)_35%,var(--border))] bg-[var(--om-status-red-bg)] text-[var(--destructive)]"
           }`}
         >
           {message.text}
@@ -411,12 +411,12 @@ export function MasterSettingsClient({
             <button
               type="button"
               onClick={() => setCategory("list")}
-              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
+              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[var(--muted-foreground)] transition-colors duration-150 hover:text-[var(--primary)]"
             >
               <ArrowLeft className="h-4 w-4" /> Back to configure
             </button>
           )}
-          <div className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-4">
+          <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-4">
             <PlannerResultsColumnsConfig />
           </div>
         </div>
@@ -428,7 +428,7 @@ export function MasterSettingsClient({
             <button
               type="button"
               onClick={() => setCategory("list")}
-              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
+              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[var(--muted-foreground)] transition-colors duration-150 hover:text-[var(--primary)]"
             >
               <ArrowLeft className="h-4 w-4" /> Back to configure
             </button>
@@ -441,7 +441,7 @@ export function MasterSettingsClient({
                 setRowsPerPage(Number(e.target.value));
                 setCurrentPage(1);
               }}
-              className="h-9 rounded-lg border border-[#2a2a2a] bg-[#141414] px-2 text-sm text-[#e0e0e0]"
+              className="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-2 text-sm text-[var(--text)]"
             >
               <option value={10}>10 / page</option>
               <option value={25}>25 / page</option>
@@ -528,7 +528,7 @@ export function MasterSettingsClient({
 
           {showItemAddForm && (
             <form
-              className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-4"
+              className="rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-4"
               onSubmit={async (e) => {
                 e.preventDefault();
                 await fetch("/api/masters/item", {
@@ -548,7 +548,7 @@ export function MasterSettingsClient({
             >
               <div className="grid grid-cols-1 items-end gap-3 md:grid-cols-4">
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-[#888888]">Item *</label>
+                  <label className="mb-1 block text-xs font-semibold text-[var(--muted-foreground)]">Item *</label>
                   <Input
                     aria-label="New item code"
                     placeholder="ITEM"
@@ -559,7 +559,7 @@ export function MasterSettingsClient({
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-[#888888]">CBM *</label>
+                  <label className="mb-1 block text-xs font-semibold text-[var(--muted-foreground)]">CBM *</label>
                   <Input
                     aria-label="New item CBM"
                     placeholder="CBM"
@@ -570,7 +570,7 @@ export function MasterSettingsClient({
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-[#888888]">Weight (KG) *</label>
+                  <label className="mb-1 block text-xs font-semibold text-[var(--muted-foreground)]">Weight (KG) *</label>
                   <Input
                     aria-label="New item weight in kilograms"
                     placeholder="Weight (KG)"
@@ -593,11 +593,11 @@ export function MasterSettingsClient({
             </form>
           )}
 
-          <div className="overflow-hidden rounded-lg border border-[#2a2a2a] bg-[#141414]">
+          <div className="overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)]">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[640px] md:min-w-[760px] text-sm">
                 <thead>
-                  <tr className="border-b border-[#2a2a2a] bg-[#1a1a1a]">
+                  <tr className="border-b border-[var(--border)] bg-[var(--card)]">
                     <th className="w-10 px-3 py-3 text-center">
                       <input
                         aria-label="Select all visible item rows"
@@ -625,7 +625,7 @@ export function MasterSettingsClient({
                     <th className={masterThClass}>Weight (KG)</th>
                     <th className={`${masterThClass} w-28 text-right`}>Actions</th>
                   </tr>
-                  <tr className="border-b border-[#2a2a2a] bg-[#141414]">
+                  <tr className="border-b border-[var(--border)] bg-[var(--surface-elevated)]">
                     <th className="px-3 py-2" />
                     <th className="px-4 py-2">
                       <Input
@@ -666,7 +666,7 @@ export function MasterSettingsClient({
                 <tbody>
                   {itemPage.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-[#888888]">
+                      <td colSpan={5} className="px-4 py-8 text-center text-[var(--muted-foreground)]">
                         {itemFilters.item || itemFilters.cbm || itemFilters.weightKg
                           ? "No items match the applied filters."
                           : "No items in item master."}
@@ -678,8 +678,10 @@ export function MasterSettingsClient({
                       return (
                         <tr
                           key={row.id}
-                          className={`group border-b border-[#2a2a2a] transition-colors ${
-                            isEditing ? "bg-[rgba(29,158,117,0.06)]" : "hover:bg-[#1a1a1a]"
+                          className={`group border-b border-[var(--border)] transition-colors ${
+                            isEditing
+                              ? "bg-[color-mix(in_oklch,var(--primary)_10%,var(--card))]"
+                              : "hover:bg-[var(--surface-elevated)]"
                           }`}
                         >
                           {isEditing && itemEditForm ? (
@@ -752,7 +754,7 @@ export function MasterSettingsClient({
                                       setItemEditForm(null);
                                       setMessage({ type: "success", text: "Item saved." });
                                     }}
-                                    className="rounded-md p-2.5 text-[#1D9E75] transition-colors hover:bg-[rgba(29,158,117,0.1)]"
+                                    className="rounded-md p-2.5 text-[var(--primary)] transition-colors hover:bg-[color-mix(in_oklch,var(--primary)_14%,var(--card))]"
                                     title="Save"
                                     aria-label={`Save item row ${row.item || row.id}`}
                                   >
@@ -764,7 +766,7 @@ export function MasterSettingsClient({
                                       setEditingItemId(null);
                                       setItemEditForm(null);
                                     }}
-                                    className="rounded-md p-2.5 text-[#888888] transition-colors hover:bg-[#1a1a1a] hover:text-[#e0e0e0]"
+                                    className="rounded-md p-2.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--surface-elevated)] hover:text-[var(--text)]"
                                     title="Cancel"
                                     aria-label={`Cancel editing item row ${row.item || row.id}`}
                                   >
@@ -794,9 +796,9 @@ export function MasterSettingsClient({
                                   className={masterTableCheckboxClass}
                                 />
                               </td>
-                              <td className="px-4 py-3 text-[#e0e0e0]">{row.item}</td>
-                              <td className="px-4 py-3 text-center text-[#888888]">{row.cbm}</td>
-                              <td className="px-4 py-3 text-center text-[#888888]">{row.weightKg}</td>
+                              <td className="px-4 py-3 text-[var(--text)]">{row.item}</td>
+                              <td className="px-4 py-3 text-center text-[var(--muted-foreground)]">{row.cbm}</td>
+                              <td className="px-4 py-3 text-center text-[var(--muted-foreground)]">{row.weightKg}</td>
                               <td className="px-4 py-3 text-right">
                                 <div className="flex items-center justify-end gap-1 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:hover:opacity-100 [tr:hover_&]:opacity-100">
                                   <button
@@ -806,7 +808,7 @@ export function MasterSettingsClient({
                                       setItemEditForm({ ...row });
                                       setShowItemAddForm(false);
                                     }}
-                                    className="rounded-md p-2.5 text-[#888888] transition-colors hover:bg-[rgba(29,158,117,0.08)] hover:text-[#1D9E75]"
+                                    className="rounded-md p-2.5 text-[var(--muted-foreground)] transition-colors hover:bg-[color-mix(in_oklch,var(--primary)_12%,var(--card))] hover:text-[var(--primary)]"
                                     title="Edit"
                                     aria-label={`Edit item row ${row.item || row.id}`}
                                   >
@@ -825,7 +827,7 @@ export function MasterSettingsClient({
             </div>
           </div>
 
-          <p className="text-center text-xs text-[#888888]">
+          <p className="text-center text-xs text-[var(--muted-foreground)]">
             {itemPage.length} of {itemFiltered.length} filtered rows shown ({items.length} total)
           </p>
           <div className="flex items-center justify-center gap-2">
@@ -838,7 +840,7 @@ export function MasterSettingsClient({
             >
               Prev
             </Button>
-            <span className="text-xs text-[#888888]">
+            <span className="text-xs text-[var(--muted-foreground)]">
               Page {safePage} / {totalPages}
             </span>
             <Button
@@ -860,14 +862,14 @@ export function MasterSettingsClient({
             <button
               type="button"
               onClick={() => setCategory("list")}
-              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
+              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[var(--muted-foreground)] transition-colors duration-150 hover:text-[var(--primary)]"
             >
               <ArrowLeft className="h-4 w-4" /> Back to configure
             </button>
           )}
-          <p className="text-sm text-[#888888]">
+          <p className="text-sm text-[var(--muted-foreground)]">
             Manage DC coordinates, channels, transport modes, and receiving windows. Export street addresses still come from the{" "}
-            <span className="font-semibold text-[#e0e0e0]">Address</span> column on each orders CSV row.
+            <span className="font-semibold text-[var(--text)]">Address</span> column on each orders CSV row.
           </p>
 
           <div className="flex flex-wrap items-center justify-end gap-2">
@@ -877,7 +879,7 @@ export function MasterSettingsClient({
                 setRowsPerPage(Number(e.target.value));
                 setCurrentPage(1);
               }}
-              className="h-9 rounded-lg border border-[#2a2a2a] bg-[#141414] px-2 text-sm text-[#e0e0e0]"
+              className="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-2 text-sm text-[var(--text)]"
             >
               <option value={10}>10 / page</option>
               <option value={25}>25 / page</option>
@@ -1038,21 +1040,21 @@ export function MasterSettingsClient({
           </div>
 
           {showAddressForm && (
-            <div className="grid gap-2 rounded-lg border border-[#2a2a2a] bg-[#141414] p-4 md:grid-cols-4">
-              <Input placeholder="Origin" value={newAddress.origin} onChange={(e) => setNewAddress((p) => ({ ...p, origin: e.target.value }))} className="border-[#2a2a2a] bg-[#141414] text-[#e0e0e0] placeholder:text-[#5c5c5c]" />
-              <Input placeholder="DC" value={newAddress.dcName} onChange={(e) => setNewAddress((p) => ({ ...p, dcName: e.target.value }))} className="border-[#2a2a2a] bg-[#141414] text-[#e0e0e0] placeholder:text-[#5c5c5c]" />
-              <Input placeholder="Channel Type" value={newAddress.channelType} onChange={(e) => setNewAddress((p) => ({ ...p, channelType: e.target.value }))} className="border-[#2a2a2a] bg-[#141414] text-[#e0e0e0] placeholder:text-[#5c5c5c]" />
-              <Input placeholder="Transport Mode" value={newAddress.transportMode} onChange={(e) => setNewAddress((p) => ({ ...p, transportMode: e.target.value }))} className="border-[#2a2a2a] bg-[#141414] text-[#e0e0e0] placeholder:text-[#5c5c5c]" />
-              <Input placeholder="Max KG LTL/LCL" value={newAddress.maxKgLtlLcl} onChange={(e) => setNewAddress((p) => ({ ...p, maxKgLtlLcl: e.target.value }))} className="border-[#2a2a2a] bg-[#141414] text-[#e0e0e0] placeholder:text-[#5c5c5c]" />
-              <Input placeholder="Lead Time FTL/FCL (days)" value={newAddress.leadTimeFtlFcl} onChange={(e) => setNewAddress((p) => ({ ...p, leadTimeFtlFcl: e.target.value }))} className="border-[#2a2a2a] bg-[#141414] text-[#e0e0e0] placeholder:text-[#5c5c5c]" />
-              <Input placeholder="Lead Time LTL/LCL (days)" value={newAddress.leadTimeLtlLcl} onChange={(e) => setNewAddress((p) => ({ ...p, leadTimeLtlLcl: e.target.value }))} className="border-[#2a2a2a] bg-[#141414] text-[#e0e0e0] placeholder:text-[#5c5c5c]" />
-              <Input placeholder="Latitude" value={newAddress.latitude} onChange={(e) => setNewAddress((p) => ({ ...p, latitude: e.target.value }))} className="border-[#2a2a2a] bg-[#141414] text-[#e0e0e0] placeholder:text-[#5c5c5c]" />
-              <Input placeholder="Longitude" value={newAddress.longitude} onChange={(e) => setNewAddress((p) => ({ ...p, longitude: e.target.value }))} className="border-[#2a2a2a] bg-[#141414] text-[#e0e0e0] placeholder:text-[#5c5c5c]" />
-              <Input placeholder="Province" value={newAddress.province} onChange={(e) => setNewAddress((p) => ({ ...p, province: e.target.value }))} className="border-[#2a2a2a] bg-[#141414] text-[#e0e0e0] placeholder:text-[#5c5c5c]" />
-              <Input placeholder="City" value={newAddress.city} onChange={(e) => setNewAddress((p) => ({ ...p, city: e.target.value }))} className="border-[#2a2a2a] bg-[#141414] text-[#e0e0e0] placeholder:text-[#5c5c5c]" />
-              <Input placeholder="Register Open (HH:mm)" value={newAddress.registerOpen} onChange={(e) => setNewAddress((p) => ({ ...p, registerOpen: e.target.value }))} className="border-[#2a2a2a] bg-[#141414] text-[#e0e0e0] placeholder:text-[#5c5c5c]" />
-              <Input placeholder="Register Closed (HH:mm)" value={newAddress.registerClosed} onChange={(e) => setNewAddress((p) => ({ ...p, registerClosed: e.target.value }))} className="border-[#2a2a2a] bg-[#141414] text-[#e0e0e0] placeholder:text-[#5c5c5c]" />
-              <Input placeholder="Unload Duration (min)" value={newAddress.unloadDurationMin} onChange={(e) => setNewAddress((p) => ({ ...p, unloadDurationMin: e.target.value }))} className="border-[#2a2a2a] bg-[#141414] text-[#e0e0e0] placeholder:text-[#5c5c5c]" />
+            <div className="grid gap-2 rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-4 md:grid-cols-4">
+              <Input placeholder="Origin" value={newAddress.origin} onChange={(e) => setNewAddress((p) => ({ ...p, origin: e.target.value }))} className="border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] placeholder:text-[var(--om-text-muted)]" />
+              <Input placeholder="DC" value={newAddress.dcName} onChange={(e) => setNewAddress((p) => ({ ...p, dcName: e.target.value }))} className="border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] placeholder:text-[var(--om-text-muted)]" />
+              <Input placeholder="Channel Type" value={newAddress.channelType} onChange={(e) => setNewAddress((p) => ({ ...p, channelType: e.target.value }))} className="border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] placeholder:text-[var(--om-text-muted)]" />
+              <Input placeholder="Transport Mode" value={newAddress.transportMode} onChange={(e) => setNewAddress((p) => ({ ...p, transportMode: e.target.value }))} className="border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] placeholder:text-[var(--om-text-muted)]" />
+              <Input placeholder="Max KG LTL/LCL" value={newAddress.maxKgLtlLcl} onChange={(e) => setNewAddress((p) => ({ ...p, maxKgLtlLcl: e.target.value }))} className="border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] placeholder:text-[var(--om-text-muted)]" />
+              <Input placeholder="Lead Time FTL/FCL (days)" value={newAddress.leadTimeFtlFcl} onChange={(e) => setNewAddress((p) => ({ ...p, leadTimeFtlFcl: e.target.value }))} className="border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] placeholder:text-[var(--om-text-muted)]" />
+              <Input placeholder="Lead Time LTL/LCL (days)" value={newAddress.leadTimeLtlLcl} onChange={(e) => setNewAddress((p) => ({ ...p, leadTimeLtlLcl: e.target.value }))} className="border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] placeholder:text-[var(--om-text-muted)]" />
+              <Input placeholder="Latitude" value={newAddress.latitude} onChange={(e) => setNewAddress((p) => ({ ...p, latitude: e.target.value }))} className="border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] placeholder:text-[var(--om-text-muted)]" />
+              <Input placeholder="Longitude" value={newAddress.longitude} onChange={(e) => setNewAddress((p) => ({ ...p, longitude: e.target.value }))} className="border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] placeholder:text-[var(--om-text-muted)]" />
+              <Input placeholder="Province" value={newAddress.province} onChange={(e) => setNewAddress((p) => ({ ...p, province: e.target.value }))} className="border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] placeholder:text-[var(--om-text-muted)]" />
+              <Input placeholder="City" value={newAddress.city} onChange={(e) => setNewAddress((p) => ({ ...p, city: e.target.value }))} className="border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] placeholder:text-[var(--om-text-muted)]" />
+              <Input placeholder="Register Open (HH:mm)" value={newAddress.registerOpen} onChange={(e) => setNewAddress((p) => ({ ...p, registerOpen: e.target.value }))} className="border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] placeholder:text-[var(--om-text-muted)]" />
+              <Input placeholder="Register Closed (HH:mm)" value={newAddress.registerClosed} onChange={(e) => setNewAddress((p) => ({ ...p, registerClosed: e.target.value }))} className="border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] placeholder:text-[var(--om-text-muted)]" />
+              <Input placeholder="Unload Duration (min)" value={newAddress.unloadDurationMin} onChange={(e) => setNewAddress((p) => ({ ...p, unloadDurationMin: e.target.value }))} className="border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text)] placeholder:text-[var(--om-text-muted)]" />
               <Button
                 type="button"
                 size="sm"
@@ -1108,11 +1110,11 @@ export function MasterSettingsClient({
             </div>
           )}
 
-          <div className="overflow-hidden rounded-lg border border-[#2a2a2a] bg-[#141414]">
+          <div className="overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)]">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1200px] whitespace-nowrap md:min-w-[2200px] text-sm">
                 <thead>
-                  <tr className="border-b border-[#2a2a2a] bg-[#1a1a1a]">
+                  <tr className="border-b border-[var(--border)] bg-[var(--card)]">
                     <th className="w-10 px-3 py-3 text-center">
                       <input
                         aria-label="Select all visible address rows"
@@ -1151,7 +1153,7 @@ export function MasterSettingsClient({
                     <th className={masterThClass}>Unload (min)</th>
                     <th className={`${masterThClass} text-right`}>Actions</th>
                   </tr>
-                  <tr className="border-b border-[#2a2a2a] bg-[#141414]">
+                  <tr className="border-b border-[var(--border)] bg-[var(--surface-elevated)]">
                     <th className="px-3 py-2" />
                     <th className="px-4 py-2">
                       <Input
@@ -1313,7 +1315,7 @@ export function MasterSettingsClient({
                 <tbody>
                 {addressPage.length === 0 ? (
                   <tr>
-                    <td colSpan={16} className="px-4 py-8 text-center text-[#888888]">
+                    <td colSpan={16} className="px-4 py-8 text-center text-[var(--muted-foreground)]">
                       {Object.values(addressFilters).some((v) => String(v).trim())
                         ? "No addresses match the applied filters."
                         : "No addresses in address master."}
@@ -1323,7 +1325,7 @@ export function MasterSettingsClient({
                 addressPage.map((row) => (
                   <tr
                     key={row.id}
-                    className="group border-b border-[#2a2a2a] transition-colors hover:bg-[#1a1a1a]"
+                    className="group border-b border-[var(--border)] transition-colors hover:bg-[var(--surface-elevated)]"
                   >
                     {editingAddressId === row.id && addressEditForm ? (
                       <>
@@ -1376,7 +1378,7 @@ export function MasterSettingsClient({
                                 setAddressEditForm(null);
                                 setMessage({ type: "success", text: "Address saved." });
                               }}
-                              className="rounded-md p-2.5 text-[#1D9E75] transition-colors hover:bg-[rgba(29,158,117,0.1)]"
+                              className="rounded-md p-2.5 text-[var(--primary)] transition-colors hover:bg-[color-mix(in_oklch,var(--primary)_14%,var(--card))]"
                               title="Save"
                               aria-label={`Save address row ${row.dcName || row.id}`}
                             >
@@ -1388,7 +1390,7 @@ export function MasterSettingsClient({
                                 setEditingAddressId(null);
                                 setAddressEditForm(null);
                               }}
-                              className="rounded-md p-2.5 text-[#888888] transition-colors hover:bg-[#1a1a1a]"
+                              className="rounded-md p-2.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--surface-elevated)]"
                               title="Cancel"
                               aria-label={`Cancel editing address row ${row.dcName || row.id}`}
                             >
@@ -1418,20 +1420,20 @@ export function MasterSettingsClient({
                         className={masterTableCheckboxClass}
                       />
                     </td>
-                    <td className="px-4 py-3 text-[#e0e0e0]">{row.origin || "-"}</td>
-                    <td className="px-4 py-3 text-[#e0e0e0]">{row.dcName || "-"}</td>
-                    <td className="px-4 py-3 text-[#e0e0e0]">{row.channelType || "-"}</td>
-                    <td className="px-4 py-3 text-[#e0e0e0]">{row.transportMode || "-"}</td>
-                    <td className="px-4 py-3 text-[#e0e0e0]">{row.maxKgLtlLcl ?? "-"}</td>
-                    <td className="px-4 py-3 text-[#e0e0e0]">{row.leadTimeFtlFcl ?? "-"}</td>
-                    <td className="px-4 py-3 text-[#e0e0e0]">{row.leadTimeLtlLcl ?? "-"}</td>
-                    <td className="px-4 py-3 text-[#e0e0e0]">{row.latitude}</td>
-                    <td className="px-4 py-3 text-[#e0e0e0]">{row.longitude}</td>
-                    <td className="px-4 py-3 text-[#e0e0e0]">{row.province || "-"}</td>
-                    <td className="px-4 py-3 text-[#e0e0e0]">{row.city || "-"}</td>
-                    <td className="px-4 py-3 text-[#e0e0e0]">{row.registerOpen || "-"}</td>
-                    <td className="px-4 py-3 text-[#e0e0e0]">{row.registerClosed || "-"}</td>
-                    <td className="px-4 py-3 text-[#e0e0e0]">{row.unloadDurationMin ?? "-"}</td>
+                    <td className="px-4 py-3 text-[var(--text)]">{row.origin || "-"}</td>
+                    <td className="px-4 py-3 text-[var(--text)]">{row.dcName || "-"}</td>
+                    <td className="px-4 py-3 text-[var(--text)]">{row.channelType || "-"}</td>
+                    <td className="px-4 py-3 text-[var(--text)]">{row.transportMode || "-"}</td>
+                    <td className="px-4 py-3 text-[var(--text)]">{row.maxKgLtlLcl ?? "-"}</td>
+                    <td className="px-4 py-3 text-[var(--text)]">{row.leadTimeFtlFcl ?? "-"}</td>
+                    <td className="px-4 py-3 text-[var(--text)]">{row.leadTimeLtlLcl ?? "-"}</td>
+                    <td className="px-4 py-3 text-[var(--text)]">{row.latitude}</td>
+                    <td className="px-4 py-3 text-[var(--text)]">{row.longitude}</td>
+                    <td className="px-4 py-3 text-[var(--text)]">{row.province || "-"}</td>
+                    <td className="px-4 py-3 text-[var(--text)]">{row.city || "-"}</td>
+                    <td className="px-4 py-3 text-[var(--text)]">{row.registerOpen || "-"}</td>
+                    <td className="px-4 py-3 text-[var(--text)]">{row.registerClosed || "-"}</td>
+                    <td className="px-4 py-3 text-[var(--text)]">{row.unloadDurationMin ?? "-"}</td>
                     <td className="px-4 py-2 text-right">
                       <div className="flex items-center justify-end gap-1 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:hover:opacity-100 [tr:hover_&]:opacity-100">
                         <button
@@ -1440,7 +1442,7 @@ export function MasterSettingsClient({
                             setEditingAddressId(row.id);
                             setAddressEditForm({ ...row });
                           }}
-                          className="rounded-md p-2.5 text-[#888888] transition-colors hover:bg-[rgba(29,158,117,0.08)] hover:text-[#1D9E75]"
+                          className="rounded-md p-2.5 text-[var(--muted-foreground)] transition-colors hover:bg-[color-mix(in_oklch,var(--primary)_12%,var(--card))] hover:text-[var(--primary)]"
                           title="Edit"
                           aria-label={`Edit address row ${row.dcName || row.id}`}
                         >
@@ -1458,7 +1460,7 @@ export function MasterSettingsClient({
             </div>
           </div>
 
-          <p className="text-center text-xs text-[#888888]">
+          <p className="text-center text-xs text-[var(--muted-foreground)]">
             {addressPage.length} of {addressFiltered.length} filtered rows shown ({addresses.length} total)
           </p>
           <div className="flex items-center justify-center gap-2">
@@ -1471,7 +1473,7 @@ export function MasterSettingsClient({
             >
               Prev
             </Button>
-            <span className="text-xs text-[#888888]">
+            <span className="text-xs text-[var(--muted-foreground)]">
               Page {safePage} / {totalPages}
             </span>
             <Button
@@ -1493,7 +1495,7 @@ export function MasterSettingsClient({
             <button
               type="button"
               onClick={() => setCategory("list")}
-              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
+              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[var(--muted-foreground)] transition-colors duration-150 hover:text-[var(--primary)]"
             >
               <ArrowLeft className="h-4 w-4" /> Back to configure
             </button>
@@ -1506,7 +1508,7 @@ export function MasterSettingsClient({
                 setRowsPerPage(Number(e.target.value));
                 setCurrentPage(1);
               }}
-              className="h-9 rounded-lg border border-[#2a2a2a] bg-[#141414] px-2 text-sm text-[#e0e0e0]"
+              className="h-9 rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] px-2 text-sm text-[var(--text)]"
             >
               <option value={10}>10 / page</option>
               <option value={25}>25 / page</option>
@@ -1593,7 +1595,7 @@ export function MasterSettingsClient({
 
           {showTruckAddForm && (
             <form
-              className="rounded-lg border border-[#2a2a2a] bg-[#141414] p-4"
+              className="rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-4"
               onSubmit={async (e) => {
                 e.preventDefault();
                 await fetch("/api/masters/truck", {
@@ -1613,7 +1615,7 @@ export function MasterSettingsClient({
             >
               <div className="grid grid-cols-1 items-end gap-3 md:grid-cols-4">
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-[#888888]">Truck type *</label>
+                  <label className="mb-1 block text-xs font-semibold text-[var(--muted-foreground)]">Truck type *</label>
                   <Input
                     aria-label="New truck type"
                     placeholder="Truck Type"
@@ -1624,7 +1626,7 @@ export function MasterSettingsClient({
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-[#888888]">Max kg *</label>
+                  <label className="mb-1 block text-xs font-semibold text-[var(--muted-foreground)]">Max kg *</label>
                   <Input
                     aria-label="New truck maximum weight in kilograms"
                     placeholder="Max Kg"
@@ -1635,7 +1637,7 @@ export function MasterSettingsClient({
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-xs font-semibold text-[#888888]">Max CBM *</label>
+                  <label className="mb-1 block text-xs font-semibold text-[var(--muted-foreground)]">Max CBM *</label>
                   <Input
                     aria-label="New truck maximum CBM"
                     placeholder="Max CBM"
@@ -1658,11 +1660,11 @@ export function MasterSettingsClient({
             </form>
           )}
 
-          <div className="overflow-hidden rounded-lg border border-[#2a2a2a] bg-[#141414]">
+          <div className="overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)]">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[640px] md:min-w-[760px] text-sm">
                 <thead>
-                  <tr className="border-b border-[#2a2a2a] bg-[#1a1a1a]">
+                  <tr className="border-b border-[var(--border)] bg-[var(--card)]">
                     <th className="w-10 px-3 py-3 text-center">
                       <input
                         aria-label="Select all visible truck rows"
@@ -1690,7 +1692,7 @@ export function MasterSettingsClient({
                     <th className={masterThClass}>Max CBM</th>
                     <th className={`${masterThClass} w-28 text-right`}>Actions</th>
                   </tr>
-                  <tr className="border-b border-[#2a2a2a] bg-[#141414]">
+                  <tr className="border-b border-[var(--border)] bg-[var(--surface-elevated)]">
                     <th className="px-3 py-2" />
                     <th className="px-4 py-2">
                       <Input
@@ -1731,7 +1733,7 @@ export function MasterSettingsClient({
                 <tbody>
                   {truckPage.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-[#888888]">
+                      <td colSpan={5} className="px-4 py-8 text-center text-[var(--muted-foreground)]">
                         {truckFilters.truckType || truckFilters.maxKg || truckFilters.maxCbm
                           ? "No trucks match the applied filters."
                           : "No trucks in truck master."}
@@ -1743,8 +1745,10 @@ export function MasterSettingsClient({
                       return (
                         <tr
                           key={row.id}
-                          className={`group border-b border-[#2a2a2a] transition-colors ${
-                            isEditing ? "bg-[rgba(29,158,117,0.06)]" : "hover:bg-[#1a1a1a]"
+                          className={`group border-b border-[var(--border)] transition-colors ${
+                            isEditing
+                              ? "bg-[color-mix(in_oklch,var(--primary)_10%,var(--card))]"
+                              : "hover:bg-[var(--surface-elevated)]"
                           }`}
                         >
                           {isEditing && truckEditForm ? (
@@ -1819,7 +1823,7 @@ export function MasterSettingsClient({
                                       setTruckEditForm(null);
                                       setMessage({ type: "success", text: "Truck saved." });
                                     }}
-                                    className="rounded-md p-2.5 text-[#1D9E75] transition-colors hover:bg-[rgba(29,158,117,0.1)]"
+                                    className="rounded-md p-2.5 text-[var(--primary)] transition-colors hover:bg-[color-mix(in_oklch,var(--primary)_14%,var(--card))]"
                                     title="Save"
                                     aria-label={`Save truck row ${row.truckType || row.id}`}
                                   >
@@ -1831,7 +1835,7 @@ export function MasterSettingsClient({
                                       setEditingTruckId(null);
                                       setTruckEditForm(null);
                                     }}
-                                    className="rounded-md p-2.5 text-[#888888] transition-colors hover:bg-[#1a1a1a] hover:text-[#e0e0e0]"
+                                    className="rounded-md p-2.5 text-[var(--muted-foreground)] transition-colors hover:bg-[var(--surface-elevated)] hover:text-[var(--text)]"
                                     title="Cancel"
                                     aria-label={`Cancel editing truck row ${row.truckType || row.id}`}
                                   >
@@ -1861,9 +1865,9 @@ export function MasterSettingsClient({
                                   className={masterTableCheckboxClass}
                                 />
                               </td>
-                              <td className="px-4 py-3 text-[#e0e0e0]">{row.truckType}</td>
-                              <td className="px-4 py-3 text-center text-[#888888]">{row.maxKg}</td>
-                              <td className="px-4 py-3 text-center text-[#888888]">{row.maxCbm}</td>
+                              <td className="px-4 py-3 text-[var(--text)]">{row.truckType}</td>
+                              <td className="px-4 py-3 text-center text-[var(--muted-foreground)]">{row.maxKg}</td>
+                              <td className="px-4 py-3 text-center text-[var(--muted-foreground)]">{row.maxCbm}</td>
                               <td className="px-4 py-3 text-right">
                                 <div className="flex items-center justify-end gap-1 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:hover:opacity-100 [tr:hover_&]:opacity-100">
                                   <button
@@ -1873,7 +1877,7 @@ export function MasterSettingsClient({
                                       setTruckEditForm({ ...row });
                                       setShowTruckAddForm(false);
                                     }}
-                                    className="rounded-md p-2.5 text-[#888888] transition-colors hover:bg-[rgba(29,158,117,0.08)] hover:text-[#1D9E75]"
+                                    className="rounded-md p-2.5 text-[var(--muted-foreground)] transition-colors hover:bg-[color-mix(in_oklch,var(--primary)_12%,var(--card))] hover:text-[var(--primary)]"
                                     title="Edit"
                                     aria-label={`Edit truck row ${row.truckType || row.id}`}
                                   >
@@ -1892,7 +1896,7 @@ export function MasterSettingsClient({
             </div>
           </div>
 
-          <p className="text-center text-xs text-[#888888]">
+          <p className="text-center text-xs text-[var(--muted-foreground)]">
             {truckPage.length} of {truckFiltered.length} filtered rows shown ({trucks.length} total)
           </p>
           <div className="flex items-center justify-center gap-2">
@@ -1905,7 +1909,7 @@ export function MasterSettingsClient({
             >
               Prev
             </Button>
-            <span className="text-xs text-[#888888]">
+            <span className="text-xs text-[var(--muted-foreground)]">
               Page {safePage} / {totalPages}
             </span>
             <Button
@@ -1929,12 +1933,12 @@ export function MasterSettingsClient({
 
   return (
     <div className="pb-12">
-      <header className="sticky top-0 z-20 border-b border-[#2a2a2a] bg-[#0d0d0d]">
+      <header className="sticky top-0 z-20 border-b border-[var(--border)] bg-[var(--card)]">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between gap-4 mb-4">
             <Link
               href="/configure"
-              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
+              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[var(--muted-foreground)] transition-colors duration-150 hover:text-[var(--primary)]"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to configure
@@ -1942,9 +1946,9 @@ export function MasterSettingsClient({
           </div>
           <div className="flex items-center gap-3 mb-2">
             <BrandMark size="sm" />
-            <h1 className="font-display text-xl font-black tracking-tight text-[#e0e0e0]">Planner masters</h1>
+            <h1 className="font-display text-xl font-black tracking-tight text-[var(--text)]">Planner masters</h1>
           </div>
-          <p className="mt-1 text-sm text-[#888888]">
+          <p className="mt-1 text-sm text-[var(--muted-foreground)]">
             Manage the item, address, and truck data used by route planning.
           </p>
         </div>

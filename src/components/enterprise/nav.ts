@@ -1,8 +1,11 @@
 export type EnterpriseNavItem = {
   href: string;
   label: string;
-  section: "Workspace" | "Operations" | "Planning" | "Admin";
+  section: "Dashboard" | "PO Collection" | "Planning" | "Admin";
 };
+
+/** Sidebar column order (Admin is pinned separately in the shell). */
+export const ENTERPRISE_SIDEBAR_SECTIONS = ["Dashboard", "PO Collection", "Planning"] as const;
 
 /**
  * Longest-prefix match so e.g. `/shipments/map` resolves to Shipments Map, not Shipments.
@@ -14,8 +17,8 @@ export function matchEnterpriseNavItem(pathname: string): EnterpriseNavItem | nu
 }
 
 export const enterpriseNav: EnterpriseNavItem[] = [
-  { href: "/", label: "Overview", section: "Workspace" },
-  { href: "/extract", label: "Extract POs", section: "Operations" },
+  { href: "/", label: "Overview", section: "Dashboard" },
+  { href: "/extract", label: "PO Extract", section: "PO Collection" },
   { href: "/planner", label: "Planner", section: "Planning" },
   { href: "/shipments", label: "Shipments", section: "Planning" },
   { href: "/shipments/map", label: "Map", section: "Planning" },

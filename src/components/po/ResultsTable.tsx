@@ -95,16 +95,16 @@ export function ResultsTable({
     >
       {showToolbar ? (
         <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2 text-sm text-[#888888]">
+          <div className="flex items-center gap-2 text-sm text-[var(--om-text-muted)]">
             <span>{new Set(data.map((r) => r.po_number || "")).size || 0} POs</span>
-            <span className="text-[#5c5c5c]">·</span>
+            <span className="text-[var(--om-text-faint)]">·</span>
             <span>{data.length} SKUs</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {retailers.map((r) => (
               <span
                 key={r}
-                className="rounded-md border border-[#2a2a2a] bg-[#141414] px-2 py-0.5 text-xs font-semibold text-[#888888]"
+                className="rounded-md border border-[var(--border)] bg-[var(--surface-elevated)] px-2 py-0.5 text-xs font-semibold text-[var(--muted-foreground)]"
               >
                 {r}
               </span>
@@ -123,19 +123,19 @@ export function ResultsTable({
       <div
         className={cn(
           fill
-            ? "min-h-0 flex-1 overflow-auto rounded-lg border border-[#2a2a2a]"
-            : "max-h-[50vh] overflow-auto rounded-lg border border-[#2a2a2a]",
+            ? "min-h-0 flex-1 overflow-auto rounded-lg border border-[var(--border)]"
+            : "max-h-[50vh] overflow-auto rounded-lg border border-[var(--border)]",
           tableContainerClassName,
         )}
       >
-        <table className="w-full text-sm text-[#e0e0e0]">
+        <table className="w-full font-sans text-sm text-[var(--text)]">
           <caption className="sr-only">Extracted records results table</caption>
           <thead className="sticky top-0 z-10">
-            <tr className="border-b border-[#2a2a2a] bg-[#1a1a1a]">
+            <tr className="border-b border-[var(--border)] bg-[var(--surface-elevated)]">
               {activeHeaders.map((h) => (
                 <th
                   key={h.key}
-                  className="whitespace-nowrap px-3 py-2.5 text-left text-xs font-bold uppercase tracking-wider text-[#888888]"
+                  className="whitespace-nowrap px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)]"
                 >
                   <TableColumnHeaderControlButtons
                     label={h.label}
@@ -159,13 +159,14 @@ export function ResultsTable({
                 <tr
                   key={`${row.retailer ?? ""}-${row.po_number ?? ""}-${row.product_code ?? ""}-${rowIndex}`}
                   className={cn(
-                    "border-t border-[#2a2a2a] transition-colors duration-150 hover:bg-[#141414] [content-visibility:auto] [contain-intrinsic-size:0_34px]",
+                    "border-t border-[var(--border)] transition-colors duration-150 hover:bg-[var(--surface-elevated)] [content-visibility:auto] [contain-intrinsic-size:0_34px]",
                     lowConfidence && "bg-amber-500/10",
                   )}
                 >
                   {activeHeaders.map((h) => {
                     const isDateCol = h.key === "po_date" || h.key === "delivery_date";
                     const isCustName = h.key === "delivery_location";
+                    const isMonoCol = h.key === "po_number" || h.key === "product_code";
                     let displayVal = isDateCol
                       ? formatDateDdMmmYy(row[h.key] as string | null)
                       : String(row[h.key] ?? "");
@@ -176,8 +177,9 @@ export function ResultsTable({
                       <td
                         key={h.key}
                         className={cn(
-                          "whitespace-nowrap px-3 py-2 text-[#e0e0e0]",
+                          "whitespace-nowrap px-3 py-2 text-[var(--text)]",
                           isCustName ? "min-w-[140px] text-sm" : "text-sm",
+                          isMonoCol && "font-mono text-[13px]",
                         )}
                       >
                         {displayVal}

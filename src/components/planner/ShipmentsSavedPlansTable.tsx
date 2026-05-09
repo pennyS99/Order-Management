@@ -151,7 +151,7 @@ function SortHeaderCell({
       onFilterClick={toggleFilterColumn}
       onSortClick={toggleSort}
       variant="po"
-      labelClassName="text-inherit text-xs font-medium uppercase tracking-wider"
+      labelClassName="text-inherit text-xs font-medium uppercase tracking-wide"
     />
   );
 
@@ -189,7 +189,7 @@ function BodyCell({
   routedId: string;
   planId: string;
 }) {
-  const tdBase = "border-t border-[var(--border)] px-3 py-2 text-sm text-[var(--text)]";
+  const tdBase = "border-t border-[var(--border)] px-2 py-1.5 text-sm text-[var(--text)]";
 
   switch (columnId) {
     case "savedPlan":
@@ -199,7 +199,10 @@ function BodyCell({
     case "shipmentId":
       return (
         <td
-          className={cn(tdBase, "max-w-[220px] truncate font-mono text-sm text-[var(--text)]")}
+          className={cn(
+            tdBase,
+            "max-w-[min(280px,36vw)] truncate font-sans text-[13px] font-medium tabular-nums tracking-[-0.02em] text-[var(--text)] antialiased",
+          )}
           title={row.shipmentId !== routedId ? `${routedId} (${row.shipmentId})` : routedId}
         >
           {routedId}
@@ -259,7 +262,7 @@ function BodyCell({
           {planId ? (
             <Link
               href={`/planner/saved/${encodeURIComponent(planId)}`}
-              className="inline-flex rounded-md border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-2 py-1 text-sm font-semibold text-[var(--primary)] hover:bg-[color-mix(in_oklch,var(--primary)_12%,var(--surface))]"
+              className="inline-flex rounded-md border border-[var(--border-strong)] bg-[var(--surface-elevated)] px-1.5 py-0.5 text-xs font-semibold text-[var(--primary)] hover:bg-[color-mix(in_oklch,var(--primary)_12%,var(--surface))]"
             >
               Open
             </Link>
@@ -367,7 +370,7 @@ export function ShipmentsSavedPlansTable({
     `${displayRows.length} row${displayRows.length === 1 ? "" : "s"} shown · one row per DC stop per shipment`;
 
   const thBase =
-    "border-b border-[var(--border)] bg-[var(--surface-elevated)] px-3 py-2 text-left text-xs font-medium uppercase tracking-wider text-[var(--muted-foreground)]";
+    "border-b border-[var(--border)] bg-[var(--surface-elevated)] px-2 py-1.5 text-left text-xs font-medium uppercase tracking-wide text-[var(--muted-foreground)]";
 
   const scrollClass =
     tableScrollMaxHeightClass ?? (isDashboard ? "max-h-[min(52vh,520px)]" : "max-h-[min(70vh,720px)]");
@@ -397,7 +400,7 @@ export function ShipmentsSavedPlansTable({
         />
       </div>
       <div className={cn("om-results-table-scroll overflow-auto", scrollClass)}>
-        <table className="min-w-full border-separate border-spacing-0 whitespace-nowrap text-sm leading-normal text-[var(--text)]">
+        <table className="min-w-full border-separate border-spacing-0 font-sans whitespace-nowrap text-sm leading-normal text-[var(--text)]">
           <thead className="sticky top-0 z-10 [&_th]:bg-[var(--surface-elevated)]">
             <tr>
               <th className={thBase}>No.</th>
@@ -422,9 +425,9 @@ export function ShipmentsSavedPlansTable({
               return (
                 <tr
                   key={`${row.shipmentId}-${row.dcName}-${index}`}
-                  className="group border-t border-[var(--border)] transition-colors hover:bg-[color-mix(in_oklch,var(--surface-elevated)_40%,transparent)]"
+                  className="group transition-colors hover:bg-[color-mix(in_oklch,var(--surface-elevated)_40%,transparent)]"
                 >
-                  <td className="border-t border-[var(--border)] px-3 py-2 text-sm tabular-nums text-[var(--muted-foreground)]">
+                  <td className="border-t border-[var(--border)] px-2 py-1.5 text-sm tabular-nums text-[var(--muted-foreground)]">
                     {index + 1}
                   </td>
                   {visibleColumns.map((col) => (
@@ -436,7 +439,7 @@ export function ShipmentsSavedPlansTable({
             {rows.length === 0 && (
               <tr>
                 <td
-                  className="border-t border-[var(--border)] px-3 py-8 text-center text-sm leading-relaxed text-[var(--muted-foreground)]"
+                  className="border-t border-[var(--border)] px-2 py-8 text-center text-sm leading-relaxed text-[var(--muted-foreground)]"
                   colSpan={1 + visibleColumns.length}
                 >
                   No saved shipments yet. Save a plan from the planner, or open{" "}

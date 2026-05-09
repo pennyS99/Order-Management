@@ -148,11 +148,11 @@ export default function HistoryPage() {
     <div className="pb-12">
       {showClearConfirm && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#0d0d0d]/80"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 backdrop-blur-[2px]"
           onClick={handleCancelClear}
         >
           <div
-            className="mx-4 w-full max-w-sm rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] p-5 shadow-lg"
+            className="mx-4 w-full max-w-sm rounded-lg border border-[var(--border)] bg-[var(--card)] p-5 shadow-lg"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
@@ -160,10 +160,10 @@ export default function HistoryPage() {
             aria-describedby="clear-history-description"
             ref={clearDialogRef}
           >
-            <h3 id="clear-history-title" className="font-display font-bold text-[#e0e0e0]">Clear all history?</h3>
-            <p id="clear-history-description" className="mt-2 text-sm text-[#888888]">
+            <h3 id="clear-history-title" className="font-display font-bold text-[var(--text)]">Clear all history?</h3>
+            <p id="clear-history-description" className="mt-2 text-sm text-[var(--muted-foreground)]">
               This will permanently delete all batch history. Type{" "}
-              <span className="font-mono font-semibold text-[#1D9E75]">{CONFIRM_TEXT}</span> to
+              <span className="font-mono font-semibold text-[var(--primary)]">{CONFIRM_TEXT}</span> to
               confirm.
             </p>
             <input
@@ -171,7 +171,7 @@ export default function HistoryPage() {
               value={clearConfirmInput}
               onChange={(e) => setClearConfirmInput(e.target.value)}
               placeholder={CONFIRM_TEXT}
-              className="mt-3 w-full rounded-lg border border-[#2a2a2a] bg-[#141414] px-3 py-2 text-sm text-[#e0e0e0] placeholder:text-[#5c5c5c] focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/45"
+              className="mt-3 w-full rounded-lg border border-[var(--border)] bg-[var(--input)] px-3 py-2 text-sm text-[var(--text)] placeholder:text-[var(--om-text-muted)] focus:outline-none focus:ring-2 focus:ring-[color-mix(in_oklch,var(--primary)_45%,transparent)]"
               autoFocus
               ref={clearInputRef}
               aria-label="Type DELETE to confirm clearing history"
@@ -192,12 +192,12 @@ export default function HistoryPage() {
           </div>
         </div>
       )}
-      <header className="sticky top-0 z-20 border-b border-[#2a2a2a] bg-[#0d0d0d]">
+      <header className="sticky top-0 z-20 border-b border-[var(--border)] bg-[var(--card)]">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between gap-4 mb-4">
             <Link
               href="/extract"
-              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[#888888] transition-colors duration-150 hover:text-[#1D9E75]"
+              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[var(--muted-foreground)] transition-colors duration-150 hover:text-[var(--primary)]"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to extraction
@@ -207,7 +207,7 @@ export default function HistoryPage() {
                 variant="ghost"
                 size="sm"
                 onClick={handleClearAll}
-                className="text-[#888888] hover:text-[#1D9E75]"
+                className="text-[var(--muted-foreground)] hover:text-[var(--primary)]"
                 ref={clearAllTriggerRef}
               >
                 Clear all
@@ -216,11 +216,11 @@ export default function HistoryPage() {
           </div>
           <div className="flex items-center gap-3 mb-2">
             <BrandMark size="sm" />
-            <h1 className="font-display text-xl font-black tracking-tight text-[#e0e0e0]">
+            <h1 className="font-display text-xl font-black tracking-tight text-[var(--text)]">
               Extraction history
             </h1>
           </div>
-          <p className="mt-1 text-sm text-[#888888]">
+          <p className="mt-1 text-sm text-[var(--muted-foreground)]">
             Review previous extraction batches and export them again when needed.
           </p>
         </div>
@@ -228,15 +228,15 @@ export default function HistoryPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         {exportError && (
-          <p role="alert" className="mb-3 rounded-lg border border-[#5a2020] bg-[#2a1212] px-3 py-2 text-sm text-[#ffb4b4]">
+          <p role="alert" className="mb-3 rounded-lg border border-[color-mix(in_oklch,var(--destructive)_35%,var(--border))] bg-[var(--om-status-red-bg)] px-3 py-2 text-sm text-[var(--destructive)]">
             {exportError}
           </p>
         )}
         {history.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-[#2a2a2a] bg-[#1a1a1a] py-16 text-center">
-            <History className="mx-auto mb-3 h-10 w-10 text-[#888888]" />
-            <p className="text-sm font-semibold text-[#e0e0e0]">No batch history yet</p>
-            <p className="mt-1 text-sm text-[#888888]">
+          <div className="rounded-lg border border-dashed border-[var(--border)] bg-[var(--card)] py-16 text-center">
+            <History className="mx-auto mb-3 h-10 w-10 text-[var(--muted-foreground)]" />
+            <p className="text-sm font-semibold text-[var(--text)]">No batch history yet</p>
+            <p className="mt-1 text-sm text-[var(--muted-foreground)]">
               Processed batches will appear here after extraction completes.
             </p>
             <Link href="/extract">
@@ -247,7 +247,7 @@ export default function HistoryPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            <p className="text-sm text-[#888888]">
+            <p className="text-sm text-[var(--muted-foreground)]">
               {history.length} batch{history.length !== 1 ? "es" : ""} in history
             </p>
 
@@ -255,13 +255,13 @@ export default function HistoryPage() {
               {history.map((entry) => (
                 <li
                   key={entry.id}
-                  className="flex cursor-default items-center justify-between gap-4 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] p-4 transition-[border-color,box-shadow] duration-150 hover:border-[#1D9E75]/35"
+                  className="flex cursor-default items-center justify-between gap-4 rounded-lg border border-[var(--border)] bg-[var(--card)] p-4 transition-[border-color,box-shadow] duration-150 hover:border-[color-mix(in_oklch,var(--primary)_35%,transparent)]"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-[#e0e0e0]">
+                    <p className="truncate text-sm font-semibold text-[var(--text)]">
                       {entry.batchName}
                     </p>
-                    <p className="mt-0.5 text-sm text-[#888888]">
+                    <p className="mt-0.5 text-sm text-[var(--muted-foreground)]">
                       {entry.fileCount} PO{entry.fileCount !== 1 ? "s" : ""} ·{" "}
                       {entry.itemCount} SKU{entry.itemCount !== 1 ? "s" : ""} ·{" "}
                       {formatDate(entry.completedAt)}
@@ -271,11 +271,11 @@ export default function HistoryPage() {
                         {getChannelsFromData(entry.data).map(({ name, count }) => (
                           <span
                             key={name}
-                            className="inline-flex items-center gap-1.5 rounded-full border border-[#2a2a2a] bg-[rgba(26,26,26,0.72)] px-2 py-0.5 text-xs font-semibold text-[#888888]"
+                            className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[color-mix(in_oklch,var(--surface-elevated)_88%,var(--card))] px-2 py-0.5 text-xs font-semibold text-[var(--muted-foreground)]"
                           >
-                            <span className="h-1 w-1 rounded-full bg-[#1D9E75]" aria-hidden />
+                            <span className="h-1 w-1 rounded-full bg-[var(--primary)]" aria-hidden />
                             {name}
-                            <span className="ml-0.5 text-[#5c5c5c]">({count})</span>
+                            <span className="ml-0.5 text-[var(--om-text-muted)]">({count})</span>
                           </span>
                         ))}
                       </div>
