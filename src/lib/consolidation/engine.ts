@@ -57,16 +57,76 @@ function pickFirst(row: Record<string, string | undefined>, keys: string[]): str
   return "";
 }
 
+function parseDateInput(rawValue: string | undefined): Date | null {
+  const raw = (rawValue ?? "").trim();
+  if (!raw) return null;
+  // Excel empty-date artifacts when using SheetJS `raw:false` or time-only cells
+  if (/^0-jan-0{2}$/i.test(raw)) return null;
+  if (/^\d{1,2}:\d{2}(?::\d{2})?$/.test(raw)) return null;
+  // dd-mmm-yy / dd-mmm-yyyy
+  const dMonY = /^(\d{1,2})-([a-z]{3})-(\d{2,4})$/i.exec(raw);
+  if (dMonY) {
+    const day = Number(dMonY[1]);
+    const mon = dMonY[2].toLowerCase();
+    const yRaw = Number(dMonY[3]);
+    const monthIndex = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(mon);
+    if (monthIndex < 0) return null;
+    const year = yRaw < 100 ? 2000 + yRaw : yRaw;
+    const normalized = new Date(year, monthIndex, day);
+    return Number.isNaN(normalized.getTime()) ? null : normalized;
+  }
+  // IMPORTANT: Avoid `new Date("YYYY-MM-DD")` timezone-dependent behavior.
+  // Normalize date-only strings to a local Date so formatting is stable across runtimes.
+  const isoDateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
+  if (isoDateOnly) {
+    const year = Number(isoDateOnly[1]);
+    const month = Number(isoDateOnly[2]);
+    const day = Number(isoDateOnly[3]);
+    const normalized = new Date(year, month - 1, day);
+    return Number.isNaN(normalized.getTime()) ? null : normalized;
+  }
+  const isoSlashDateOnly = /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/.exec(raw);
+  if (isoSlashDateOnly) {
+    const year = Number(isoSlashDateOnly[1]);
+    const month = Number(isoSlashDateOnly[2]);
+    const day = Number(isoSlashDateOnly[3]);
+    const normalized = new Date(year, month - 1, day);
+    return Number.isNaN(normalized.getTime()) ? null : normalized;
+  }
+  const direct = new Date(raw);
+  if (!Number.isNaN(direct.getTime())) return direct;
+  const match = /^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/.exec(raw);
+  if (!match) return null;
+  const a = Number(match[1]);
+  const b = Number(match[2]);
+  const yRaw = Number(match[3]);
+  const year = yRaw < 100 ? 2000 + yRaw : yRaw;
+  const month = a > 12 ? b : a;
+  const day = a > 12 ? a : b;
+  const normalized = new Date(year, month - 1, day);
+  return Number.isNaN(normalized.getTime()) ? null : normalized;
+}
+
+function normalizeDateString(rawValue: string | undefined): string | undefined {
+  const d = parseDateInput(rawValue);
+  if (!d) return undefined;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 function normalizeOrders(rows: RawOrderCsvRow[]): OrderLine[] {
   return rows.map((row) => {
     const desc = row.Desc?.trim();
-    const pld = row.PLD?.trim() || row["Plan Loading Date"]?.trim() || "";
-    const poExpiredDate =
+    const pldRaw = row.PLD?.trim() || row["Plan Loading Date"]?.trim() || "";
+    const pld = normalizeDateString(pldRaw) ?? pldRaw;
+    const poExpiredRaw =
       row["Expired PO"]?.trim() ||
       (row as unknown as Record<string, string | undefined>)["PO Expired Date"]?.trim() ||
       "";
+    const poExpiredDate = normalizeDateString(poExpiredRaw) ?? poExpiredRaw;
+    const orderDateRaw = row["Order Date"]?.trim() ?? "";
+    const orderDate = normalizeDateString(orderDateRaw) ?? orderDateRaw;
     return {
-      orderDate: row["Order Date"]?.trim() ?? "",
+      orderDate,
       ...(poExpiredDate ? { poExpiredDate } : {}),
       purchaseOrder: row["Purchase Order"]?.trim() ?? "",
       dcName: row["DC Name"]?.trim() ?? "",
@@ -442,41 +502,6 @@ function minutesToHHmm(minutes: number): string {
   const h = Math.floor(total / 60);
   const m = total % 60;
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-}
-
-function parseDateInput(value: string | undefined): Date | null {
-  const raw = (value ?? "").trim();
-  if (!raw) return null;
-  // IMPORTANT: Avoid `new Date("YYYY-MM-DD")` timezone-dependent behavior.
-  // Normalize date-only strings to a local Date so computations are stable across runtimes (Vercel/local).
-  const isoDateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
-  if (isoDateOnly) {
-    const year = Number(isoDateOnly[1]);
-    const month = Number(isoDateOnly[2]);
-    const day = Number(isoDateOnly[3]);
-    const normalized = new Date(year, month - 1, day);
-    return Number.isNaN(normalized.getTime()) ? null : normalized;
-  }
-  const isoSlashDateOnly = /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/.exec(raw);
-  if (isoSlashDateOnly) {
-    const year = Number(isoSlashDateOnly[1]);
-    const month = Number(isoSlashDateOnly[2]);
-    const day = Number(isoSlashDateOnly[3]);
-    const normalized = new Date(year, month - 1, day);
-    return Number.isNaN(normalized.getTime()) ? null : normalized;
-  }
-  const direct = new Date(raw);
-  if (!Number.isNaN(direct.getTime())) return direct;
-  const match = /^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/.exec(raw);
-  if (!match) return null;
-  const a = Number(match[1]);
-  const b = Number(match[2]);
-  const yRaw = Number(match[3]);
-  const year = yRaw < 100 ? 2000 + yRaw : yRaw;
-  const month = a > 12 ? b : a;
-  const day = a > 12 ? a : b;
-  const normalized = new Date(year, month - 1, day);
-  return Number.isNaN(normalized.getTime()) ? null : normalized;
 }
 
 function formatDateYYYYMMDD(date: Date): string {

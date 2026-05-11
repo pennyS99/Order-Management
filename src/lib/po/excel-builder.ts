@@ -42,10 +42,11 @@ function toExcelSerial(val: string | null): number | null {
     m = mi;
     y = 2000 + parseInt(year, 10);
   } else return null;
-  const date = new Date(y, m, d);
-  if (isNaN(date.getTime())) return null;
-  const epoch = new Date(1899, 11, 30);
-  return Math.floor((date.getTime() - epoch.getTime()) / 86400000);
+  // Use UTC math so timezone/DST can never shift the day (prevents D-1 issues).
+  const utcMs = Date.UTC(y, m, d);
+  if (!Number.isFinite(utcMs)) return null;
+  const epochUtcMs = Date.UTC(1899, 11, 30);
+  return Math.floor((utcMs - epochUtcMs) / 86400000);
 }
 
 export function buildExcelWorkbook(

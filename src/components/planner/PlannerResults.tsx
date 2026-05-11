@@ -113,6 +113,10 @@ function formatTripDurationMin(m: number | null | undefined): string {
 function parseDateForOutput(raw: string | undefined): Date | null {
   const value = (raw ?? "").trim();
   if (!value) return null;
+  // Excel/SheetJS artifacts for empty date cells.
+  if (/^0-jan-0{2}$/i.test(value)) return null;
+  // Time-only strings are not calendar dates.
+  if (/^\d{1,2}:\d{2}(?::\d{2})?$/.test(value)) return null;
   // IMPORTANT: Avoid `new Date("YYYY-MM-DD")` timezone-dependent behavior.
   // Normalize date-only strings to a local Date so formatting is stable across runtimes (Vercel/local).
   const isoDateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
@@ -121,6 +125,17 @@ function parseDateForOutput(raw: string | undefined): Date | null {
     const month = Number(isoDateOnly[2]);
     const day = Number(isoDateOnly[3]);
     const normalized = new Date(year, month - 1, day);
+    return Number.isNaN(normalized.getTime()) ? null : normalized;
+  }
+  const dMonYy = /^(\d{1,2})-([a-z]{3})-(\d{2,4})$/i.exec(value);
+  if (dMonYy) {
+    const day = Number(dMonYy[1]);
+    const mon = dMonYy[2].toLowerCase();
+    const yRaw = Number(dMonYy[3]);
+    const monthIndex = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"].indexOf(mon);
+    if (monthIndex < 0) return null;
+    const year = yRaw < 100 ? 2000 + yRaw : yRaw;
+    const normalized = new Date(year, monthIndex, day);
     return Number.isNaN(normalized.getTime()) ? null : normalized;
   }
   const isoSlashDateOnly = /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/.exec(value);
@@ -156,8 +171,12 @@ function formatDateDdMmmYy(raw: string | undefined): string {
 
 const EXPORT_DATE_NUM_FMT = "dd-mmm-yy";
 
-/** Excel 1900 date system: serial 1 = 1900-01-01 (UTC calendar); integer = no time-of-day. */
-const EXCEL_1900_DATE_SERIAL_ORIGIN_UTC_MS = Date.UTC(1899, 11, 31);
+/**
+ * Excel 1900 date system (with the 1900-leap-year bug):
+ * Day 0 is 1899-12-30, day 1 is 1899-12-31, day 2 is 1900-01-01, etc.
+ * We use the same origin Excel uses so exported dates never shift by -1 day.
+ */
+const EXCEL_1900_DATE_SERIAL_ORIGIN_UTC_MS = Date.UTC(1899, 11, 30);
 
 /** Local calendar date at 00:00 (strip time from parsed instants). */
 function startOfLocalCalendarDay(d: Date): Date {
@@ -878,7 +897,7 @@ function buildPlannerWarehouseSheetAoA(
       schedule?.pltClock ?? "—",
       toExcelDateCell(o.pld, ""),
       toExcelDateCell(o.rad, ""),
-      toExcelDateCell(o.orderDate, ""),
+      toExcelDateCell(o.poExpiredDate, ""),
     ];
   });
   return [headerRow, ...dataRows];

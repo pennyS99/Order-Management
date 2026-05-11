@@ -4,6 +4,7 @@ import L from "leaflet";
 import { useEffect, useMemo, useState } from "react";
 import { CircleMarker, MapContainer, Marker, Polyline, Popup, TileLayer, Tooltip, useMap } from "react-leaflet";
 import type { Shipment } from "@/types/planner";
+import { useTheme } from "@/components/theme/theme-context";
 
 import "leaflet/dist/leaflet.css";
 
@@ -242,6 +243,36 @@ function FocusDc({
   return null;
 }
 
+function SyncLeafletTheme({ theme }: { theme: "light" | "dark" }) {
+  const map = useMap();
+  useEffect(() => {
+    const el = map.getContainer?.();
+    if (!el) return;
+
+    const darkClass = "om-leaflet-theme-dark";
+    const lightClass = "om-leaflet-theme-light";
+    el.classList.toggle(darkClass, theme === "dark");
+    el.classList.toggle(lightClass, theme === "light");
+
+    // Force a fast repaint/redraw so CSS filter changes apply immediately.
+    try {
+      map.invalidateSize({ pan: false, debounceMoveend: true });
+    } catch {
+      /* ignore */
+    }
+    try {
+      map.eachLayer((layer) => {
+        const maybe = layer as unknown as { redraw?: () => void };
+        maybe.redraw?.();
+      });
+    } catch {
+      /* ignore */
+    }
+  }, [map, theme]);
+
+  return null;
+}
+
 export interface PlannerShipmentsOverviewMapProps {
   shipments: Shipment[];
   dcCoordMap: DcCoordMap;
@@ -263,6 +294,7 @@ export function PlannerShipmentsOverviewMap({
   selectedDcName,
   onDcMarkerClick,
 }: PlannerShipmentsOverviewMapProps) {
+  const { theme } = useTheme();
   const [fetchedRoutesById, setFetchedRoutesById] = useState<Record<string, FetchedRouteState>>({});
 
   const markers = useMemo(() => {
@@ -469,9 +501,10 @@ export function PlannerShipmentsOverviewMap({
         <MapContainer
           center={center}
           zoom={6}
-          className="om-leaflet-always-dark size-full"
+          className="size-full"
           scrollWheelZoom
         >
+          <SyncLeafletTheme theme={theme} />
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

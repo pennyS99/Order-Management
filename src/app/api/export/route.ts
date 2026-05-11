@@ -33,10 +33,10 @@ export async function POST(request: NextRequest) {
     const wb = buildExcelWorkbook(data, mergedHeaders, mergedOptions);
     const buffer = workbookToBuffer(wb);
 
-    const timestamp = new Date()
-      .toISOString()
-      .replace(/[-:]/g, "")
-      .slice(0, 15);
+    // Use local time (UI uses local time); avoid UTC "D-1" filenames near midnight.
+    const now = new Date();
+    const pad2 = (n: number) => String(n).padStart(2, "0");
+    const timestamp = `${now.getFullYear()}${pad2(now.getMonth() + 1)}${pad2(now.getDate())}_${pad2(now.getHours())}${pad2(now.getMinutes())}${pad2(now.getSeconds())}`;
     const filename = `PO_Extracted_${timestamp}.xlsx`;
 
     return new NextResponse(buffer as unknown as BodyInit, {

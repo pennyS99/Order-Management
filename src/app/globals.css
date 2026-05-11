@@ -743,13 +743,22 @@ pre {
   border: none !important;
 }
 
-/* Leaflet base-map “always dark” (free tiles) */
-.om-leaflet-always-dark .leaflet-container {
+/* Leaflet base-map theme switching (PlannerShipmentsOverviewMap) */
+.om-leaflet-theme-dark.leaflet-container {
   background: #0b1220;
 }
 
-.om-leaflet-always-dark .leaflet-tile-pane {
+.om-leaflet-theme-dark .leaflet-tile-pane {
+  /* Keep free OSM tiles, visually darken via invert trick. */
   filter: invert(1) hue-rotate(180deg) saturate(0.85) contrast(1.08) brightness(0.92);
+}
+
+.om-leaflet-theme-light.leaflet-container {
+  background: var(--surface);
+}
+
+.om-leaflet-theme-light .leaflet-tile-pane {
+  filter: none;
 }
 
 /* Leaflet “leg distance” labels: high contrast over dark map */
@@ -762,15 +771,15 @@ pre {
   display: inline-block;
   padding: 3px 8px;
   border-radius: 999px;
-  background: rgba(10, 15, 20, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: color-mix(in oklch, var(--background) 78%, transparent);
+  border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
   font: 700 11px/1 var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--text);
   white-space: nowrap;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.65);
+  text-shadow: 0 1px 1px color-mix(in oklch, var(--background) 65%, transparent);
   box-shadow:
-    0 6px 18px rgba(0, 0, 0, 0.35),
-    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+    0 6px 18px color-mix(in oklch, var(--background) 55%, transparent),
+    0 1px 0 color-mix(in oklch, var(--card) 50%, transparent) inset;
 }
 
 @theme inline {
