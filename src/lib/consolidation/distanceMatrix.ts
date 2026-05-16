@@ -8,7 +8,7 @@ export type DistanceMatrixPayload = {
 };
 
 export const MAX_DROPS_DEFAULT = 3;
-export const MICRO_CLUSTER_THRESHOLD_KM = 0.3;
+export const MICRO_CLUSTER_THRESHOLD_KM = 0;
 export const MAX_FIRST_TO_LAST_DROP_ROUTE_KM = 25;
 
 export function pairKey(from: string, to: string): string {

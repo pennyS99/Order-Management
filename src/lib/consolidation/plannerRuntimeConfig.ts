@@ -15,7 +15,7 @@ export type PlannerRuntimeConfig = {
 
 export const DEFAULT_PLANNER_RUNTIME_CONFIG: PlannerRuntimeConfig = {
   maxDropsDefault: 3,
-  microClusterThresholdKm: 0.3,
+  microClusterThresholdKm: 0,
   maxFirstToLastRouteKm: 25,
   arrivalBufferBeforeCloseMin: 60,
   globalLunchStartMin: 12 * 60,

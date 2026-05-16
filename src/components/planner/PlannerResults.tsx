@@ -2004,6 +2004,20 @@ export function PlannerResults() {
       .sort((a, b) => b.count - a.count || a.truckType.localeCompare(b.truckType, undefined, { sensitivity: "base" }));
   }, [shipmentsForSummary]);
 
+  const qtyByProvince = useMemo(() => {
+    const byProv = new Map<string, number>();
+    for (const shipment of shipmentsForSummary) {
+      for (const order of shipment.orders) {
+        const prov = String(order.province ?? "").trim() || "—";
+        const cases = Number.isFinite(order.cases) ? order.cases : 0;
+        byProv.set(prov, (byProv.get(prov) ?? 0) + cases);
+      }
+    }
+    return Array.from(byProv.entries())
+      .map(([province, qty]) => ({ province, qty }))
+      .sort((a, b) => b.qty - a.qty || a.province.localeCompare(b.province, undefined, { sensitivity: "base" }));
+  }, [shipmentsForSummary]);
+
   if (!consolidationResult) {
     return null;
   }
@@ -2499,10 +2513,10 @@ export function PlannerResults() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="om-kpi-card">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="om-kpi-card !justify-start">
           <span className="om-kpi-label">Truck types</span>
-          <span className="mt-0.5 text-xs text-[var(--om-text-muted)]">Stops by equipment</span>
+          <span className="mt-0.5 text-xs text-[var(--om-text-muted)]">Trucks by type</span>
 
           {truckTypeCounts.length === 0 ? (
             <div className="mt-3">
@@ -2515,7 +2529,7 @@ export function PlannerResults() {
                 return truckTypeCounts.map((row) => (
                   <li key={row.truckType} className="flex items-center gap-3">
                     <span
-                      className="min-w-[88px] truncate text-sm font-semibold text-[var(--om-text)]"
+                      className="min-w-[120px] truncate text-sm font-semibold text-[var(--om-text)]"
                       title={row.truckType}
                     >
                       {row.truckType}
@@ -2526,7 +2540,7 @@ export function PlannerResults() {
                         style={{ width: `${Math.round((row.count / max) * 100)}%` }}
                       />
                     </div>
-                    <span className="w-8 shrink-0 text-right text-sm font-semibold tabular-nums text-[var(--om-text-secondary)]">
+                    <span className="w-16 shrink-0 text-right text-sm font-semibold tabular-nums text-[var(--om-text-secondary)]">
                       {row.count}
                     </span>
                   </li>
@@ -2534,8 +2548,16 @@ export function PlannerResults() {
               })()}
             </ul>
           )}
+
+          <div className="mt-auto flex items-center gap-3 border-t border-[rgba(255,255,255,0.08)] pt-2">
+            <span className="min-w-[120px] text-xs font-medium text-[var(--om-text-muted)]">Total</span>
+            <div className="flex-1" />
+            <span className="w-16 shrink-0 text-right text-sm font-bold tabular-nums text-[var(--om-text)]">
+              {truckTypeCounts.reduce((sum, r) => sum + r.count, 0)}
+            </span>
+          </div>
         </div>
-        <div className="om-kpi-card">
+        <div className="om-kpi-card !justify-start">
           <span className="om-kpi-label">Qty</span>
           <span className="mt-0.5 text-xs text-[var(--om-text-muted)]">Cases by channel type</span>
 
@@ -2570,10 +2592,54 @@ export function PlannerResults() {
             </ul>
           )}
 
-          <div className="mt-4 flex items-baseline justify-between gap-3 border-t border-[rgba(255,255,255,0.06)] pt-3">
-            <span className="text-xs font-medium text-[var(--muted-foreground)]">Total</span>
-            <span className="text-sm font-bold tabular-nums text-[var(--text)]">
+          <div className="mt-auto flex items-center gap-3 border-t border-[rgba(255,255,255,0.08)] pt-2">
+            <span className="min-w-[120px] text-xs font-medium text-[var(--om-text-muted)]">Total</span>
+            <div className="flex-1" />
+            <span className="w-16 shrink-0 text-right text-sm font-bold tabular-nums text-[var(--om-text)]">
               {Math.round(totalCases).toLocaleString()}
+            </span>
+          </div>
+        </div>
+        <div className="om-kpi-card !justify-start">
+          <span className="om-kpi-label">Province</span>
+          <span className="mt-0.5 text-xs text-[var(--om-text-muted)]">Cases by province</span>
+
+          {qtyByProvince.length === 0 ? (
+            <div className="mt-3">
+              <span className="om-kpi-value">—</span>
+            </div>
+          ) : (
+            <ul className="mt-3 space-y-2">
+              {(() => {
+                const max = Math.max(1, ...qtyByProvince.map((r) => r.qty));
+                return qtyByProvince.map((row) => (
+                  <li key={row.province} className="flex items-center gap-3">
+                    <span
+                      className="min-w-[120px] truncate text-sm font-semibold text-[var(--om-text)]"
+                      title={row.province}
+                    >
+                      {row.province}
+                    </span>
+                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-[rgba(255,255,255,0.05)] ring-1 ring-[rgba(255,255,255,0.06)]">
+                      <div
+                        className="h-full rounded-full bg-[color-mix(in_oklch,var(--om-accent)_78%,var(--card))]"
+                        style={{ width: `${Math.round((row.qty / max) * 100)}%` }}
+                      />
+                    </div>
+                    <span className="w-16 shrink-0 text-right text-sm font-semibold tabular-nums text-[var(--om-text-secondary)]">
+                      {Math.round(row.qty).toLocaleString()}
+                    </span>
+                  </li>
+                ));
+              })()}
+            </ul>
+          )}
+
+          <div className="mt-auto flex items-center gap-3 border-t border-[rgba(255,255,255,0.08)] pt-2">
+            <span className="min-w-[120px] text-xs font-medium text-[var(--om-text-muted)]">Total</span>
+            <div className="flex-1" />
+            <span className="w-16 shrink-0 text-right text-sm font-bold tabular-nums text-[var(--om-text)]">
+              {Math.round(qtyByProvince.reduce((sum, r) => sum + r.qty, 0)).toLocaleString()}
             </span>
           </div>
         </div>

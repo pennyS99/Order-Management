@@ -18,6 +18,7 @@ import type {
 } from "@/types/planner";
 import {
   computeDropStops,
+  intraClusterMaxPairKm,
   microClusterComponentCount,
   microClusterRootByDc,
   minInterClusterKm,
@@ -35,6 +36,9 @@ import {
 import { dcPldKey } from "@/lib/planner/savedPlanOverlap";
 import type { PlannerRuntimeConfig } from "@/lib/consolidation/plannerRuntimeConfig";
 import { DEFAULT_PLANNER_RUNTIME_CONFIG } from "@/lib/consolidation/plannerRuntimeConfig";
+
+/** Drops within this distance are exempt from the above-CDD multidrop restriction. */
+const MICRO_CLUSTER_THRESHOLD_KM_FOR_CDD_EXCEPTION = 0.3;
 
 function toNumber(value: string): number {
   const parsed = Number(value);
@@ -457,7 +461,10 @@ function effectivePhysicalDropCount(
   return drops.size;
 }
 
-/** Multidrop (2+ effective physical stops) is not allowed on trucks above CDD capacity class. */
+/**
+ * Multidrop (2+ effective physical stops) is not allowed on trucks above CDD capacity class,
+ * UNLESS every pair of drops is within 0.3 km of each other (same-area exception).
+ */
 function multidropForbiddenForTruck(
   lines: EnrichedOrderLine[],
   truck: TruckType,
@@ -465,7 +472,16 @@ function multidropForbiddenForTruck(
   drivingDistanceKm: Map<string, number> | undefined,
   planner: PlannerRuntimeConfig,
 ): boolean {
-  return effectivePhysicalDropCount(lines, drivingDistanceKm, planner) > 1 && isTruckAboveCdd(trucks, truck);
+  if (effectivePhysicalDropCount(lines, drivingDistanceKm, planner) <= 1) return false;
+  if (!isTruckAboveCdd(trucks, truck)) return false;
+
+  const drops = new Set(lines.map((o) => o.dcName.trim()).filter(Boolean));
+  if (drivingDistanceKm && drivingDistanceKm.size > 0) {
+    const maxPairKm = intraClusterMaxPairKm(drops, drivingDistanceKm);
+    if (maxPairKm < MICRO_CLUSTER_THRESHOLD_KM_FOR_CDD_EXCEPTION) return false;
+  }
+
+  return true;
 }
 
 function mixedOrSingle(values: string[]): string {
@@ -1147,6 +1163,68 @@ export function runConsolidation(
     }
 
     if (bestI < 0) {
+      // Rebalance pass: try to rescue single-drop groups by splitting a nearby multidrop
+      // group. For each orphan (1 unique DC), find the closest multidrop group (2+ DCs) and
+      // check whether one of its DCs can be moved to the orphan's shipment, leaving the
+      // donor group still valid. This avoids stranding a drop alone when a balanced 2+2
+      // split would produce two viable shipments.
+      let rebalanced = false;
+      for (let oi = 0; oi < groups.length; oi++) {
+        const orphan = groups[oi]!;
+        const orphanDcs = new Set(orphan.map((o) => o.dcName));
+        if (orphanDcs.size !== 1) continue;
+
+        let bestDonorIdx = -1;
+        let bestDonorDc: string | null = null;
+        let bestSepKm = Number.POSITIVE_INFINITY;
+
+        for (let di = 0; di < groups.length; di++) {
+          if (di === oi) continue;
+          const donor = groups[di]!;
+          const donorDcs = new Set(donor.map((o) => o.dcName));
+          if (donorDcs.size < 3) continue;
+
+          for (const candidateDc of donorDcs) {
+            const sepKm = pairSeparationKm(
+              orphan,
+              donor.filter((o) => o.dcName === candidateDc),
+            );
+            if (sepKm >= bestSepKm) continue;
+
+            const movedLines = donor.filter((o) => o.dcName === candidateDc);
+            const remainingLines = donor.filter((o) => o.dcName !== candidateDc);
+            const newOrphanGroup = [...orphan, ...movedLines];
+
+            if (!fastMergePrecheck(newOrphanGroup)) continue;
+
+            const probeNew = recomputeShipmentFromOrders(
+              "__rebal_new__", newOrphanGroup, trucks, drivingDistanceKm, addressMap, drivingDurationMin, planner,
+            );
+            if (!probeNew.shipment) continue;
+
+            const probeRemain = recomputeShipmentFromOrders(
+              "__rebal_rem__", remainingLines, trucks, drivingDistanceKm, addressMap, drivingDurationMin, planner,
+            );
+            if (!probeRemain.shipment) continue;
+
+            bestDonorIdx = di;
+            bestDonorDc = candidateDc;
+            bestSepKm = sepKm;
+          }
+        }
+
+        if (bestDonorIdx >= 0 && bestDonorDc !== null) {
+          const donor = groups[bestDonorIdx]!;
+          const movedLines = donor.filter((o) => o.dcName === bestDonorDc);
+          const remainingLines = donor.filter((o) => o.dcName !== bestDonorDc);
+          groups[oi] = [...orphan, ...movedLines];
+          groups[bestDonorIdx] = remainingLines;
+          rebalanced = true;
+        }
+      }
+
+      if (rebalanced) continue;
+
       const snapshot = groups.slice();
       groups = [];
       for (const g of snapshot) {
